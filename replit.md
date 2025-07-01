@@ -1002,6 +1002,15 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Re-added zone selection field with intelligent pricing fallback system
   - Priority: Settings price per kg → Zone pricing → Error message for missing prices
   - Enhanced price breakdown display showing data source (من الإعدادات/من المنطقة)
+- **July 01, 2025: Integrated revenue system with real-time shipment tracking and Financial Center synchronization**
+  - Updated all revenue API endpoints to use `paid_amount` instead of `price` for accurate revenue calculation
+  - Modified air/land/document shipping revenue calculations to reflect actual payments received
+  - Enhanced shipment creation process to trigger automatic revenue updates in Financial Center
+  - Added real-time revenue synchronization between add shipment form and Financial Center
+  - Implemented auto-refresh system in Financial Center that updates every 10 seconds when on revenues tab
+  - Revenue calculations now properly filter general shipments by shipping_method ('جوي'/'بري') and separate documents
+  - Added session flags to track revenue updates and trigger real-time data refresh across system
+  - Enhanced Financial Center JavaScript with automatic revenue detection and display updates
   - Implemented real-time row removal with fade-out animation and automatic table refresh
   - Added loading states, error handling, and success/error notifications system
   - Created showNotification() function for user feedback with auto-dismiss alerts

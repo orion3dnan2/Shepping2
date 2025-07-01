@@ -988,5 +988,81 @@ function showNotification(message, type) {
         }
     }, 5000);
 }
+
+// Auto-refresh revenues when new shipment is added
+function checkForRevenueUpdates() {
+    // Check if a new shipment was added (indicated by session flag)
+    fetch('/api/get_all_revenues')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update air shipping revenue
+                document.getElementById('airRevenueAmount').textContent = 
+                    (data.air_revenue || 0).toFixed(3) + ' د.ك';
+                
+                // Update land shipping revenue
+                document.getElementById('landRevenueAmount').textContent = 
+                    (data.land_revenue || 0).toFixed(3) + ' د.ك';
+                
+                // Update document shipping revenue
+                document.getElementById('documentRevenueAmount').textContent = 
+                    (data.document_revenue || 0).toFixed(3) + ' د.ك';
+                
+                // Update total revenue
+                document.getElementById('totalRevenueAmount').textContent = 
+                    (data.total_revenue || 0).toFixed(3) + ' د.ك';
+                
+                console.log('Revenue data updated automatically');
+            }
+        })
+        .catch(error => console.error('Error auto-updating revenues:', error));
+}
+
+// Check for updates every 10 seconds when on revenues tab
+let revenueUpdateInterval;
+
+function startRevenueAutoUpdate() {
+    // Clear any existing interval
+    if (revenueUpdateInterval) {
+        clearInterval(revenueUpdateInterval);
+    }
+    
+    // Start new interval for auto-updates
+    revenueUpdateInterval = setInterval(checkForRevenueUpdates, 10000);
+    
+    // Also check immediately
+    checkForRevenueUpdates();
+}
+
+function stopRevenueAutoUpdate() {
+    if (revenueUpdateInterval) {
+        clearInterval(revenueUpdateInterval);
+        revenueUpdateInterval = null;
+    }
+}
+
+// Enhanced tab switching with auto-update
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to tabs
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="pill"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (e) {
+            const targetTab = e.target.getAttribute('data-bs-target');
+            
+            if (targetTab === '#revenues') {
+                loadRevenues();
+                startRevenueAutoUpdate();
+            } else {
+                stopRevenueAutoUpdate();
+            }
+        });
+    });
+    
+    // If revenues tab is initially active, start auto-update
+    const activeTab = document.querySelector('.nav-link.active[data-bs-target="#revenues"]');
+    if (activeTab) {
+        startRevenueAutoUpdate();
+    }
+});
 </script>
 {% endblock %}

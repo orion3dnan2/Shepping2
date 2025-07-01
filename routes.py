@@ -547,6 +547,11 @@ def add_shipment():
             
             flash(f'تم إنشاء الشحنة بنجاح! رقم التتبع: {tracking_number}', 'success')
             logging.info(f'New shipment created: {tracking_number}')
+            
+            # Trigger revenue update for Financial Center real-time sync
+            session['revenue_updated'] = True
+            session['last_shipment_added'] = tracking_number
+            
             return redirect(url_for('track_search'))
             
         except Exception as e:
@@ -2348,12 +2353,12 @@ def api_air_shipping_revenue():
     try:
         # Query air shipping revenue from all general shipments with shipping_method = 'جوي'
         air_shipments = Shipment.query.filter(
-            Shipment.package_type == 'general',
+            Shipment.package_type != 'document',
             Shipment.shipping_method == 'جوي'
         ).all()
         
-        # Calculate total using price field from all shipments
-        total_air_revenue = sum(float(shipment.price or 0) for shipment in air_shipments)
+        # Calculate total using paid_amount field (actual revenue received)
+        total_air_revenue = sum(float(shipment.paid_amount or 0) for shipment in air_shipments)
         
         return jsonify({
             'success': True,
@@ -2374,12 +2379,12 @@ def api_land_shipping_revenue():
     try:
         # Query land shipping revenue from all general shipments with shipping_method = 'بري'
         land_shipments = Shipment.query.filter(
-            Shipment.package_type == 'general',
+            Shipment.package_type != 'document',
             Shipment.shipping_method == 'بري'
         ).all()
         
-        # Calculate total using price field from all shipments
-        total_land_revenue = sum(float(shipment.price or 0) for shipment in land_shipments)
+        # Calculate total using paid_amount field (actual revenue received)
+        total_land_revenue = sum(float(shipment.paid_amount or 0) for shipment in land_shipments)
         
         return jsonify({
             'success': True,
@@ -2403,8 +2408,8 @@ def api_document_shipping_revenue():
             Shipment.package_type == 'document'
         ).all()
         
-        # Calculate total using price field from all document shipments
-        total_document_revenue = sum(float(shipment.price or 0) for shipment in document_shipments)
+        # Calculate total using paid_amount field (actual revenue received)
+        total_document_revenue = sum(float(shipment.paid_amount or 0) for shipment in document_shipments)
         
         return jsonify({
             'success': True,
@@ -2463,20 +2468,20 @@ def get_all_revenues():
             Shipment.shipping_method == 'جوي',
             Shipment.package_type != 'document'
         ).all()
-        air_revenue = sum(float(s.price or 0) for s in air_shipments)
+        air_revenue = sum(float(s.paid_amount or 0) for s in air_shipments)
         
         # Calculate land shipping revenue  
         land_shipments = Shipment.query.filter(
             Shipment.shipping_method == 'بري',
             Shipment.package_type != 'document'
         ).all()
-        land_revenue = sum(float(s.price or 0) for s in land_shipments)
+        land_revenue = sum(float(s.paid_amount or 0) for s in land_shipments)
         
         # Calculate document shipping revenue
         document_shipments = Shipment.query.filter(
             Shipment.package_type == 'document'
         ).all()
-        document_revenue = sum(float(s.price or 0) for s in document_shipments)
+        document_revenue = sum(float(s.paid_amount or 0) for s in document_shipments)
         
         total_revenue = air_revenue + land_revenue + document_revenue
         
