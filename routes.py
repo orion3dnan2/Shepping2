@@ -149,6 +149,8 @@ def permission_required(page):
         return decorated_function
     return decorator
 
+
+
 @app.route('/login', methods=['GET', 'POST'])
 @rate_limit(max_requests=5, window=300)  # 5 attempts per 5 minutes
 def login():
