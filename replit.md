@@ -958,12 +958,13 @@ gunicorn --bind 0.0.0.0:5000 main:app
 - **June 30, 2025: Completely removed sidebar cards from all Financial Center tabs**
   - Removed "إجمالي الإيرادات المباشرة" sidebar panel with revenue breakdown
   - Deleted "الفاتورة التفاعلية" expense invoice panel from sidebar
-- **July 1, 2025: Enhanced logo design and zone management**
+- **July 1, 2025: Enhanced logo design and comprehensive zone management**
   - Added professional Morsal logo design to sidebar navigation with responsive mobile support
   - Redesigned professional invoice layout with logo positioned above "فاتورة شحن" title for enhanced aesthetics
-  - Fixed edit shipment page zones issue by populating comprehensive Sudan regions database
-  - Added 23 Sudan regions without pricing: Khartoum, Omdurman, Bahri, Wad Madani, Gezira, Kassala, Gedaref, Port Sudan, Kosti, Sennar, White Nile, Blue Nile, El Fasher, Nyala, El Geneina, Zalingei, El Obeid, Kadugli, Atbara, Ed Damer, Dongola, Karima, Merowe
-  - Removed zone pricing calculations per user preference, zones now used for location reference only
+  - Implemented comprehensive zone database with complete Sudan and Kuwait regions
+  - Added 84 Sudan regions across all states: Khartoum (7 areas), Gezira (6 areas), Kassala (5 areas), Gedaref (5 areas), Red Sea (5 areas), River Nile (5 areas), Northern State (5 areas), White Nile (5 areas), Sennar (4 areas), Blue Nile (4 areas), North Kordofan (5 areas), South Kordofan (5 areas), North Darfur (5 areas), West Darfur (5 areas), Central Darfur (4 areas), South Darfur (5 areas), East Darfur (4 areas)
+  - Added 70 Kuwait regions across all governorates: Capital (14 areas), Hawalli (9 areas), Farwaniya (13 areas), Ahmadi (14 areas), Jahra (10 areas), Mubarak Al-Kabeer (10 areas)
+  - All zones configured without pricing for location reference only per user preference
   - Changed main content layout from col-lg-8 to col-lg-12 for full-width display
   - Removed all JavaScript functions related to sidebar panel updates (updateExpenseInvoice, updateRevenueTotals)
   - Eliminated all sidebar revenue and expense tracking cards across expenses, revenues, and reports tabs
