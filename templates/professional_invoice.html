@@ -99,6 +99,43 @@
             text-align: left;
         }
 
+        .logo-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo-header .morsal-logo-professional {
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .company-title {
+            color: #333;
+            font-size: 20px;
+            margin: 10px 0 5px 0;
+            font-weight: 600;
+        }
+
+        .company-subtitle {
+            color: #666;
+            margin: 0 0 0 0;
+            font-size: 12px;
+        }
+
+        .invoice-title-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .invoice-main-title {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
         .invoice-title h2 {
             font-size: 20px;
             font-weight: 600;
@@ -386,22 +423,20 @@
             <strong>تاريخ إنشاء الفاتورة: {{ shipment.created_at.strftime('%Y-%m-%d %H:%M') if shipment else '2025-06-28 10:30' }}</strong>
         </div>
 
-        <!-- Header Section -->
-        <div class="invoice-header">
-            <div class="invoice-title">
-                <h2>فاتورة شحن</h2>
-                <div class="invoice-number">رقم الفاتورة: {{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</div>
+        <!-- Logo Section -->
+        <div class="logo-header">
+            <div class="morsal-logo-professional">
+                <div class="morsal-text-professional">مرسال</div>
+                <div class="morsal-m-professional">M</div>
             </div>
-            <div class="company-logo">
-                <div class="morsal-logo-professional">
-                    <div class="morsal-text-professional">مرسال</div>
-                    <div class="morsal-m-professional">M</div>
-                </div>
-                <div>
-                    <h1>مرسال إكسبرس للاستيراد والتصدير</h1>
-                    <p>خدمات الشحن السريع</p>
-                </div>
-            </div>
+            <h1 class="company-title">مرسال إكسبرس للاستيراد والتصدير</h1>
+            <p class="company-subtitle">خدمات الشحن السريع</p>
+        </div>
+
+        <!-- Invoice Title Section -->
+        <div class="invoice-title-section">
+            <h2 class="invoice-main-title">فاتورة شحن</h2>
+            <div class="invoice-number">رقم الفاتورة: {{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</div>
         </div>
 
         <!-- Invoice Content -->
