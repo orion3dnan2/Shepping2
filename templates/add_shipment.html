@@ -355,26 +355,13 @@
                                 <label for="zone" class="form-label required-field">المنطقة</label>
                                 <select class="form-select" id="zone" name="zone" onchange="calculateZoneBasedPrice()">
                                     <option value="">اختر المنطقة</option>
-                                    <option value="khartoum" data-price="5.000" data-direction="kuwait_to_sudan">الخرطوم</option>
-                                    <option value="omdurman" data-price="5.000" data-direction="kuwait_to_sudan">أم درمان</option>
-                                    <option value="khartoum_north" data-price="5.000" data-direction="kuwait_to_sudan">الخرطوم بحري</option>
-                                    <option value="gezira" data-price="6.000" data-direction="kuwait_to_sudan">الجزيرة</option>
-                                    <option value="kassala" data-price="7.000" data-direction="kuwait_to_sudan">كسلا</option>
-                                    <option value="port_sudan" data-price="7.000" data-direction="kuwait_to_sudan">بورتسودان</option>
-                                    <option value="gedaref" data-price="7.000" data-direction="kuwait_to_sudan">القضارف</option>
-                                    <option value="sennar" data-price="6.500" data-direction="kuwait_to_sudan">سنار</option>
-                                    <option value="white_nile" data-price="6.500" data-direction="kuwait_to_sudan">النيل الأبيض</option>
-                                    <option value="blue_nile" data-price="7.500" data-direction="kuwait_to_sudan">النيل الأزرق</option>
-                                    <option value="north_kordofan" data-price="8.000" data-direction="kuwait_to_sudan">شمال كردفان</option>
-                                    <option value="south_kordofan" data-price="8.500" data-direction="kuwait_to_sudan">جنوب كردفان</option>
-                                    <option value="north_darfur" data-price="9.000" data-direction="kuwait_to_sudan">شمال دارفور</option>
-                                    <option value="south_darfur" data-price="9.000" data-direction="kuwait_to_sudan">جنوب دارفور</option>
-                                    <option value="west_darfur" data-price="9.500" data-direction="kuwait_to_sudan">غرب دارفور</option>
-                                    <option value="east_darfur" data-price="9.000" data-direction="kuwait_to_sudan">شرق دارفور</option>
-                                    <option value="central_darfur" data-price="9.000" data-direction="kuwait_to_sudan">وسط دارفور</option>
-                                    <option value="northern" data-price="8.000" data-direction="kuwait_to_sudan">الشمالية</option>
-                                    <option value="river_nile" data-price="7.000" data-direction="kuwait_to_sudan">نهر النيل</option>
-                                    <option value="red_sea" data-price="7.500" data-direction="kuwait_to_sudan">البحر الأحمر</option>
+                                    {% for zone in zone_pricings %}
+                                    <option value="{{ zone.zone_name_ar }}" 
+                                            data-price="{{ zone.price_per_kg }}" 
+                                            data-direction="{{ zone.direction }}">
+                                        {{ zone.zone_name_ar }}
+                                    </option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             
