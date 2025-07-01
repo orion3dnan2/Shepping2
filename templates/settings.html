@@ -1264,6 +1264,16 @@ function updatePricePerKgDisplay(value) {
             displayElement.style.transform = 'scale(1)';
         }, 200);
     }
+    
+    // Update price per kg in Add Shipment page if it's open
+    if (window.parent && window.parent.refreshPricePerKg) {
+        window.parent.refreshPricePerKg();
+    }
+    
+    // If Add Shipment page is in same window, update it directly
+    if (window.refreshPricePerKg) {
+        window.refreshPricePerKg();
+    }
 }
 
 // Update packaging price display in real-time

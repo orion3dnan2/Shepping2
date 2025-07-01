@@ -2111,6 +2111,25 @@ def update_air_shipping_costs():
         return jsonify({'success': False, 'message': 'حدث خطأ أثناء حفظ التكاليف'})
 
 
+@app.route('/api/price_per_kg')
+@login_required
+def get_price_per_kg():
+    """Get current price per kg setting"""
+    try:
+        # Get price per kg from session or GlobalSettings
+        price_per_kg = session.get('price_per_kg', 0.000)
+        if price_per_kg == 0.000:
+            price_per_kg = GlobalSettings.get_setting('price_per_kg', 0.000)
+        
+        return jsonify({
+            'success': True,
+            'price_per_kg': float(price_per_kg)
+        })
+    except Exception as e:
+        logging.error(f'Error getting price per kg: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل سعر الكيلو'})
+
+
 @app.route('/api/air_shipping_costs')
 @login_required
 @permission_required('expenses')

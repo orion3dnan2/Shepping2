@@ -988,6 +988,17 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Fixed duplicate function name conflict by removing redundant route definition
   - Connected existing delete_operational_cost route (/delete_operational_cost/<id>) to expense table delete buttons
   - Added comprehensive JavaScript deleteOperationalCost() function with confirmation dialog
+- **July 01, 2025: Implemented dynamic price per kg integration between Settings and Add Shipment pages**
+  - Added `/api/price_per_kg` endpoint to fetch current price setting from session/GlobalSettings
+  - Removed complex zone-based pricing system and simplified to weight × price per kg calculation
+  - Created global `globalPricePerKg` variable in Add Shipment page for real-time price storage
+  - Added `loadPricePerKg()` function that fetches price from API on page load
+  - Updated `calculateZoneBasedPrice()` function to use settings price instead of zone pricing
+  - Simplified packaging system to checkbox only, removed zone selection field completely
+  - Enhanced `updatePricePerKgDisplay()` in Settings to automatically update Add Shipment price calculations
+  - Added `refreshPricePerKg()` global function for cross-page price synchronization
+  - Real-time calculation: Total Price = (Weight × Price per KG) + Packaging + Policy + Comment costs
+  - Automatic price recalculation when price per kg is updated in Settings page
   - Implemented real-time row removal with fade-out animation and automatic table refresh
   - Added loading states, error handling, and success/error notifications system
   - Created showNotification() function for user feedback with auto-dismiss alerts
