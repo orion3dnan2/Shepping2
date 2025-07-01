@@ -304,143 +304,115 @@
     
     .company-header-section {
         display: flex;
-        align-items: center;
-        margin-bottom: 25px;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 30px;
         position: relative;
         z-index: 2;
-        flex-direction: row-reverse;
     }
     
-    .morsal-logo-small {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 15px;
-        padding: 12px 18px;
-        box-shadow: 
-            0 8px 25px rgba(0,0,0,0.15),
-            0 4px 10px rgba(220, 38, 38, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    .morsal-logo-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         text-align: center;
         position: relative;
-        min-width: 85px;
-        margin-right: 20px;
-        flex-shrink: 0;
-        border: 1px solid rgba(220, 38, 38, 0.1);
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-    }
-    
-    .morsal-logo-small:hover {
-        transform: translateY(-2px);
-        box-shadow: 
-            0 12px 35px rgba(0,0,0,0.2),
-            0 6px 15px rgba(220, 38, 38, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        min-width: 120px;
+        border: 3px solid rgba(255,255,255,0.2);
     }
     
     .morsal-text-arabic {
-        font-size: 20px;
-        font-weight: 900;
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        font-size: 24px;
+        font-weight: 800;
+        color: #dc2626;
         font-family: 'Tajawal', 'Cairo', sans-serif;
-        margin-bottom: 2px;
+        margin-bottom: 5px;
         letter-spacing: 0.5px;
-        filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
     }
     
     .morsal-text-english {
-        font-size: 11px;
-        font-weight: 700;
-        color: #dc2626;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
         font-family: 'Arial', sans-serif;
         margin-bottom: 0;
-        letter-spacing: 0.8px;
-        opacity: 0.8;
-        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     
-    .morsal-m-letter {
+    .morsal-m-circle {
         position: absolute;
-        top: -8px;
-        right: -8px;
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #b91c1c 100%);
+        top: -15px;
+        right: -15px;
+        background: #dc2626;
         color: white;
-        width: 28px;
-        height: 28px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
-        font-weight: 900;
+        font-size: 18px;
+        font-weight: 800;
         font-family: 'Arial', sans-serif;
-        box-shadow: 
-            0 6px 15px rgba(220, 38, 38, 0.4),
-            0 2px 5px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        border: 2px solid white;
-        animation: pulse 3s ease-in-out infinite;
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        border: 3px solid white;
     }
     
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-    
-    .company-info-main {
+    .company-info-section {
         flex: 1;
-        text-align: left;
+        text-align: center;
+        padding: 0 20px;
     }
     
-    .company-name {
-        font-size: 26px;
-        font-weight: 900;
-        margin: 0 0 15px 0;
-        background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 30%, #c7d2fe 70%, #a5b4fc 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
-        line-height: 1.2;
-        letter-spacing: 0.5px;
+    .company-title {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0 0 5px 0;
+        color: white;
         font-family: 'Tajawal', 'Cairo', sans-serif;
-        position: relative;
+        letter-spacing: 0.5px;
     }
     
-    .company-name::after {
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
-        transition: width 0.3s ease;
-    }
-    
-    .company-info-main:hover .company-name::after {
-        width: 100%;
+    .company-subtitle {
+        font-size: 18px;
+        margin: 0 0 15px 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        font-family: 'Tajawal', 'Cairo', sans-serif;
     }
     
     .company-tagline {
-        font-size: 15px;
-        opacity: 0.9;
-        font-style: italic;
+        font-size: 14px;
+        opacity: 0.8;
         display: flex;
         align-items: center;
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 500;
-        letter-spacing: 0.3px;
-        margin-top: 5px;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
     }
     
     .company-tagline i {
         margin-left: 8px;
-        font-size: 16px;
+        font-size: 14px;
         color: #fbbf24;
-        filter: drop-shadow(0 1px 3px rgba(251, 191, 36, 0.4));
+    }
+    
+    .truck-icon-container {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .truck-icon {
+        font-size: 35px;
+        color: white;
+        opacity: 0.9;
     }
     
     .service-highlights {
@@ -604,34 +576,46 @@
             min-height: 260px;
         }
         
-        .morsal-logo-small {
-            padding: 10px 14px;
-            min-width: 75px;
-            margin-right: 15px;
+        .morsal-logo-card {
+            min-width: 100px;
+            padding: 15px;
         }
         
         .morsal-text-arabic {
-            font-size: 18px;
+            font-size: 20px;
         }
         
         .morsal-text-english {
             font-size: 10px;
         }
         
-        .morsal-m-letter {
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
-            top: -6px;
-            right: -6px;
+        .morsal-m-circle {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            top: -12px;
+            right: -12px;
         }
         
-        .company-name {
-            font-size: 22px;
+        .company-title {
+            font-size: 26px;
+        }
+        
+        .company-subtitle {
+            font-size: 16px;
         }
         
         .company-tagline {
             font-size: 13px;
+        }
+        
+        .truck-icon-container {
+            width: 65px;
+            height: 65px;
+        }
+        
+        .truck-icon {
+            font-size: 28px;
         }
         
         .service-icon {
@@ -662,13 +646,16 @@
         }
         
         .company-header-section {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
             margin-bottom: 18px;
         }
         
-        .morsal-logo-small {
-            padding: 8px 12px;
-            min-width: 65px;
-            margin-right: 12px;
+        .morsal-logo-card {
+            min-width: 80px;
+            padding: 12px;
+            margin-bottom: 15px;
         }
         
         .morsal-text-arabic {
@@ -679,33 +666,51 @@
             font-size: 9px;
         }
         
-        .morsal-m-letter {
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
-            top: -5px;
-            right: -5px;
+        .morsal-m-circle {
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            top: -10px;
+            right: -10px;
         }
         
-        .company-name {
-            font-size: 18px;
+        .company-info-section {
+            padding: 0;
+            margin-bottom: 15px;
+        }
+        
+        .company-title {
+            font-size: 20px;
+        }
+        
+        .company-subtitle {
+            font-size: 14px;
         }
         
         .company-tagline {
-            font-size: 12px;
+            font-size: 11px;
+        }
+        
+        .truck-icon-container {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .truck-icon {
+            font-size: 22px;
         }
         
         .service-highlights {
-            padding: 18px 10px;
+            padding: 15px 8px;
         }
         
         .service-icon {
-            font-size: 22px;
-            margin-bottom: 8px;
+            font-size: 20px;
+            margin-bottom: 6px;
         }
         
         .service-item span {
-            font-size: 11px;
+            font-size: 10px;
         }
         
         .service-highlights {
@@ -925,17 +930,21 @@ function printShipmentTable(tableType) {
     <div class="col-lg-6 col-md-6 mb-3">
         <div class="company-branding-card">
             <div class="company-header-section">
-                <div class="morsal-logo-small">
+                <div class="morsal-logo-card">
                     <div class="morsal-text-arabic">مرسال</div>
-                    <div class="morsal-text-english">Morsal</div>
-                    <div class="morsal-m-letter">M</div>
+                    <div class="morsal-text-english">MORSAL</div>
+                    <div class="morsal-m-circle">M</div>
                 </div>
-                <div class="company-info-main">
-                    <h2 class="company-name">مرسال اكسبرس للاستيراد والتصدير</h2>
+                <div class="company-info-section">
+                    <h2 class="company-title">مرسال اكسبرس</h2>
+                    <p class="company-subtitle">للاستيراد والتصدير</p>
                     <div class="company-tagline">
-                        <i class="fas fa-globe-africa me-2"></i>
+                        <i class="fas fa-shield-alt"></i>
                         شريكك الموثوق في الشحن الدولي
                     </div>
+                </div>
+                <div class="truck-icon-container">
+                    <i class="fas fa-truck truck-icon"></i>
                 </div>
             </div>
             <div class="service-highlights">
