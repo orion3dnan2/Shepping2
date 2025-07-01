@@ -299,6 +299,11 @@
             border-bottom: 1px solid #ccc;
             height: 35px;
             margin-bottom: 5px;
+            padding-top: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
         }
 
         /* Print Styles */
@@ -524,7 +529,7 @@
         <div class="signature-section">
             <div class="signature-box">
                 <div class="signature-label">توقيع الموظف</div>
-                <div class="signature-line"></div>
+                <div class="signature-line">{{ current_user.username }}</div>
             </div>
         </div>
     </div>
