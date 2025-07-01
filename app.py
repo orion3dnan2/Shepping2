@@ -5,13 +5,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-# Configure logging (production-safe)
-log_level = logging.INFO if os.environ.get('ENVIRONMENT') == 'production' else logging.DEBUG
-logging.basicConfig(level=log_level)
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 class Base(DeclarativeBase):
     pass
@@ -20,25 +18,7 @@ db = SQLAlchemy(model_class=Base)
 
 # create the app
 app = Flask(__name__)
-
-# Security configurations
-session_secret = os.environ.get("SESSION_SECRET")
-if not session_secret:
-    if os.environ.get('ENVIRONMENT') == 'production':
-        raise ValueError("SESSION_SECRET environment variable must be set for production security")
-    else:
-        # Development fallback - not secure for production
-        import secrets
-        session_secret = secrets.token_hex(32)
-        logging.warning("Using auto-generated session secret for development. Set SESSION_SECRET environment variable for production.")
-
-app.secret_key = session_secret
-app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # CSRF token expires in 1 hour
-app.config['WTF_CSRF_SECRET_KEY'] = session_secret
-
-# Initialize CSRF Protection
-csrf = CSRFProtect(app)
-
+app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-here")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for to generate with https
 
 # configure the database - PostgreSQL configuration
@@ -88,28 +68,6 @@ with app.app_context():
         admin.is_super_admin = True
         db.session.commit()
         logging.info('Updated existing admin to super admin')
-
-# Error handlers for production security
-@app.errorhandler(404)
-def page_not_found(e):
-    from flask import render_template
-    return render_template('errors/404.html'), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    from flask import render_template
-    if os.environ.get('ENVIRONMENT') == 'production':
-        # Hide error details in production
-        return render_template('errors/500.html'), 500
-    else:
-        # Show error details in development
-        import traceback
-        return f"<h1>Internal Server Error</h1><pre>{traceback.format_exc()}</pre>", 500
-
-@app.errorhandler(403)
-def forbidden(e):
-    from flask import render_template
-    return render_template('errors/403.html'), 403
 
 # Import routes after app initialization
 import routes  # noqa: F401

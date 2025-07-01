@@ -411,7 +411,6 @@
 
                 <!-- Login Form -->
                 <form method="POST" id="loginForm">
-                    {{ form.hidden_tag() }}
                     <div class="form-group">
                         <label for="username" class="form-label">
                             <i class="fas fa-user"></i>
@@ -419,14 +418,8 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fas fa-user input-icon"></i>
-                            {{ form.username(class="form-control", id="username", placeholder="أدخل اسم المستخدم", autocomplete="username") }}
-                            {% if form.username.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.username.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   placeholder="أدخل اسم المستخدم" required autocomplete="username">
                         </div>
                     </div>
                     
@@ -437,14 +430,8 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
-                            {{ form.password(class="form-control", id="password", placeholder="أدخل كلمة المرور", autocomplete="current-password") }}
-                            {% if form.password.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.password.errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="أدخل كلمة المرور" required autocomplete="current-password">
                         </div>
                     </div>
                     
