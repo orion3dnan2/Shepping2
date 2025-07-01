@@ -930,33 +930,7 @@ function deleteUser(userId, username) {
     }
 }
 
-function editUser(userId, username, permissions, isSuperAdmin) {
-    // Fill edit form
-    document.getElementById('editUserId').value = userId;
-    document.getElementById('editUsername').value = username;
-    document.getElementById('editPassword').value = '';
-    document.getElementById('editConfirmPassword').value = '';
-    
-    // Set super admin checkbox
-    const superAdminCheckbox = document.getElementById('editIsSuperAdmin');
-    if (superAdminCheckbox) {
-        superAdminCheckbox.checked = isSuperAdmin;
-    }
-    
-    // Set permissions checkboxes
-    const permissionCheckboxes = document.querySelectorAll('#editUserModal input[name="permissions"]');
-    permissionCheckboxes.forEach(checkbox => {
-        const permissionKey = checkbox.value.toLowerCase();
-        checkbox.checked = permissions[permissionKey] || false;
-    });
-    
-    // Update form action
-    document.getElementById('editUserForm').action = `/edit_user/${userId}`;
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-    modal.show();
-}
+
 
 function showNotification(type, message) {
     // Create notification element
@@ -1230,17 +1204,29 @@ function editDocumentType(id, nameAr, nameEn, price, isActive) {
 }
 
 function editUser(id, username, permissions, isSuperAdmin) {
+    // Fill edit form
     document.getElementById('editUserId').value = id;
     document.getElementById('editUsername').value = username;
-    document.getElementById('editIsSuperAdmin').checked = isSuperAdmin;
+    document.getElementById('editPassword').value = '';
+    document.getElementById('editConfirmPassword').value = '';
     
-    // Set permissions checkboxes
+    // Set super admin checkbox
+    const superAdminCheckbox = document.getElementById('editIsSuperAdmin');
+    if (superAdminCheckbox) {
+        superAdminCheckbox.checked = isSuperAdmin;
+    }
+    
+    // Set permissions checkboxes - direct mapping
     const permissionCheckboxes = document.querySelectorAll('#editUserModal input[name="permissions"]');
     permissionCheckboxes.forEach(checkbox => {
-        const permissionKey = checkbox.value.toLowerCase();
+        const permissionKey = checkbox.value; // home, shipments, etc. (already lowercase in HTML)
         checkbox.checked = permissions[permissionKey] || false;
     });
     
+    // Update form action
+    document.getElementById('editUserForm').action = `/edit_user/${id}`;
+    
+    // Show modal
     const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
     modal.show();
 }
