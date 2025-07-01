@@ -958,6 +958,12 @@ gunicorn --bind 0.0.0.0:5000 main:app
 - **June 30, 2025: Completely removed sidebar cards from all Financial Center tabs**
   - Removed "إجمالي الإيرادات المباشرة" sidebar panel with revenue breakdown
   - Deleted "الفاتورة التفاعلية" expense invoice panel from sidebar
+- **July 1, 2025: Enhanced logo design and zone management**
+  - Added professional Morsal logo design to sidebar navigation with responsive mobile support
+  - Redesigned professional invoice layout with logo positioned above "فاتورة شحن" title for enhanced aesthetics
+  - Fixed edit shipment page zones issue by populating comprehensive Sudan regions database
+  - Added 23 Sudan regions without pricing: Khartoum, Omdurman, Bahri, Wad Madani, Gezira, Kassala, Gedaref, Port Sudan, Kosti, Sennar, White Nile, Blue Nile, El Fasher, Nyala, El Geneina, Zalingei, El Obeid, Kadugli, Atbara, Ed Damer, Dongola, Karima, Merowe
+  - Removed zone pricing calculations per user preference, zones now used for location reference only
   - Changed main content layout from col-lg-8 to col-lg-12 for full-width display
   - Removed all JavaScript functions related to sidebar panel updates (updateExpenseInvoice, updateRevenueTotals)
   - Eliminated all sidebar revenue and expense tracking cards across expenses, revenues, and reports tabs
