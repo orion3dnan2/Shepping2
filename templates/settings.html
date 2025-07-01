@@ -206,10 +206,19 @@
                                     <div class="col-md-4">
                                         <div class="input-group">
                                             <input type="number" step="0.001" class="form-control price-per-kg-input-compact" name="price_per_kg" 
-                                                   value="{{ price_per_kg or '0.000' }}" min="0" required placeholder="أدخل السعر">
+                                                   id="pricePerKgInput" value="{{ price_per_kg or '0.000' }}" min="0" required placeholder="أدخل السعر"
+                                                   oninput="updatePricePerKgDisplay(this.value)">
                                             <span class="input-group-text">د.ك</span>
                                         </div>
                                         <div class="form-text text-muted">سيتم استخدام هذا السعر لحساب التكلفة الإجمالية للشحنات</div>
+                                        <!-- Live Price Display -->
+                                        <div class="mt-3 p-3 rounded" style="background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%); border: 1px solid #c3e6cb;">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <span class="text-success fw-bold">السعر الحالي:</span>
+                                                <span class="text-success fw-bold fs-5" id="currentPriceDisplay">{{ "%.3f"|format(price_per_kg|float if price_per_kg else 0) }} د.ك</span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">يتم التحديث فورياً مع تغيير القيمة</small>
+                                        </div>
                                     </div>
                                     <div class="col-md-3">
                                         <button type="submit" class="btn btn-primary btn-save-kg-price">
@@ -234,10 +243,19 @@
                                     <div class="col-md-4">
                                         <div class="input-group">
                                             <input type="number" step="0.001" class="form-control price-per-kg-input-compact" name="packaging_price" 
-                                                   value="{{ packaging_price or '0.000' }}" min="0" required placeholder="أدخل السعر">
+                                                   id="packagingPriceInput" value="{{ packaging_price or '0.000' }}" min="0" required placeholder="أدخل السعر"
+                                                   oninput="updatePackagingPriceDisplay(this.value)">
                                             <span class="input-group-text">د.ك</span>
                                         </div>
                                         <div class="form-text text-muted">سيتم إضافة هذا السعر عند اختيار التغليف</div>
+                                        <!-- Live Packaging Price Display -->
+                                        <div class="mt-3 p-3 rounded" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 1px solid #ffc107;">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <span class="text-warning fw-bold">سعر التغليف الحالي:</span>
+                                                <span class="text-warning fw-bold fs-5" id="currentPackagingPriceDisplay">{{ "%.3f"|format(packaging_price|float if packaging_price else 0) }} د.ك</span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">يتم التحديث فورياً مع تغيير القيمة</small>
+                                        </div>
                                     </div>
                                     <div class="col-md-3">
                                         <button type="submit" class="btn btn-primary btn-save-kg-price">
@@ -1231,6 +1249,40 @@ function editUser(id, username, permissions, isSuperAdmin) {
     modal.show();
 }
 
+// Update price per kg display in real-time
+function updatePricePerKgDisplay(value) {
+    const displayElement = document.getElementById('currentPriceDisplay');
+    if (displayElement) {
+        // Format to 3 decimal places
+        const formattedPrice = parseFloat(value || 0).toFixed(3);
+        displayElement.textContent = `${formattedPrice} د.ك`;
+        
+        // Add animation effect
+        displayElement.style.transform = 'scale(1.05)';
+        displayElement.style.transition = 'all 0.2s ease';
+        setTimeout(() => {
+            displayElement.style.transform = 'scale(1)';
+        }, 200);
+    }
+}
+
+// Update packaging price display in real-time
+function updatePackagingPriceDisplay(value) {
+    const displayElement = document.getElementById('currentPackagingPriceDisplay');
+    if (displayElement) {
+        // Format to 3 decimal places
+        const formattedPrice = parseFloat(value || 0).toFixed(3);
+        displayElement.textContent = `${formattedPrice} د.ك`;
+        
+        // Add animation effect
+        displayElement.style.transform = 'scale(1.05)';
+        displayElement.style.transition = 'all 0.2s ease';
+        setTimeout(() => {
+            displayElement.style.transform = 'scale(1)';
+        }, 200);
+    }
+}
+
 // Initialize Bootstrap tabs
 document.addEventListener('DOMContentLoaded', function() {
     const triggerTabList = [].slice.call(document.querySelectorAll('#settingsTab button'));
@@ -1242,6 +1294,17 @@ document.addEventListener('DOMContentLoaded', function() {
             tabTrigger.show();
         });
     });
+    
+    // Initialize price displays
+    const priceInput = document.getElementById('pricePerKgInput');
+    if (priceInput) {
+        updatePricePerKgDisplay(priceInput.value);
+    }
+    
+    const packagingInput = document.getElementById('packagingPriceInput');
+    if (packagingInput) {
+        updatePackagingPriceDisplay(packagingInput.value);
+    }
 });
 </script>
 {% endblock %}
