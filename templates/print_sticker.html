@@ -29,6 +29,49 @@
             text-align: center;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        
+        .company-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 8px;
+        }
+        
+        .morsal-logo-sticker {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .morsal-text-sticker {
+            font-size: 14px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .morsal-m-sticker {
+            background: #dc2626;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .company-name-sticker {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
 
         .tracking-number {
             font-size: 24px;
@@ -161,9 +204,13 @@
     </div>
 
     <div class="sticker-container">
-        <!-- Company Name -->
-        <div style="font-size: 16px; font-weight: 600; color: #000; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 8px;">
-            مرسال إكسبرس للاستيراد والتصدير
+        <!-- Company Header -->
+        <div class="company-header">
+            <div class="morsal-logo-sticker">
+                <div class="morsal-text-sticker">مرسال</div>
+                <div class="morsal-m-sticker">M</div>
+            </div>
+            <div class="company-name-sticker">مرسال إكسبرس للاستيراد والتصدير</div>
         </div>
         
         <!-- Tracking Number -->

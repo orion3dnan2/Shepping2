@@ -36,10 +36,40 @@
         }
         
         .invoice-header {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 0.4cm;
             border-bottom: 2px solid #000;
             padding-bottom: 0.3cm;
+            gap: 15px;
+        }
+        
+        .morsal-logo-invoice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .morsal-text-invoice {
+            font-size: 16px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .morsal-m-invoice {
+            background: #dc2626;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            font-family: 'Arial', sans-serif;
         }
         
         .company-name {
@@ -311,6 +341,10 @@
     <div class="invoice-container">
         <!-- Header -->
         <div class="invoice-header">
+            <div class="morsal-logo-invoice">
+                <div class="morsal-text-invoice">مرسال</div>
+                <div class="morsal-m-invoice">M</div>
+            </div>
             <div class="company-name">مرسال إكسبرس للاستيراد والتصدير</div>
         </div>
 

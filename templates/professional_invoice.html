@@ -51,10 +51,40 @@
 
         .company-logo {
             text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .morsal-logo-professional {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .morsal-text-professional {
+            font-size: 18px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .morsal-m-professional {
+            background: #dc2626;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            font-family: 'Arial', sans-serif;
         }
 
         .company-logo h1 {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #000;
             margin-bottom: 5px;
@@ -363,8 +393,14 @@
                 <div class="invoice-number">رقم الفاتورة: {{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</div>
             </div>
             <div class="company-logo">
-                <h1>مرسال إكسبرس للاستيراد والتصدير</h1>
-                <p>خدمات الشحن السريع</p>
+                <div class="morsal-logo-professional">
+                    <div class="morsal-text-professional">مرسال</div>
+                    <div class="morsal-m-professional">M</div>
+                </div>
+                <div>
+                    <h1>مرسال إكسبرس للاستيراد والتصدير</h1>
+                    <p>خدمات الشحن السريع</p>
+                </div>
             </div>
         </div>
 
