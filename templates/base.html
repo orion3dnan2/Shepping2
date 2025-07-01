@@ -37,15 +37,61 @@
         }
         
         .sidebar-logo {
-            width: 120px;
-            height: 60px;
+            width: 100px;
+            height: 70px;
             background: white;
-            border-radius: 0.5rem;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            padding: 0.5rem;
+            margin: 0 auto 1.5rem;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .morsal-logo-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+        }
+        
+        .morsal-text-sidebar {
+            font-size: 14px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Tajawal', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        
+        .morsal-english-sidebar {
+            font-size: 8px;
+            font-weight: 600;
+            color: #666;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        
+        .morsal-m-sidebar {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc2626;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Arial', sans-serif;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
         }
         
         .sidebar-logo img {
@@ -553,6 +599,28 @@
                 padding: 80px 15px 15px 15px;
             }
             
+            .sidebar-logo {
+                width: 80px;
+                height: 60px;
+                padding: 12px;
+            }
+            
+            .morsal-text-sidebar {
+                font-size: 12px;
+            }
+            
+            .morsal-english-sidebar {
+                font-size: 7px;
+            }
+            
+            .morsal-m-sidebar {
+                width: 16px;
+                height: 16px;
+                font-size: 9px;
+                top: -6px;
+                right: -6px;
+            }
+            
             .main-header {
                 padding: 1rem;
                 margin-bottom: 1rem;
@@ -683,7 +751,11 @@
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <img src="{{ url_for('static', filename='images/morsal-logo.png') }}" alt="Morsal Logo">
+                <div class="morsal-logo-sidebar">
+                    <div class="morsal-text-sidebar">مرسال</div>
+                    <div class="morsal-english-sidebar">MORSAL</div>
+                    <div class="morsal-m-sidebar">M</div>
+                </div>
             </div>
             <h3>مرسال إكسبرس للاستيراد والتصدير</h3>
             <div class="subtitle">نظام إدارة الشحن المتقدم</div>
