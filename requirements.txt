@@ -89,3 +89,11 @@ psycopg2-binary
 Flask-SQLAlchemy
 Flask-Login
 Flask-Migrate
+flask-dance
+flask-login
+oauthlib
+pyjwt
+sqlalchemy
+bcrypt
+flask-wtf
+wtforms

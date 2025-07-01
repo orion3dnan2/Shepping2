@@ -1,14 +1,88 @@
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from flask import render_template, request, redirect, url_for, flash, session, jsonify, abort
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash
+from flask_wtf.csrf import validate_csrf
+from werkzeug.exceptions import BadRequest
 from app import app, db
 from models import Admin, Shipment, ShipmentType, DocumentType, Notification, ZonePricing, PackagingType, GlobalSettings, FinancialTransaction, OperationalCost, ExpenseGeneral, ExpenseDocuments
+from forms import LoginForm, AddShipmentForm, CreateUserForm, PaymentForm, ExpenseForm, RevenueForm, sanitize_input, validate_file_upload
 import logging
 from datetime import datetime
 from sqlalchemy import func, extract
 from translations import get_text
 import json
 from functools import wraps
+import re
+import html
+
+# Security helper functions
+def escape_html_output(text):
+    """Escape HTML in output to prevent XSS"""
+    if not text:
+        return text
+    return html.escape(str(text))
+
+def validate_integer_input(value, min_val=None, max_val=None):
+    """Validate integer input safely"""
+    try:
+        int_val = int(value)
+        if min_val is not None and int_val < min_val:
+            return None
+        if max_val is not None and int_val > max_val:
+            return None
+        return int_val
+    except (ValueError, TypeError):
+        return None
+
+def validate_float_input(value, min_val=None, max_val=None):
+    """Validate float input safely"""
+    try:
+        float_val = float(value)
+        if min_val is not None and float_val < min_val:
+            return None
+        if max_val is not None and float_val > max_val:
+            return None
+        return float_val
+    except (ValueError, TypeError):
+        return None
+
+def validate_permission(permission_name):
+    """Validate user has specific permission"""
+    if not current_user.is_authenticated:
+        return False
+    return current_user.has_permission(permission_name)
+
+# Rate limiting decorator
+request_counts = {}
+def rate_limit(max_requests=5, window=60):
+    """Simple rate limiting decorator"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+            current_time = datetime.now().timestamp()
+            
+            if client_ip not in request_counts:
+                request_counts[client_ip] = []
+            
+            # Clean old requests
+            request_counts[client_ip] = [
+                req_time for req_time in request_counts[client_ip] 
+                if current_time - req_time < window
+            ]
+            
+            if len(request_counts[client_ip]) >= max_requests:
+                abort(429)  # Too Many Requests
+            
+            request_counts[client_ip].append(current_time)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+# CSRF error handler
+@app.errorhandler(400)
+def handle_csrf_error(e):
+    flash('انتهت صلاحية النموذج. يرجى المحاولة مرة أخرى.', 'error')
+    return redirect(url_for('login'))
 
 # Helper function to get document type Arabic name
 def get_document_type_arabic(document_type_en):
@@ -76,29 +150,55 @@ def permission_required(page):
     return decorator
 
 @app.route('/login', methods=['GET', 'POST'])
+@rate_limit(max_requests=5, window=300)  # 5 attempts per 5 minutes
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        # Sanitize inputs
+        username = sanitize_input(form.username.data).strip()
+        password = form.password.data.strip()
         
+        # Additional validation
         if not username or not password:
             flash('يرجى إدخال اسم المستخدم وكلمة المرور', 'error')
-            return render_template('login.html')
+            return render_template('login.html', form=form)
         
-        admin = Admin.query.filter_by(username=username).first()
+        # Log login attempt
+        logging.info(f"Login attempt for username: {username} from IP: {request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)}")
         
-        if admin and admin.check_password(password):
-            login_user(admin)
-            next_page = request.args.get('next')
-            flash(f'مرحباً {username}! تم تسجيل الدخول بنجاح', 'success')
-            return redirect(next_page) if next_page else redirect(url_for('index'))
-        else:
-            flash('اسم المستخدم أو كلمة المرور غير صحيحة', 'error')
+        try:
+            admin = Admin.query.filter_by(username=username).first()
+            
+            if admin and admin.check_password(password):
+                login_user(admin)
+                next_page = request.args.get('next')
+                
+                # Log successful login
+                logging.info(f"Successful login for user: {username}")
+                
+                # Escape username for display
+                safe_username = escape_html_output(username)
+                flash(f'مرحباً {safe_username}! تم تسجيل الدخول بنجاح', 'success')
+                
+                # Validate next_page to prevent open redirect
+                if next_page and next_page.startswith('/'):
+                    return redirect(next_page)
+                else:
+                    return redirect(url_for('index'))
+            else:
+                # Log failed login attempt
+                logging.warning(f"Failed login attempt for username: {username} from IP: {request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)}")
+                flash('اسم المستخدم أو كلمة المرور غير صحيحة', 'error')
+        
+        except Exception as e:
+            logging.error(f"Login error: {e}")
+            flash('حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.', 'error')
     
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @app.route('/logout')
 @login_required

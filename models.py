@@ -1,7 +1,7 @@
 from app import db
 from datetime import datetime
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt
 from sqlalchemy.dialects.postgresql import JSONB
 import os
 import json
@@ -15,10 +15,17 @@ class Admin(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        """Hash password using bcrypt for enhanced security"""
+        if len(password) < 8:
+            raise ValueError("كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل")
+        salt = bcrypt.gensalt()
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        """Verify password using bcrypt"""
+        if not self.password_hash:
+            return False
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
     
     def set_permissions(self, permissions_dict):
         """Set user permissions as JSONB (PostgreSQL optimized)"""
