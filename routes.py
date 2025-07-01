@@ -4,7 +4,7 @@ from flask_wtf.csrf import validate_csrf
 from werkzeug.exceptions import BadRequest
 from app import app, db
 from models import Admin, Shipment, ShipmentType, DocumentType, Notification, ZonePricing, PackagingType, GlobalSettings, FinancialTransaction, OperationalCost, ExpenseGeneral, ExpenseDocuments
-from forms import LoginForm, AddShipmentForm, CreateUserForm, PaymentForm, ExpenseForm, RevenueForm, ChangePasswordForm, sanitize_input, validate_file_upload
+from forms import LoginForm, AddShipmentForm, CreateUserForm, PaymentForm, ExpenseForm, RevenueForm, sanitize_input, validate_file_upload
 import logging
 from datetime import datetime
 from sqlalchemy import func, extract
@@ -149,15 +149,6 @@ def permission_required(page):
         return decorated_function
     return decorator
 
-@app.before_request
-def check_password_change_required():
-    """Check if user needs to change password before accessing protected pages"""
-    if (current_user.is_authenticated and 
-        hasattr(current_user, 'force_password_change') and 
-        current_user.force_password_change and 
-        request.endpoint not in ['change_password', 'logout', 'static']):
-        return redirect(url_for('change_password'))
-
 @app.route('/login', methods=['GET', 'POST'])
 @rate_limit(max_requests=5, window=300)  # 5 attempts per 5 minutes
 def login():
@@ -184,16 +175,10 @@ def login():
             
             if admin and admin.check_password(password):
                 login_user(admin)
+                next_page = request.args.get('next')
                 
                 # Log successful login
                 logging.info(f"Successful login for user: {username}")
-                
-                # Check if password change is required
-                if admin.force_password_change:
-                    flash('يجب عليك تغيير كلمة المرور قبل المتابعة', 'warning')
-                    return redirect(url_for('change_password'))
-                
-                next_page = request.args.get('next')
                 
                 # Escape username for display
                 safe_username = escape_html_output(username)
@@ -214,35 +199,6 @@ def login():
             flash('حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.', 'error')
     
     return render_template('login.html', form=form)
-
-@app.route('/change-password', methods=['GET', 'POST'])
-@login_required
-def change_password():
-    """Change password page - required for users with force_password_change"""
-    form = ChangePasswordForm()
-    
-    if form.validate_on_submit():
-        # Check current password
-        if not current_user.check_password(form.current_password.data):
-            flash('كلمة المرور الحالية غير صحيحة', 'error')
-            return render_template('change_password.html', form=form)
-        
-        try:
-            # Set new password
-            current_user.set_password(form.new_password.data)
-            current_user.force_password_change = False  # Remove force password change flag
-            db.session.commit()
-            
-            logging.info(f"Password changed successfully for user: {current_user.username}")
-            flash('تم تغيير كلمة المرور بنجاح!', 'success')
-            return redirect(url_for('index'))
-            
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"Password change error for user {current_user.username}: {e}")
-            flash('حدث خطأ أثناء تغيير كلمة المرور. يرجى المحاولة مرة أخرى.', 'error')
-    
-    return render_template('change_password.html', form=form)
 
 @app.route('/logout')
 @login_required

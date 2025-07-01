@@ -12,7 +12,6 @@ class Admin(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     permissions = db.Column(JSONB, nullable=True, default={})  # JSONB field for permissions (PostgreSQL optimized)
     is_super_admin = db.Column(db.Boolean, nullable=False, default=False)
-    force_password_change = db.Column(db.Boolean, nullable=False, default=False)  # Force password change on next login
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def set_password(self, password):

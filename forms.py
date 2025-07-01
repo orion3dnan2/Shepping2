@@ -2,8 +2,8 @@
 Secure forms with CSRF protection and input validation for Morsal Express System
 """
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, FloatField, SelectField, TextAreaField, BooleanField, DecimalField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, NumberRange, Optional, Regexp, EqualTo
+from wtforms import StringField, PasswordField, FloatField, SelectField, TextAreaField, BooleanField, DecimalField
+from wtforms.validators import DataRequired, Email, Length, NumberRange, Optional, Regexp
 from wtforms.widgets import HiddenInput
 import re
 
@@ -231,18 +231,3 @@ def validate_file_upload(file):
         return False, "نوع الملف غير آمن"
     
     return True, "الملف آمن"
-
-class ChangePasswordForm(FlaskForm):
-    """Simple password change form"""
-    current_password = PasswordField('كلمة المرور الحالية', validators=[
-        DataRequired(message='كلمة المرور الحالية مطلوبة')
-    ])
-    new_password = PasswordField('كلمة المرور الجديدة', validators=[
-        DataRequired(message='كلمة المرور الجديدة مطلوبة'),
-        Length(min=4, message='كلمة المرور يجب أن تحتوي على 4 أحرف على الأقل')
-    ])
-    confirm_password = PasswordField('تأكيد كلمة المرور', validators=[
-        DataRequired(message='تأكيد كلمة المرور مطلوب'),
-        EqualTo('new_password', message='كلمات المرور غير متطابقة')
-    ])
-    submit = SubmitField('تغيير كلمة المرور')
