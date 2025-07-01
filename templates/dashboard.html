@@ -272,66 +272,84 @@
         transform: rotate(45deg);
     }
     
-    .morsal-logo-container {
+    .company-header-section {
         display: flex;
-        justify-content: center;
         align-items: center;
         margin-bottom: 25px;
         position: relative;
         z-index: 2;
     }
     
-    .morsal-logo {
+    .morsal-logo-small {
         background: white;
-        border-radius: 15px;
-        padding: 20px 30px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        border-radius: 10px;
+        padding: 10px 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         text-align: center;
         position: relative;
-        min-width: 180px;
+        min-width: 80px;
+        margin-left: 15px;
+        flex-shrink: 0;
     }
     
     .morsal-text-arabic {
-        font-size: 32px;
+        font-size: 18px;
         font-weight: 800;
         color: #dc2626;
         font-family: 'Tajawal', 'Cairo', sans-serif;
-        margin-bottom: 2px;
-        letter-spacing: 1px;
+        margin-bottom: 1px;
+        letter-spacing: 0.5px;
     }
     
     .morsal-text-english {
-        font-size: 18px;
+        font-size: 10px;
         font-weight: 600;
         color: #dc2626;
         font-family: 'Arial', sans-serif;
         margin-bottom: 0;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
     }
     
     .morsal-m-letter {
         position: absolute;
-        top: -10px;
-        right: -10px;
+        top: -6px;
+        right: -6px;
         background: #dc2626;
         color: white;
-        width: 40px;
-        height: 40px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 14px;
         font-weight: 800;
         font-family: 'Arial', sans-serif;
-        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
     }
     
-    .company-info-section {
-        text-align: center;
-        margin-bottom: 25px;
-        position: relative;
-        z-index: 2;
+    .company-info-main {
+        flex: 1;
+        text-align: right;
+    }
+    
+    .company-name {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0 0 5px 0;
+        background: linear-gradient(45deg, #ffffff, #e0e7ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .company-subtitle {
+        font-size: 16px;
+        margin: 0 0 10px 0;
+        opacity: 0.9;
+        font-weight: 500;
+        color: white;
     }
     
     .company-tagline {
@@ -451,25 +469,34 @@
             min-height: 220px;
         }
         
-        .morsal-logo {
-            padding: 15px 25px;
-            min-width: 150px;
+        .morsal-logo-small {
+            padding: 8px 12px;
+            min-width: 70px;
+            margin-left: 12px;
         }
         
         .morsal-text-arabic {
-            font-size: 26px;
+            font-size: 16px;
         }
         
         .morsal-text-english {
-            font-size: 15px;
+            font-size: 9px;
         }
         
         .morsal-m-letter {
-            width: 35px;
-            height: 35px;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            top: -5px;
+            right: -5px;
+        }
+        
+        .company-name {
             font-size: 20px;
-            top: -8px;
-            right: -8px;
+        }
+        
+        .company-subtitle {
+            font-size: 14px;
         }
         
         .service-highlights {
@@ -491,29 +518,38 @@
             padding: 15px 12px;
         }
         
-        .morsal-logo-container {
+        .company-header-section {
             margin-bottom: 15px;
         }
         
-        .morsal-logo {
-            padding: 12px 20px;
-            min-width: 120px;
+        .morsal-logo-small {
+            padding: 6px 10px;
+            min-width: 60px;
+            margin-left: 8px;
         }
         
         .morsal-text-arabic {
-            font-size: 20px;
+            font-size: 14px;
         }
         
         .morsal-text-english {
-            font-size: 12px;
+            font-size: 8px;
         }
         
         .morsal-m-letter {
-            width: 28px;
-            height: 28px;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            top: -4px;
+            right: -4px;
+        }
+        
+        .company-name {
             font-size: 16px;
-            top: -6px;
-            right: -6px;
+        }
+        
+        .company-subtitle {
+            font-size: 12px;
         }
         
         .company-tagline {
@@ -736,17 +772,19 @@ function printShipmentTable(tableType) {
     <!-- Company Branding Section - Top Center -->
     <div class="col-lg-6 col-md-6 mb-3">
         <div class="company-branding-card">
-            <div class="morsal-logo-container">
-                <div class="morsal-logo">
+            <div class="company-header-section">
+                <div class="morsal-logo-small">
                     <div class="morsal-text-arabic">مرسال</div>
                     <div class="morsal-text-english">Morsal</div>
                     <div class="morsal-m-letter">M</div>
                 </div>
-            </div>
-            <div class="company-info-section">
-                <div class="company-tagline">
-                    <i class="fas fa-globe-africa me-2"></i>
-                    شريكك الموثوق في الشحن الدولي
+                <div class="company-info-main">
+                    <h2 class="company-name">مرسال اكسبرس</h2>
+                    <p class="company-subtitle">للاستيراد والتصدير</p>
+                    <div class="company-tagline">
+                        <i class="fas fa-globe-africa me-2"></i>
+                        شريكك الموثوق في الشحن الدولي
+                    </div>
                 </div>
             </div>
             <div class="service-highlights">
