@@ -249,27 +249,57 @@
     }
     
     .company-branding-card {
-        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 25%, #1e40af 50%, #2563eb 75%, #3b82f6 100%);
         color: white;
-        border-radius: 20px;
-        padding: 30px 25px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-radius: 25px;
+        padding: 35px 30px;
+        box-shadow: 
+            0 20px 40px rgba(30, 27, 75, 0.3),
+            0 10px 20px rgba(59, 130, 246, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
         position: relative;
         overflow: hidden;
         height: 100%;
-        min-height: 280px;
+        min-height: 300px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .company-branding-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 25px 50px rgba(30, 27, 75, 0.4),
+            0 15px 30px rgba(59, 130, 246, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     
     .company-branding-card::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -20%;
+        top: -60%;
+        right: -25%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .company-branding-card::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        left: -15%;
         width: 200px;
         height: 200px;
-        background: rgba(255,255,255,0.1);
+        background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(147, 197, 253, 0.1));
         border-radius: 50%;
-        transform: rotate(45deg);
+        animation: float 8s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
     }
     
     .company-header-section {
@@ -282,51 +312,81 @@
     }
     
     .morsal-logo-small {
-        background: white;
-        border-radius: 10px;
-        padding: 10px 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 15px;
+        padding: 12px 18px;
+        box-shadow: 
+            0 8px 25px rgba(0,0,0,0.15),
+            0 4px 10px rgba(220, 38, 38, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
         text-align: center;
         position: relative;
-        min-width: 80px;
-        margin-right: 15px;
+        min-width: 85px;
+        margin-right: 20px;
         flex-shrink: 0;
+        border: 1px solid rgba(220, 38, 38, 0.1);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .morsal-logo-small:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+            0 12px 35px rgba(0,0,0,0.2),
+            0 6px 15px rgba(220, 38, 38, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
     
     .morsal-text-arabic {
-        font-size: 18px;
-        font-weight: 800;
-        color: #dc2626;
+        font-size: 20px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         font-family: 'Tajawal', 'Cairo', sans-serif;
-        margin-bottom: 1px;
+        margin-bottom: 2px;
         letter-spacing: 0.5px;
+        filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
     }
     
     .morsal-text-english {
-        font-size: 10px;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
         color: #dc2626;
         font-family: 'Arial', sans-serif;
         margin-bottom: 0;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.8px;
+        opacity: 0.8;
+        text-transform: uppercase;
     }
     
     .morsal-m-letter {
         position: absolute;
-        top: -6px;
-        right: -6px;
-        background: #dc2626;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #b91c1c 100%);
         color: white;
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        font-weight: 800;
+        font-size: 16px;
+        font-weight: 900;
         font-family: 'Arial', sans-serif;
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        box-shadow: 
+            0 6px 15px rgba(220, 38, 38, 0.4),
+            0 2px 5px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        animation: pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
     }
     
     .company-info-main {
@@ -335,35 +395,73 @@
     }
     
     .company-name {
-        font-size: 22px;
-        font-weight: 800;
-        margin: 0 0 10px 0;
-        background: linear-gradient(45deg, #ffffff, #e0e7ff);
+        font-size: 26px;
+        font-weight: 900;
+        margin: 0 0 15px 0;
+        background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 30%, #c7d2fe 70%, #a5b4fc 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        line-height: 1.3;
+        filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+        line-height: 1.2;
+        letter-spacing: 0.5px;
+        font-family: 'Tajawal', 'Cairo', sans-serif;
+        position: relative;
+    }
+    
+    .company-name::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
+        transition: width 0.3s ease;
+    }
+    
+    .company-info-main:hover .company-name::after {
+        width: 100%;
     }
     
     .company-tagline {
-        font-size: 14px;
-        opacity: 0.8;
+        font-size: 15px;
+        opacity: 0.9;
         font-style: italic;
         display: flex;
         align-items: center;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        margin-top: 5px;
+    }
+    
+    .company-tagline i {
+        margin-left: 8px;
+        font-size: 16px;
+        color: #fbbf24;
+        filter: drop-shadow(0 1px 3px rgba(251, 191, 36, 0.4));
     }
     
     .service-highlights {
         display: flex;
         justify-content: space-around;
-        background: rgba(255,255,255,0.1);
-        border-radius: 15px;
-        padding: 20px 10px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
+        background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%);
+        border-radius: 20px;
+        padding: 25px 15px;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.25);
         position: relative;
         z-index: 2;
+        box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            0 8px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .service-highlights:hover {
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.12) 100%);
+        transform: translateY(-2px);
     }
     
     .service-item {
@@ -372,19 +470,62 @@
         align-items: center;
         text-align: center;
         flex: 1;
+        transition: all 0.3s ease;
+        padding: 10px 5px;
+        border-radius: 12px;
+        position: relative;
+    }
+    
+    .service-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+    }
+    
+    .service-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        transition: width 0.3s ease;
+        border-radius: 1px;
+    }
+    
+    .service-item:hover::before {
+        width: 80%;
     }
     
     .service-icon {
-        font-size: 24px;
-        margin-bottom: 8px;
-        color: #fbbf24;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        font-size: 28px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 3px 6px rgba(251, 191, 36, 0.4));
+        transition: all 0.3s ease;
+    }
+    
+    .service-item:hover .service-icon {
+        transform: scale(1.1);
+        filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.6));
     }
     
     .service-item span {
-        font-size: 12px;
-        font-weight: 600;
-        opacity: 0.9;
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.95);
+        letter-spacing: 0.3px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .service-item:hover span {
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     }
     
     .tracking-link {
@@ -459,34 +600,46 @@
         }
         
         .company-branding-card {
-            padding: 20px 15px;
-            min-height: 220px;
+            padding: 25px 20px;
+            min-height: 260px;
         }
         
         .morsal-logo-small {
-            padding: 8px 12px;
-            min-width: 70px;
-            margin-right: 12px;
+            padding: 10px 14px;
+            min-width: 75px;
+            margin-right: 15px;
         }
         
         .morsal-text-arabic {
-            font-size: 16px;
+            font-size: 18px;
         }
         
         .morsal-text-english {
-            font-size: 9px;
+            font-size: 10px;
         }
         
         .morsal-m-letter {
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            top: -5px;
-            right: -5px;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            top: -6px;
+            right: -6px;
         }
         
         .company-name {
-            font-size: 18px;
+            font-size: 22px;
+        }
+        
+        .company-tagline {
+            font-size: 13px;
+        }
+        
+        .service-icon {
+            font-size: 24px;
+        }
+        
+        .service-item span {
+            font-size: 12px;
         }
         
         .service-highlights {
@@ -504,42 +657,55 @@
     
     @media (max-width: 576px) {
         .company-branding-card {
-            min-height: 200px;
-            padding: 15px 12px;
+            min-height: 240px;
+            padding: 20px 15px;
         }
         
         .company-header-section {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         
         .morsal-logo-small {
-            padding: 6px 10px;
-            min-width: 60px;
-            margin-right: 8px;
+            padding: 8px 12px;
+            min-width: 65px;
+            margin-right: 12px;
         }
         
         .morsal-text-arabic {
-            font-size: 14px;
+            font-size: 16px;
         }
         
         .morsal-text-english {
-            font-size: 8px;
+            font-size: 9px;
         }
         
         .morsal-m-letter {
-            width: 18px;
-            height: 18px;
-            font-size: 10px;
-            top: -4px;
-            right: -4px;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            top: -5px;
+            right: -5px;
         }
         
         .company-name {
-            font-size: 14px;
+            font-size: 18px;
         }
         
         .company-tagline {
             font-size: 12px;
+        }
+        
+        .service-highlights {
+            padding: 18px 10px;
+        }
+        
+        .service-icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        
+        .service-item span {
+            font-size: 11px;
         }
         
         .service-highlights {
