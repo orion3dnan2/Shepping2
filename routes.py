@@ -1287,14 +1287,15 @@ def add_user():
             flash('اسم المستخدم موجود بالفعل', 'error')
             return redirect(url_for('settings') + '#users')
         
-        # Create permissions dictionary
+        # Create permissions dictionary - use lowercase keys to match form values
         permissions = {
-            'home': 'Home' in permissions_list,
-            'shipments': 'Shipments' in permissions_list,
-            'tracking': 'Tracking' in permissions_list,
-            'reports': 'Reports' in permissions_list,
-            'expenses': 'Expenses' in permissions_list,
-            'add_shipment': 'AddShipment' in permissions_list,
+            'home': 'home' in permissions_list,
+            'shipments': 'shipments' in permissions_list,
+            'tracking': 'tracking' in permissions_list,
+            'reports': 'reports' in permissions_list,
+            'expenses': 'expenses' in permissions_list,
+            'add_shipment': 'add_shipment' in permissions_list,
+            'settings': 'settings' in permissions_list,
         }
         
         # Create new user
@@ -1323,14 +1324,15 @@ def edit_user(user_id):
     try:
         user = Admin.query.get_or_404(user_id)
         
-        # Don't allow editing super admin
-        if user.is_super_admin:
-            flash('لا يمكن تحرير المدير العام', 'error')
+        # Allow super admin to be edited by other super admins
+        if user.is_super_admin and not current_user.is_super_admin:
+            flash('لا يمكن تحرير المدير العام إلا من قبل مدير عام آخر', 'error')
             return redirect(url_for('settings') + '#users')
         
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
         permissions_list = request.form.getlist('permissions')
+        is_super_admin = 'is_super_admin' in request.form
         
         # Validation
         if not username:
@@ -1348,14 +1350,19 @@ def edit_user(user_id):
         if password:  # Only update password if provided
             user.set_password(password)
         
-        # Update permissions
+        # Update super admin status if current user is super admin
+        if current_user.is_super_admin:
+            user.is_super_admin = is_super_admin
+        
+        # Update permissions - use lowercase keys to match form values
         permissions = {
-            'home': 'Home' in permissions_list,
-            'shipments': 'Shipments' in permissions_list,
-            'tracking': 'Tracking' in permissions_list,
-            'reports': 'Reports' in permissions_list,
-            'expenses': 'Expenses' in permissions_list,
-            'add_shipment': 'AddShipment' in permissions_list,
+            'home': 'home' in permissions_list,
+            'shipments': 'shipments' in permissions_list,
+            'tracking': 'tracking' in permissions_list,
+            'reports': 'reports' in permissions_list,
+            'expenses': 'expenses' in permissions_list,
+            'add_shipment': 'add_shipment' in permissions_list,
+            'settings': 'settings' in permissions_list,
         }
         user.set_permissions(permissions)
         
