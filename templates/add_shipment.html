@@ -349,8 +349,35 @@
                             </div>
                         </div>
 
-                        <!-- Simplified packaging as checkbox -->
-                        <div class="row" id="packaging_row" style="display: none;">
+                        <!-- Zone and packaging fields -->
+                        <div class="row" id="zone_packaging_row" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <label for="zone" class="form-label required-field">المنطقة</label>
+                                <select class="form-select" id="zone" name="zone" onchange="calculateZoneBasedPrice()">
+                                    <option value="">اختر المنطقة</option>
+                                    <option value="khartoum" data-price="5.000" data-direction="kuwait_to_sudan">الخرطوم</option>
+                                    <option value="omdurman" data-price="5.000" data-direction="kuwait_to_sudan">أم درمان</option>
+                                    <option value="khartoum_north" data-price="5.000" data-direction="kuwait_to_sudan">الخرطوم بحري</option>
+                                    <option value="gezira" data-price="6.000" data-direction="kuwait_to_sudan">الجزيرة</option>
+                                    <option value="kassala" data-price="7.000" data-direction="kuwait_to_sudan">كسلا</option>
+                                    <option value="port_sudan" data-price="7.000" data-direction="kuwait_to_sudan">بورتسودان</option>
+                                    <option value="gedaref" data-price="7.000" data-direction="kuwait_to_sudan">القضارف</option>
+                                    <option value="sennar" data-price="6.500" data-direction="kuwait_to_sudan">سنار</option>
+                                    <option value="white_nile" data-price="6.500" data-direction="kuwait_to_sudan">النيل الأبيض</option>
+                                    <option value="blue_nile" data-price="7.500" data-direction="kuwait_to_sudan">النيل الأزرق</option>
+                                    <option value="north_kordofan" data-price="8.000" data-direction="kuwait_to_sudan">شمال كردفان</option>
+                                    <option value="south_kordofan" data-price="8.500" data-direction="kuwait_to_sudan">جنوب كردفان</option>
+                                    <option value="north_darfur" data-price="9.000" data-direction="kuwait_to_sudan">شمال دارفور</option>
+                                    <option value="south_darfur" data-price="9.000" data-direction="kuwait_to_sudan">جنوب دارفور</option>
+                                    <option value="west_darfur" data-price="9.500" data-direction="kuwait_to_sudan">غرب دارفور</option>
+                                    <option value="east_darfur" data-price="9.000" data-direction="kuwait_to_sudan">شرق دارفور</option>
+                                    <option value="central_darfur" data-price="9.000" data-direction="kuwait_to_sudan">وسط دارفور</option>
+                                    <option value="northern" data-price="8.000" data-direction="kuwait_to_sudan">الشمالية</option>
+                                    <option value="river_nile" data-price="7.000" data-direction="kuwait_to_sudan">نهر النيل</option>
+                                    <option value="red_sea" data-price="7.500" data-direction="kuwait_to_sudan">البحر الأحمر</option>
+                                </select>
+                            </div>
+                            
                             <div class="col-md-6 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="1" id="has_packaging" name="has_packaging" onchange="calculateZoneBasedPrice()">
@@ -559,16 +586,19 @@
         }
     }
     
-    // Show packaging fields for non-document shipments
+    // Show zone and packaging fields for non-document shipments
     function updateZonePricing() {
         const packageType = document.getElementById('package_type').value;
-        const packagingRow = document.getElementById('packaging_row');
+        const direction = document.getElementById('direction').value;
+        const zonePackagingRow = document.getElementById('zone_packaging_row');
+        const zoneSelect = document.getElementById('zone');
         const totalPriceField = document.getElementById('total_price');
         const priceStatus = document.getElementById('price_status');
         
         if (packageType === 'document') {
-            // Hide packaging for documents
-            packagingRow.style.display = 'none';
+            // Hide zone and packaging for documents
+            zonePackagingRow.style.display = 'none';
+            if (zoneSelect) zoneSelect.required = false;
             totalPriceField.value = '';
             priceStatus.textContent = 'يرجى اختيار نوع المستند لتحديد السعر';
             priceStatus.className = 'text-muted mt-1';
@@ -577,16 +607,33 @@
         }
         
         if (packageType && packageType !== '') {
-            // Show packaging for shipments
-            packagingRow.style.display = 'block';
+            // Show zone and packaging for shipments
+            zonePackagingRow.style.display = 'block';
+            if (zoneSelect) zoneSelect.required = true;
+            
+            // Filter zones by direction
+            const options = zoneSelect.querySelectorAll('option');
+            options.forEach(option => {
+                if (option.value === '') return; // Keep default option
+                const optionDirection = option.getAttribute('data-direction');
+                if (direction === '' || optionDirection === direction) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            // Reset zone selection when direction changes
+            zoneSelect.value = '';
             totalPriceField.value = '';
-            priceStatus.textContent = 'أدخل الوزن لحساب السعر الإجمالي';
+            priceStatus.textContent = 'اختر المنطقة والوزن لحساب السعر الإجمالي';
             priceStatus.className = 'text-muted mt-1';
             calculateRemaining();
         } else {
-            packagingRow.style.display = 'none';
+            zonePackagingRow.style.display = 'none';
+            if (zoneSelect) zoneSelect.required = false;
             totalPriceField.value = '';
-            priceStatus.textContent = 'يتم تحديده تلقائياً حسب النوع والوزن';
+            priceStatus.textContent = 'يتم تحديده تلقائياً حسب النوع والمنطقة والوزن';
             priceStatus.className = 'text-muted mt-1';
             calculateRemaining();
         }
@@ -639,13 +686,22 @@
             return;
         }
         
-        // Use global price per kg from settings
-        const pricePerKg = globalPricePerKg;
+        // Use price per kg from settings or zone pricing as fallback
+        let pricePerKg = globalPricePerKg;
+        
+        // If global price is not set, try to get zone price
+        if (pricePerKg <= 0) {
+            const zoneSelect = document.getElementById('zone');
+            if (zoneSelect && zoneSelect.value) {
+                const selectedZoneOption = zoneSelect.options[zoneSelect.selectedIndex];
+                pricePerKg = parseFloat(selectedZoneOption.getAttribute('data-price')) || 0;
+            }
+        }
         
         if (pricePerKg <= 0) {
             totalPriceField.value = '';
-            priceStatus.textContent = 'سعر الكيلو غير محدد في الإعدادات';
-            priceStatus.className = 'text-danger mt-1';
+            priceStatus.textContent = 'اختر المنطقة أو حدد سعر الكيلو في الإعدادات';
+            priceStatus.className = 'text-warning mt-1';
             calculateRemaining();
             return;
         }
@@ -681,7 +737,8 @@
         totalPriceField.value = totalPrice.toFixed(3);
         
         // Build detailed price breakdown message
-        let breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك = ${weightCost.toFixed(3)} د.ك`;
+        const priceSource = globalPricePerKg > 0 ? '(من الإعدادات)' : '(من المنطقة)';
+        let breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك ${priceSource} = ${weightCost.toFixed(3)} د.ك`;
         if (packagingCost > 0) {
             breakdown += ` + ${packagingCost.toFixed(3)} د.ك (تغليف)`;
         }

@@ -999,6 +999,9 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Added `refreshPricePerKg()` global function for cross-page price synchronization
   - Real-time calculation: Total Price = (Weight × Price per KG) + Packaging + Policy + Comment costs
   - Automatic price recalculation when price per kg is updated in Settings page
+  - Re-added zone selection field with intelligent pricing fallback system
+  - Priority: Settings price per kg → Zone pricing → Error message for missing prices
+  - Enhanced price breakdown display showing data source (من الإعدادات/من المنطقة)
   - Implemented real-time row removal with fade-out animation and automatic table refresh
   - Added loading states, error handling, and success/error notifications system
   - Created showNotification() function for user feedback with auto-dismiss alerts
