@@ -1,0 +1,622 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل الشحنة{% endblock %}
+{% block page_title %}تعديل الشحنة - {{ shipment.tracking_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: none;
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+    
+    .form-card-header {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: white;
+        padding: 20px 25px;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .form-card-body {
+        padding: 25px;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #333;
+        background: white;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        outline: none;
+    }
+    
+    .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #333;
+        background: white;
+        transition: all 0.2s ease;
+    }
+    
+    .form-select:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        outline: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        border: none;
+        border-radius: 10px;
+        padding: 15px 30px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 30px;
+        font-weight: 600;
+        font-size: 16px;
+        color: white;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+    
+    .price-breakdown {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    
+    .price-breakdown strong {
+        color: #2d3748;
+    }
+    
+    .alert-warning {
+        background: #fef3cd;
+        border: 1px solid #faebcc;
+        color: #856404;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+        font-size: 13px;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .form-card-body {
+            padding: 20px;
+        }
+        
+        .form-control, .form-select {
+            padding: 10px 12px;
+            font-size: 16px; /* Prevent iOS zoom */
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 12px 20px;
+            font-size: 14px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <form method="POST" action="{{ url_for('update_shipment', shipment_id=shipment.id) }}" id="editShipmentForm">
+                <!-- معلومات المرسل -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class="fas fa-user"></i>
+                        معلومات المرسل
+                    </div>
+                    <div class="form-card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="sender_name" class="form-label">اسم المرسل</label>
+                                <input type="text" class="form-control" id="sender_name" name="sender_name" 
+                                       value="{{ shipment.sender_name or '' }}" placeholder="الاسم الكامل للمرسل">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="sender_phone" class="form-label">رقم الهاتف</label>
+                                <input type="tel" class="form-control" id="sender_phone" name="sender_phone" 
+                                       value="{{ shipment.sender_phone or '' }}" placeholder="رقم الهاتف">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="sender_address" class="form-label">العنوان</label>
+                                <input type="text" class="form-control" id="sender_address" name="sender_address" 
+                                       value="{{ shipment.sender_address or '' }}" placeholder="العنوان الكامل">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="sender_email" class="form-label">البريد الإلكتروني</label>
+                                <input type="email" class="form-control" id="sender_email" name="sender_email" 
+                                       value="{{ shipment.sender_email or '' }}" placeholder="البريد الإلكتروني">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- معلومات المستلم -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class="fas fa-user-check"></i>
+                        معلومات المستلم
+                    </div>
+                    <div class="form-card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="receiver_name" class="form-label">اسم المستلم</label>
+                                <input type="text" class="form-control" id="receiver_name" name="receiver_name" 
+                                       value="{{ shipment.receiver_name or '' }}" placeholder="الاسم الكامل للمستلم">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="receiver_phone" class="form-label">رقم الهاتف</label>
+                                <input type="tel" class="form-control" id="receiver_phone" name="receiver_phone" 
+                                       value="{{ shipment.receiver_phone or '' }}" placeholder="رقم الهاتف">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="receiver_address" class="form-label">العنوان</label>
+                                <input type="text" class="form-control" id="receiver_address" name="receiver_address" 
+                                       value="{{ shipment.receiver_address or '' }}" placeholder="العنوان الكامل">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="receiver_email" class="form-label">البريد الإلكتروني</label>
+                                <input type="email" class="form-control" id="receiver_email" name="receiver_email" 
+                                       value="{{ shipment.receiver_email or '' }}" placeholder="البريد الإلكتروني">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تفاصيل الشحنة -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class="fas fa-box"></i>
+                        تفاصيل الشحنة
+                    </div>
+                    <div class="form-card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="direction" class="form-label">الاتجاه</label>
+                                <select class="form-select" id="direction" name="direction">
+                                    <option value="kuwait_to_sudan" {{ 'selected' if shipment.direction == 'kuwait_to_sudan' else '' }}>الكويت إلى السودان</option>
+                                    <option value="sudan_to_kuwait" {{ 'selected' if shipment.direction == 'sudan_to_kuwait' else '' }}>السودان إلى الكويت</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="package_type" class="form-label">نوع الشحنة</label>
+                                <select class="form-select" id="package_type" name="package_type" onchange="toggleShipmentFields()">
+                                    <option value="general" {{ 'selected' if shipment.package_type != 'document' else '' }}>عامة</option>
+                                    <option value="document" {{ 'selected' if shipment.package_type == 'document' else '' }}>مستندات</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3" id="shipping_method_field" style="{{ 'display: none;' if shipment.package_type == 'document' else '' }}">
+                                <label for="shipping_method" class="form-label">طريقة الشحن</label>
+                                <select class="form-select" id="shipping_method" name="shipping_method">
+                                    <option value="">اختر طريقة الشحن</option>
+                                    <option value="جوي" {{ 'selected' if shipment.shipping_method == 'جوي' else '' }}>جوي</option>
+                                    <option value="بري" {{ 'selected' if shipment.shipping_method == 'بري' else '' }}>بري</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- الحقول الخاصة بالمستندات -->
+                        <div id="document_fields" style="{{ 'display: block;' if shipment.package_type == 'document' else 'display: none;' }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="document_type" class="form-label">نوع المستند</label>
+                                    <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
+                                        <option value="">اختر نوع المستند</option>
+                                        {% for doc_type in document_types %}
+                                        <option value="{{ doc_type.name_ar }}" data-price="{{ doc_type.price }}" 
+                                                {{ 'selected' if shipment.document_type == doc_type.name_ar else '' }}>
+                                            {{ doc_type.name_ar }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="action_required" class="form-label">الإجراء المطلوب</label>
+                                    <input type="text" class="form-control" id="action_required" name="action_required" 
+                                           value="{{ shipment.package_contents or '' }}" placeholder="الإجراء المطلوب">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الحقول الخاصة بالشحنات العامة -->
+                        <div id="general_fields" style="{{ 'display: none;' if shipment.package_type == 'document' else 'display: block;' }}">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="zone" class="form-label">المنطقة</label>
+                                    <select class="form-select" id="zone" name="zone" onchange="updatePrice()">
+                                        <option value="">اختر المنطقة</option>
+                                        {% for zone in zone_pricings %}
+                                        <option value="{{ zone.zone_name_ar }}" data-price="{{ zone.price_per_kg }}" 
+                                                {{ 'selected' if shipment.zone == zone.zone_name_ar else '' }}>
+                                            {{ zone.zone_name_ar }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="weight" class="form-label">الوزن (كيلوغرام)</label>
+                                    <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
+                                           id="weight" name="weight" value="{{ '%.3f'|format(shipment.weight) if shipment.weight else '' }}" 
+                                           placeholder="0.000" onchange="updatePrice()">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="package_contents" class="form-label">محتويات الطرد</label>
+                                    <input type="text" class="form-control" id="package_contents" name="package_contents" 
+                                           value="{{ shipment.package_contents or '' }}" placeholder="وصف محتويات الطرد">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الخيارات الإضافية -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="has_packaging" name="has_packaging" 
+                                                   value="1" onchange="updatePrice()" {{ 'checked' if shipment.has_packaging else '' }}>
+                                            <label class="form-check-label" for="has_packaging">
+                                                تغليف
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="has_policy" name="has_policy" 
+                                                   value="1" onchange="toggleWaybillPrice(); updatePrice()" {{ 'checked' if shipment.has_policy else '' }}>
+                                            <label class="form-check-label" for="has_policy">
+                                                بوليصة
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="has_comment" name="has_comment" 
+                                                   value="1" onchange="updatePrice()" {{ 'checked' if shipment.has_comment else '' }}>
+                                            <label class="form-check-label" for="has_comment">
+                                                تعليق
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- سعر البوليصة اليدوي -->
+                        <div class="row" id="waybill_price_field" style="{{ 'display: block;' if shipment.has_policy else 'display: none;' }}">
+                            <div class="col-md-4 mb-3">
+                                <label for="waybill_price" class="form-label">سعر البوليصة (د.ك)</label>
+                                <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
+                                       id="waybill_price" name="waybill_price" value="{{ '%.3f'|format(shipment.waybill_price) if shipment.waybill_price else '' }}" 
+                                       placeholder="0.000" onchange="updatePrice()">
+                            </div>
+                        </div>
+
+                        <!-- الأسعار والدفع -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="total_price" class="form-label">السعر الإجمالي (د.ك)</label>
+                                <input type="text" class="form-control" id="total_price" name="total_price" 
+                                       value="{{ '%.2f'|format(shipment.price) if shipment.price else '' }}" placeholder="0.00" readonly>
+                                <input type="hidden" id="cost" name="cost" value="{{ shipment.cost or '0.0' }}">
+                                <input type="hidden" id="profit" name="profit" value="{{ shipment.profit or '0.0' }}">
+                                <!-- Additional hidden fields for checkboxes when unchecked -->
+                                <input type="hidden" name="has_packaging" value="0">
+                                <input type="hidden" name="has_policy" value="0">
+                                <input type="hidden" name="has_comment" value="0">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="amount_paid" class="form-label">المبلغ المدفوع (د.ك)</label>
+                                <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
+                                       id="amount_paid" name="amount_paid" value="{{ '%.2f'|format(shipment.paid_amount) if shipment.paid_amount else '' }}" 
+                                       placeholder="0.00" onchange="updateRemainingAmount()">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="remaining_amount" class="form-label">المبلغ المتبقي (د.ك)</label>
+                                <input type="text" class="form-control" id="remaining_amount" name="remaining_amount" 
+                                       value="{{ '%.2f'|format(shipment.remaining_amount) if shipment.remaining_amount else '' }}" placeholder="0.00" readonly>
+                            </div>
+                        </div>
+
+                        <!-- الملاحظات -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="notes" class="form-label">ملاحظات</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                          placeholder="ملاحظات إضافية">{{ shipment.notes or '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- تفاصيل السعر -->
+                        <div id="price_breakdown" class="price-breakdown" style="display: none;">
+                            <strong>تفاصيل السعر:</strong>
+                            <div id="price_details"></div>
+                        </div>
+
+                        <!-- تحذير المدفوع أكثر من الإجمالي -->
+                        <div id="payment_warning" class="alert-warning" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i> المبلغ المدفوع أكبر من السعر الإجمالي
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار الحفظ والإلغاء -->
+                <div class="form-card">
+                    <div class="form-card-body text-center">
+                        <button type="submit" class="btn btn-primary me-3">
+                            <i class="fas fa-save"></i> حفظ التعديلات
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> إلغاء
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global variables for pricing
+let packagingPrice = 5.0; // Default packaging price
+let commentPrice = 2.0;   // Default comment price
+
+// Get global settings on page load
+fetch('/api/global_settings')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            packagingPrice = data.packaging_price || 5.0;
+            commentPrice = data.comment_price || 2.0;
+            // Update price after loading settings
+            setTimeout(updatePrice, 100);
+        }
+    })
+    .catch(error => console.error('Error loading global settings:', error));
+
+function toggleShipmentFields() {
+    const packageType = document.getElementById('package_type').value;
+    const documentFields = document.getElementById('document_fields');
+    const generalFields = document.getElementById('general_fields');
+    const shippingMethodField = document.getElementById('shipping_method_field');
+    
+    if (packageType === 'document') {
+        documentFields.style.display = 'block';
+        generalFields.style.display = 'none';
+        shippingMethodField.style.display = 'none';
+    } else {
+        documentFields.style.display = 'none';
+        generalFields.style.display = 'block';
+        shippingMethodField.style.display = 'block';
+    }
+    
+    updatePrice();
+}
+
+function toggleShippingMethod() {
+    const packageType = document.getElementById('package_type').value;
+    const shippingMethodField = document.getElementById('shipping_method_field');
+    
+    if (packageType === 'general') {
+        shippingMethodField.style.display = 'block';
+    } else {
+        shippingMethodField.style.display = 'none';
+    }
+}
+
+function toggleWaybillPrice() {
+    const hasPolicyCheckbox = document.getElementById('has_policy');
+    const waybillPriceField = document.getElementById('waybill_price_field');
+    
+    if (hasPolicyCheckbox.checked) {
+        waybillPriceField.style.display = 'block';
+    } else {
+        waybillPriceField.style.display = 'none';
+        document.getElementById('waybill_price').value = '';
+    }
+}
+
+function updateDocumentPrice() {
+    const documentTypeSelect = document.getElementById('document_type');
+    const selectedOption = documentTypeSelect.options[documentTypeSelect.selectedIndex];
+    let price = parseFloat(selectedOption.getAttribute('data-price') || 0);
+    
+    // If no document type selected, try to get current price from form
+    if (price === 0) {
+        const currentPrice = parseFloat(document.getElementById('total_price').value || 0);
+        if (currentPrice > 0) {
+            price = currentPrice;
+        }
+    }
+    
+    document.getElementById('total_price').value = price.toFixed(2);
+    updateRemainingAmount();
+    
+    if (price > 0) {
+        showPriceBreakdown(`سعر المستند: ${price.toFixed(3)} د.ك`);
+    } else {
+        hidePriceBreakdown();
+    }
+}
+
+function updatePrice() {
+    const packageType = document.getElementById('package_type').value;
+    
+    if (packageType === 'document') {
+        updateDocumentPrice();
+        return;
+    }
+    
+    // General shipment pricing calculation
+    const zoneSelect = document.getElementById('zone');
+    const selectedZone = zoneSelect.options[zoneSelect.selectedIndex];
+    const pricePerKg = parseFloat(selectedZone.getAttribute('data-price') || 0);
+    const weight = parseFloat(document.getElementById('weight').value || 0);
+    
+    let totalPrice = 0;
+    let priceDetails = [];
+    
+    // Only calculate if we have valid zone and weight
+    if (pricePerKg > 0 && weight > 0) {
+        totalPrice = pricePerKg * weight;
+        priceDetails.push(`سعر الشحن: ${pricePerKg.toFixed(3)} × ${weight.toFixed(3)} = ${(pricePerKg * weight).toFixed(3)} د.ك`);
+    } else {
+        // If no zone pricing calculation, preserve existing price
+        const currentPrice = parseFloat(document.getElementById('total_price').value || 0);
+        if (currentPrice > 0) {
+            totalPrice = currentPrice;
+        }
+    }
+    
+    // Add packaging price
+    const hasPackaging = document.getElementById('has_packaging').checked;
+    if (hasPackaging) {
+        totalPrice += packagingPrice;
+        priceDetails.push(`التغليف: ${packagingPrice.toFixed(3)} د.ك`);
+    }
+    
+    // Add manual waybill price
+    const hasPolicy = document.getElementById('has_policy').checked;
+    if (hasPolicy) {
+        const waybillPrice = parseFloat(document.getElementById('waybill_price').value || 0);
+        if (waybillPrice > 0) {
+            totalPrice += waybillPrice;
+            priceDetails.push(`البوليصة: ${waybillPrice.toFixed(3)} د.ك`);
+        }
+    }
+    
+    // Add comment price
+    const hasComment = document.getElementById('has_comment').checked;
+    if (hasComment) {
+        totalPrice += commentPrice;
+        priceDetails.push(`التعليق: ${commentPrice.toFixed(3)} د.ك`);
+    }
+    
+    // Only update if we have a valid total price
+    if (totalPrice > 0) {
+        document.getElementById('total_price').value = totalPrice.toFixed(2);
+    }
+    
+    updateRemainingAmount();
+    
+    if (priceDetails.length > 0) {
+        priceDetails.push(`<strong>الإجمالي: ${totalPrice.toFixed(3)} د.ك</strong>`);
+        showPriceBreakdown(priceDetails.join('<br>'));
+    } else {
+        hidePriceBreakdown();
+    }
+}
+
+function updateRemainingAmount() {
+    const totalPrice = parseFloat(document.getElementById('total_price').value || 0);
+    const paidAmount = parseFloat(document.getElementById('amount_paid').value || 0);
+    const remainingAmount = totalPrice - paidAmount;
+    
+    document.getElementById('remaining_amount').value = remainingAmount.toFixed(2);
+    
+    // Show warning if paid amount exceeds total price
+    const warningDiv = document.getElementById('payment_warning');
+    if (paidAmount > totalPrice && totalPrice > 0) {
+        warningDiv.style.display = 'block';
+    } else {
+        warningDiv.style.display = 'none';
+    }
+}
+
+function showPriceBreakdown(details) {
+    const priceBreakdown = document.getElementById('price_breakdown');
+    const priceDetails = document.getElementById('price_details');
+    priceDetails.innerHTML = details;
+    priceBreakdown.style.display = 'block';
+}
+
+function hidePriceBreakdown() {
+    const priceBreakdown = document.getElementById('price_breakdown');
+    priceBreakdown.style.display = 'none';
+}
+
+// Initialize form on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleShipmentFields();
+    toggleWaybillPrice();
+    
+    // Set initial price calculation after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        const packageType = document.getElementById('package_type').value;
+        if (packageType === 'document') {
+            updateDocumentPrice();
+        } else {
+            updatePrice();
+        }
+    }, 200);
+    
+    // Also trigger price update when field values change
+    updateRemainingAmount();
+});
+</script>
+{% endblock %}

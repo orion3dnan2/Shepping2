@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}لوحة التحكم{% endblock %} - نظام إدارة الشحن</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Responsive CSS -->
+    <link href="{{ url_for('static', filename='responsive.css') }}" rel="stylesheet">
+    
+    <style>
+        /* Additional custom styles for specific components */
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-logo {
+            width: 120px;
+            height: 60px;
+            background: white;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            padding: 0.5rem;
+        }
+        
+        .sidebar-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .sidebar-header h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-logo {
+            width: 60px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+        }
+        
+        .sidebar-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .sidebar-header .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #fff;
+            transform: translateX(-5px);
+        }
+        
+        .sidebar-menu i {
+            width: 20px;
+            margin-left: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        /* Header */
+        .main-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            margin: 0;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-info .user-name {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        /* Stats Cards */
+        .stats-card {
+            background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-card.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .stats-card.warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+        
+        .stats-card.danger {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+        }
+        
+        .stats-card.info {
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        }
+        
+        .stats-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .stats-icon {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--bs-primary);
+            color: var(--bs-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn i {
+            margin-left: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        /* Notifications Dropdown */
+        .notifications-dropdown {
+            position: relative;
+        }
+        
+        .notification-bell {
+            position: relative;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .notification-bell:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--bs-primary);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 1rem;
+            height: 1rem;
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .notifications-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e9ecef;
+            min-width: 320px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .notifications-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .notifications-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .notification-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bs-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            margin-left: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .notification-text {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+        
+        .notifications-footer {
+            padding: 0.75rem 1.25rem;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .notifications-footer a {
+            color: var(--bs-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .notifications-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .empty-notifications {
+            padding: 2rem 1.25rem;
+            text-align: center;
+            color: #999;
+        }
+        
+        .empty-notifications i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 1rem 1rem 0 0 !important;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Tables */
+        .table {
+            margin: 0;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            background-color: #f8f9fa;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Notification styles */
+        .notification-item:hover {
+            background-color: #f8f9fa !important;
+        }
+        
+        .notification-list .dropdown-item {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .notification-list .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Grid System Improvements */
+        .row {
+            margin-left: -0.375rem;
+            margin-right: -0.375rem;
+        }
+
+        .row > * {
+            padding-left: 0.375rem;
+            padding-right: 0.375rem;
+        }
+
+        @media (min-width: 576px) {
+            .row {
+                margin-left: -0.75rem;
+                margin-right: -0.75rem;
+            }
+
+            .row > * {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+        }
+
+        /* Utility Classes */
+        .text-truncate-mobile {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+            .text-truncate-mobile {
+                overflow: visible;
+                text-overflow: unset;
+                white-space: normal;
+            }
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-in-transit {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        /* Mobile Navigation Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1001;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .sidebar {
+                width: 280px;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+            
+            .main-content {
+                margin-right: 0;
+                padding: 80px 15px 15px 15px;
+            }
+            
+            .main-header {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .stats-value {
+                font-size: 2rem;
+            }
+            
+            /* Mobile form optimizations */
+            .form-card {
+                margin-bottom: 15px;
+            }
+            
+            .form-card-body {
+                padding: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            /* Mobile table responsiveness */
+            .table-responsive {
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            /* Stats cards mobile layout */
+            .stats-card {
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 70px 10px 10px 10px;
+            }
+            
+            .form-card-header {
+                padding: 15px;
+                font-size: 14px;
+            }
+            
+            .form-card-body {
+                padding: 10px;
+            }
+            
+            .stats-card {
+                text-align: center;
+            }
+            
+            .stats-value {
+                font-size: 1.5rem;
+            }
+            
+            .stats-label {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Flash Messages */
+        .alert {
+            border-radius: 0.75rem;
+            border: none;
+            margin-bottom: 1rem;
+        }
+        
+        /* Forms */
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #ced4da;
+            padding: 0.75rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+        
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            border: none;
+        }
+
+        @media (min-width: 576px) {
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9375rem;
+            }
+        }
+
+        /* Button hover effects */
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="{{ url_for('static', filename='images/morsal-logo.png') }}" alt="Morsal Logo">
+            </div>
+            <h3>مرسال إكسبرس للاستيراد والتصدير</h3>
+            <div class="subtitle">نظام إدارة الشحن المتقدم</div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">
+                    <i class="fas fa-home"></i>
+                    الصفحة الرئيسية
+                </a>
+            </li>
+
+            {% if current_user.is_authenticated and current_user.has_permission('shipments') %}
+            <li>
+                <a href="{{ url_for('shipments') }}" class="{{ 'active' if request.endpoint == 'shipments' }}">
+                    <i class="fas fa-box"></i>
+                    الشحنات
+                </a>
+            </li>
+            {% endif %}
+            {% if current_user.is_authenticated and current_user.has_permission('tracking') %}
+            <li>
+                <a href="{{ url_for('track_search') }}" class="{{ 'active' if request.endpoint in ['track_search', 'track_shipment'] }}">
+                    <i class="fas fa-search-location"></i>
+                    تتبع الشحنات
+                </a>
+            </li>
+            {% endif %}
+            {% if current_user.is_authenticated and current_user.has_permission('expenses') %}
+            <li>
+                <a href="{{ url_for('financial_center') }}" class="{{ 'active' if request.endpoint in ['financial_center', 'expenses'] }}">
+                    <i class="fas fa-chart-line"></i>
+                    المركز المالي
+                </a>
+            </li>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.has_permission('settings') %}
+            <li>
+                <a href="{{ url_for('settings') }}" class="{{ 'active' if request.endpoint in ['settings', 'manage_types', 'pricing_management', 'user_management'] }}">
+                    <i class="fas fa-cog"></i>
+                    الإعدادات
+                </a>
+            </li>
+            {% endif %}
+            <li style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <a href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    تسجيل الخروج
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <h1 class="page-title">{% block page_title %}الصفحة الرئيسية{% endblock %}</h1>
+            <div class="user-info">
+                <!-- Notifications Dropdown -->
+                <div class="notifications-dropdown me-3">
+                    <button class="notification-bell" id="notificationBell" type="button">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </button>
+                    <div class="notifications-menu" id="notificationsMenu">
+                        <div class="notifications-header">
+                            <i class="fas fa-bell me-2"></i>
+                            الإشعارات الأخيرة
+                        </div>
+                        <div id="notificationList">
+                            <div class="notification-item d-flex">
+                                <div class="notification-content">
+                                    <div class="notification-text text-muted">لا توجد إشعارات جديدة</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-footer">
+                            <a href="#" onclick="markAllAsRead()">وضع علامة على الكل كمقروء</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <span class="user-name">
+                    <i class="fas fa-user-shield me-2"></i>
+                    مرحباً، {{ current_user.username }}
+                </span>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="container-fluid px-4">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+            
+            // Add fade-in animation to content
+            document.querySelector('.main-content').classList.add('fade-in');
+        });
+        
+        // Mobile menu toggle
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        }
+        
+        // Notifications dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBell = document.getElementById('notificationBell');
+            const notificationsMenu = document.getElementById('notificationsMenu');
+            
+            // Toggle notifications dropdown
+            notificationBell.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationsMenu.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationBell.contains(e.target) && !notificationsMenu.contains(e.target)) {
+                    notificationsMenu.classList.remove('show');
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside
+            notificationsMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+        
+        // Mark all notifications as read
+        function markAllAsRead() {
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            
+            // Here you would typically make an AJAX call to mark notifications as read
+            // For now, we'll just hide the badge
+            console.log('All notifications marked as read');
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

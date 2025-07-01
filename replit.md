@@ -1,0 +1,1059 @@
+# Shipment Management System
+
+## Overview
+
+This is a Flask-based web application for managing shipments and packages. The system allows users to create new shipments, generate unique tracking numbers, and track packages through a web interface. The application is designed with Arabic language support and uses a clean, responsive design.
+
+## System Architecture
+
+### Backend Architecture
+- **Framework**: Flask (Python web framework)
+- **Database**: SQLAlchemy ORM with configurable database backend
+  - Default: SQLite for development
+  - Production-ready: PostgreSQL support via environment variables
+- **Database Migrations**: Automatic table creation on application startup
+- **Session Management**: Flask built-in sessions with configurable secret key
+
+### Frontend Architecture
+- **Template Engine**: Jinja2 (Flask's default)
+- **Styling**: Bootstrap with custom CSS
+- **Icons**: Font Awesome
+- **Language Support**: Arabic RTL (Right-to-Left) layout
+- **Responsive Design**: Mobile-friendly interface
+
+### Application Structure
+```
+├── app.py          # Application factory and configuration
+├── main.py         # Application entry point
+├── models.py       # Database models and business logic
+├── routes.py       # URL routing and request handling
+├── templates/      # HTML templates
+└── static/         # CSS, JS, and static assets
+```
+
+## Key Components
+
+### Database Models
+- **Shipment Model**: Core entity storing shipment information
+  - Unique tracking number generation
+  - Sender and receiver information
+  - Package details (type, weight)
+  - Timestamp tracking
+
+### Routing System
+- **Index Route** (`/`): Main application interface
+  - GET: Display shipment form and listing
+  - POST: Process new shipment creation
+- Form validation with Arabic error messages
+- Flash message system for user feedback
+
+### Tracking Number System
+- Format: `SHIP-YYYYMMDD-XXX`
+- Automatic sequence numbering per day
+- Collision-resistant generation algorithm
+
+## Data Flow
+
+1. **Shipment Creation**:
+   - User fills out shipment form
+   - Server validates input data
+   - Generate unique tracking number
+   - Store shipment in database
+   - Display confirmation to user
+
+2. **Data Validation**:
+   - Required field validation
+   - Numeric validation for weight
+   - Phone number format checking
+   - Error message display in Arabic
+
+3. **Database Operations**:
+   - Automatic table creation on startup
+   - Connection pooling for production
+   - Environment-based configuration
+
+## External Dependencies
+
+### Python Packages
+- **Flask**: Web framework and routing
+- **Flask-SQLAlchemy**: Database ORM integration
+- **Gunicorn**: WSGI HTTP server for production
+- **psycopg2-binary**: PostgreSQL database adapter
+- **email-validator**: Email validation utilities
+- **Werkzeug**: WSGI utilities and middleware
+
+### Frontend Dependencies
+- **Bootstrap**: CSS framework (CDN)
+- **Font Awesome**: Icon library (CDN)
+- **Custom CSS**: Application-specific styling
+
+### Infrastructure
+- **PostgreSQL**: Production database (via Nix packages)
+- **OpenSSL**: Security libraries (via Nix packages)
+
+## Deployment Strategy
+
+### Development Environment
+- **Runtime**: Python 3.11
+- **Database**: SQLite (file-based)
+- **Server**: Flask development server
+- **Debug Mode**: Enabled
+
+### Production Environment
+- **Server**: Gunicorn WSGI server
+- **Scaling**: Autoscale deployment target
+- **Database**: PostgreSQL via DATABASE_URL environment variable
+- **Security**: ProxyFix middleware for HTTPS support
+- **Connection Pooling**: Configured for production workloads
+
+### Configuration Management
+- Environment variables for sensitive data
+- Database URL configuration
+- Session secret management
+- Debug mode toggling
+
+### Deployment Commands
+```bash
+# Development
+python main.py
+
+# Production
+gunicorn --bind 0.0.0.0:5000 main:app
+```
+
+## Changelog
+- June 23, 2025: Initial setup with basic shipment management
+- June 23, 2025: Added admin authentication system with Flask-Login
+- June 23, 2025: Redesigned to professional admin dashboard layout with sidebar navigation
+
+## Recent Changes
+- **June 24, 2025: Implemented comprehensive User Management system with role-based permissions**
+  - Created complete user management interface with permissions control
+  - Added role-based access control with page-specific permissions (Home, Shipments, Tracking, Reports, Expenses)
+  - Implemented super admin functionality for user management access
+  - Created user cards interface showing permissions and user details
+  - Built add/edit/delete user functionality with permission assignments
+  - Enhanced Admin model with JSON permissions field and helper methods
+  - Added permission decorators to protect sensitive routes
+  - Integrated Morsal logo branding across login and sidebar
+  - Optimized dashboard status cards layout for better visual balance (max-width: 260px)
+  - Fixed database schema with proper permissions and is_super_admin columns
+  - Updated error handling with proper 500 error page
+  - Automatic super admin creation and upgrade for existing accounts
+- **June 24, 2025: Enhanced form validation and created dedicated document tracking**
+  - Added proper validation to shipment details section requiring weight, package type, cost, and contents
+  - Implemented conditional field logic to hide package contents when document type is selected
+  - Created dedicated document tracking page (/track-document/) with horizontal timeline
+  - Built 8-step document processing workflow with visual progress indicators
+  - Added admin controls for updating document status with real-time timeline updates
+  - Implemented automatic redirection from general tracking to document tracking for document shipments
+  - Enhanced user experience with smooth animations and responsive design for document tracking
+- **June 24, 2025: Added comprehensive language toggle between Arabic and English**
+  - Created translations.py with complete Arabic/English dictionary
+  - Added language switching functionality in navigation header
+  - Implemented session-based language persistence
+  - Updated all templates to use translation functions
+  - Added proper RTL/LTR direction switching
+  - Enhanced navigation and UI elements with bilingual support
+- **June 25, 2025: Implemented comprehensive Types and Pricing Management system**
+  - Added "Manage Types" section with full CRUD operations for shipment and document types
+  - Created ShipmentType and DocumentType database models with pricing support
+  - Built dynamic form integration for shipment creation using database-driven types
+  - Implemented "Pricing Management" section with individual price editing for all types
+  - Added bulk pricing update functionality and statistical overview
+  - Enhanced admin control panel with centralized type and pricing management
+  - Populated sample data for shipment types (Electronics, Clothes, Books, Medicine, Food) and document types (certificates, official documents, etc.)
+  - All changes follow existing UI/UX patterns with professional styling matching expenses page design
+- **June 25, 2025: Implemented comprehensive responsive mobile-friendly admin dashboard**
+  - Created responsive breakpoints for all table layouts (992px, 768px, 576px)
+  - Added horizontal scrolling with touch support for table overflow
+  - Implemented mobile-optimized action buttons and status badges
+  - Created mobile navigation with sidebar toggle functionality
+  - Added scroll indicators for mobile table navigation
+  - Optimized form inputs with proper mobile keyboard types
+  - Enhanced touch interactions and prevented iOS zoom issues
+  - Applied responsive design to all admin sections (shipments, types, pricing)
+- **June 25, 2025: Unified table design across entire project**
+  - Created unified table styling with white card containers, RTL support, and professional appearance
+  - Implemented consistent action buttons: green for save, purple for edit, red for delete
+  - Applied unified design to pricing tables, shipment lists, and type management tables
+  - Enhanced form styling globally with black text on white backgrounds, rounded corners, and proper placeholders
+  - Removed English name columns from pricing management as requested
+  - All tables now use the same visual structure with Tajawal font and responsive design
+  - **CRITICAL FIX: Resolved table text visibility issues with professional styling (#222 for headers, #000 for content) ensuring excellent readability across all admin dashboard tables**
+- **June 25, 2025: Implemented adaptive column alignment and text styling for shipments table**
+  - Added column-specific CSS classes for better organization and responsiveness
+  - Enhanced tracking numbers with monospace font and improved styling
+  - Implemented contact column with proper right-alignment and structured name/phone display
+  - Added numeric columns with center alignment for weights, prices, and dates
+  - Enhanced status badges and type badges with improved visual hierarchy
+  - Added responsive design adjustments for mobile devices  
+  - Improved action buttons with consistent styling and hover effects
+  - Applied comprehensive UI enhancements with dark gradient headers, professional spacing
+  - Implemented full responsiveness with mobile-optimized layouts and interactions
+  - Added enhanced status badges with color coding and proper accessibility
+  - Ensured clean visual hierarchy with proper hover effects and transitions
+  - Enhanced text visibility and contrast across all table columns for optimal readability
+  - Improved contact information display with structured name/phone layout and phone icon
+  - Strengthened price column visibility with increased font weight and size
+  - Enhanced date column readability with proper contrast and monospace formatting
+  - Applied consistent dark text colors (#1a202c, #2d3748) throughout table content
+  - Enhanced table with modern styling: center-aligned price/weight columns, status icons, improved hover effects
+  - Restructured date display with date/time on separate lines and lighter time color (#6c757d)
+  - Added comprehensive hover effects with light gray background (#f8f9fa) and subtle animations
+  - Moved print button below table with gradient styling and professional appearance
+  - Implemented full dark mode support via prefers-color-scheme media query
+  - Enhanced action buttons with modern styling and smooth hover animations
+  - Applied consistent padding and spacing throughout table for clean, professional layout
+- **June 25, 2025: Implemented comprehensive real-time shipment tracking map integration**
+  - Added location fields to Shipment model (sender/receiver/current coordinates)
+  - Created interactive tracking map page with Leaflet.js integration
+  - Implemented location picker in shipment creation form with clickable map interface
+  - Built real-time location API endpoint with simulated GPS tracking updates
+  - Added visual timeline showing shipment progress with status-based markers
+  - Enhanced tracking page with "View on Map" button for seamless navigation
+  - Created responsive map interface with custom markers for sender/receiver/current location
+  - Implemented route visualization with progress tracking and animated current position
+  - Added location refresh functionality and map centering controls
+  - Integrated comprehensive error handling and user feedback systems
+  - Enhanced status badges with distinct gradient colors, improved contrast, and visual icons
+  - Applied professional styling with hover effects and proper spacing for status indicators
+  - Implemented responsive design for status badges across all device sizes
+- **June 25, 2025: Rebuilt shipments table with proper HTML structure and styling**
+  - Created proper HTML table with complete header row and dark gradient background
+  - Fixed all text visibility issues with dark colors (#1a202c) for readable content
+  - Implemented all columns: tracking, sender/receiver (with phone below), type badges, weight, price, status, date, actions
+  - Applied professional status badges with readable dark text and gradient backgrounds
+  - Added proper action buttons (edit/view/delete) with consistent styling
+  - Positioned print button below table with right alignment and professional styling
+  - Ensured full responsive design with mobile-friendly column collapse
+  - Fixed table layout issues with proper Bootstrap table structure and consistent padding
+  - Applied professional styling improvements: deep gray header background (#1e1e2f), light cyan tracking links (#00b7ff)
+  - Implemented Tajawal/Cairo font family for better Arabic text rendering
+  - Enhanced mobile responsiveness with horizontal scroll and proper cell spacing
+  - Added translation for "SENDING_AFTER_AUTH" status to Arabic
+  - Improved vertical alignment for status and date columns with increased padding
+- **June 25, 2025: Complete professional shipments table redesign**
+  - Created modern dark-themed table with proper gradient headers and white bold text
+  - Implemented all requested columns with perfect formatting: tracking numbers, contact info, package types, weights, prices (د.ك format), status badges, dates (YYYY-MM-DD HH:mm), and action icons
+  - Applied professional color-coded status badges: green for delivered, red for cancelled, blue for shipping, orange for processing
+  - Enhanced responsive design with horizontal scroll on mobile and proper column adaptation
+  - Added professional print button with gradient styling and hover effects
+  - Implemented Tajawal/Cairo fonts for better Arabic typography
+  - Applied consistent shadows, rounded corners, and professional spacing throughout
+  - Added smooth hover effects and transitions for modern UI experience
+  - Final refinements: improved mobile responsiveness, clean table borders, monospace dates
+  - Optimized layout for better visual hierarchy and user experience
+- **June 25, 2025: Implemented comprehensive dynamic pricing system for Add New Shipment form**
+  - Added AJAX API endpoints for fetching shipment and document prices from database
+  - Implemented real-time price auto-fill based on shipment type selection and direction
+  - Created separate document pricing logic that fetches prices when document type is selected
+  - Enhanced form with auto-calculation of remaining amount when paid amount is entered
+  - Added inline validation warning when paid amount exceeds total price
+  - Made total price field read-only and auto-populated from database
+  - Updated form layout with improved Arabic labels and responsive design
+  - Removed zone field and made weight field conditional for non-document shipments only
+  - Enhanced payment tracking with "المبلغ المدفوع" and "المبلغ المتبقي" fields
+  - Added clickable tracking numbers in shipments table with Arabic tooltips for better UX
+- **June 25, 2025: Removed shipments page completely**
+  - Deleted shipments.html template file
+  - Removed all shipments-related routes from routes.py (shipments, delete_shipment, edit_shipment, update_shipment)
+  - Removed shipments navigation link from base.html sidebar
+  - Removed shipments quick action from dashboard.html
+  - Removed shipments translation keys from translations.py
+  - Cleaned up all references to shipments page throughout the project
+  - Page will be recreated from scratch as requested
+- **June 25, 2025: Created consolidated Settings page with tabbed interface**
+  - Merged three management sections (Manage Types, Pricing Management, User Management) into single Settings page
+  - Created new settings.html template with Bootstrap pill navigation tabs
+  - Implemented internal sections for Types, Pricing, and Users with full functionality
+  - Updated sidebar navigation to show single "Settings" menu item instead of three separate items
+  - Redirected old management routes to appropriate Settings page tabs with hash anchors
+  - Created modular modal templates for all CRUD operations (add/edit types and users)
+  - Applied consistent professional styling with purple gradient theme throughout Settings interface
+  - Added comprehensive statistics and overview cards for better data visualization
+  - Enhanced user experience with smooth tab transitions and responsive design
+  - Maintained all existing functionality while consolidating user interface
+- **June 25, 2025: Unified pricing table design across both shipment and document types**
+  - Converted both "Shipment Types Prices" and "Document Types Prices" sections from card layout to structured table format
+  - Implemented consistent table styling with gradient headers, hover effects, and professional appearance
+  - Added inline edit functionality with save buttons for better user experience
+  - Enhanced pricing display with color-coded price badges and proper alignment
+  - Maintained RTL Arabic layout throughout pricing management interface
+  - Fixed document price fetching API with proper error handling and fallback mechanisms
+- **June 25, 2025: Enhanced shipment pricing table structure**
+  - Updated "Shipment Types Prices" table to include "سعر الكيلو (د.ك)" column for per-kilogram pricing
+  - Added "الوزن" column showing variable weight indication
+  - Restructured table columns: Shipment Type, Price per KG, Weight, Actions
+  - Maintained consistent RTL design and professional styling
+  - Created complete Edit Shipment functionality with dynamic pricing from Settings → الأسعار
+- **June 25, 2025: Replaced complex pricing table with simplified manual input system**
+  - Converted "Shipment Types Prices" from table format to simple labeled input fields
+  - Each shipment type now has format: [Type Name] : [Input Field] سعر الكيلو
+  - Enhanced visual design with hover effects and professional styling
+  - Added black text color for input fields for better readability
+  - Maintained responsive RTL layout and save functionality
+  - Document Types pricing remains unchanged as table format
+- **June 25, 2025: Removed Shipment Types Prices table completely**
+  - Deleted entire "أسعار أنواع الشحنات" section from Settings → Prices page
+  - Pricing for shipments will now be entered manually by users in the New Shipment form using Price per KG
+  - Document Types pricing table remains unchanged and functional
+  - Simplified pricing management workflow for shipment types
+- **June 25, 2025: Added Price per KG input field to Settings → Prices**
+  - Created new "سعر الكيلو للشحنات" section with single input field for global price per KG setting
+  - Added professional styling with RTL layout and responsive design
+  - Implemented route handler for updating price per KG value stored in session
+  - Added form validation and success/error messaging
+  - Input accepts decimal values with 0.000 format for precise pricing
+  - Value will be used for automatic price calculation in New Shipment form
+- **June 25, 2025: Implemented auto-calculation of shipment price based on weight**
+  - Added real-time price calculation: السعر الإجمالي = الوزن × سعر الكيلو
+  - Weight input field triggers automatic price updates on value change
+  - Exception handling for document shipments (uses document type pricing instead)
+  - Display calculation formula and validation messages for user feedback
+  - Price field remains read-only to prevent manual editing
+  - Integration with global price per KG setting from Settings page
+- **June 25, 2025: Enhanced UI styling for Price per KG section**
+  - Applied bold black styling to "سعر الكيلو للشحنات" label for better visibility
+  - Reduced input field width from full-width to compact design (max-width: 150px)
+  - Improved responsive layout with better column proportions (col-md-2, col-md-4, col-md-3)
+  - Enhanced visual hierarchy and form alignment in Settings → Prices page
+- **June 25, 2025: Implemented clickable tracking numbers in shipments table**
+  - Made tracking numbers in both regular and document shipments tables clickable links
+  - Regular shipments link to track_shipment page, document shipments link to track_document page
+  - Added hover effects and professional styling for tracking links
+  - Links auto-populate tracking page with selected tracking number
+  - Enhanced user experience with tooltips and smooth transitions
+- **June 25, 2025: Updated form validation for conditional field requirements**
+  - Modified Add Shipment form to have conditional validation based on shipment type
+  - When "مستندات" selected: weight, price, and contents fields are NOT required
+  - When other types selected: weight, price, and contents fields ARE required
+  - Updated backend validation logic to handle conditional requirements
+  - Enhanced frontend JavaScript for dynamic field visibility and validation
+  - Improved user experience with smooth transitions and proper error handling
+- **June 26, 2025: Implemented comprehensive zone-based pricing system with packaging costs**
+  - Added zone and packaging fields to Shipment database model
+  - Created ZonePricing and PackagingType database tables with sample data
+  - Updated Add New Shipment form with zone selection and packaging options
+  - Implemented automatic price calculation: (Zone Price per KG × Weight) + Packaging Cost
+  - Added API endpoints for zone pricing and packaging cost retrieval
+  - Enhanced pricing logic to support multiple zones (Khartoum, Omdurman, Gezira, Kassala, Port Sudan)
+  - Added packaging options (Standard Box, Strong Box, Envelope, No Packaging)
+- **June 26, 2025: Added comprehensive Actions column to shipments tables**
+  - Added "الإجراءات" (Actions) column to both General Shipments and Document Shipments tables
+  - Implemented Edit button that opens shipment in Edit Shipment page with pre-filled values
+  - Added Delete button with JavaScript confirmation modal for safe deletion
+  - Created delete_shipment API endpoint with proper error handling and logging
+  - Enhanced dashboard Recent Shipments table with same Actions functionality
+  - Applied consistent styling and responsive design for action buttons
+  - Added proper permission checks for shipment deletion (requires 'shipments' permission)
+- **June 26, 2025: Added Professional Print Invoice Functionality**
+  - Created print invoice button for each shipment in Actions column across all tables
+  - Built comprehensive print_invoice.html template with professional RTL Arabic design
+  - Implemented print-friendly styling with proper layout for physical printing on A4 paper
+  - Added responsive design for invoice page supporting mobile, tablet, and desktop views
+  - Included complete shipment details: sender/receiver info, tracking number, price, and company branding
+  - Added print and close buttons with JavaScript functionality for user convenience
+  - Applied consistent styling with gradient headers and professional invoice layout
+  - Invoice opens in new window for printing while preserving main dashboard functionality
+  - Features automatic zone and packaging information display when available
+- **June 26, 2025: Redesigned Shipments Table with Enhanced Layout and Export Functionality**
+  - Completely redesigned shipments table to match screenshot layout with exact column order (RTL)
+  - Added columns: Tracking Number, Status, Sender Name, Receiver Name, Weight, Contents, Cost, Date, Actions
+  - Implemented color-coded status badges with distinct backgrounds for each shipment status
+  - Added 3-button action column: Edit (✏️), Delete (🗑️), Print Invoice (🖨️) with appropriate icons and tooltips
+  - Removed View button from Actions column as requested, keeping only essential actions
+  - Created Print Table and Export CSV buttons at top of table for bulk operations
+  - Enhanced print invoice to show "Contents" for general shipments and "Procedure" for document shipments
+  - Applied professional styling with gradient headers, hover effects, and responsive design
+  - Added confirmation modal for safe shipment deletion with proper error handling
+  - Integrated JavaScript functionality for table printing and CSV export with proper Arabic text encoding
+- **June 26, 2025: Redesigned Print Invoice for A5 Size (Half A4 Sheet)**
+  - Completely rebuilt print invoice template to fit within A5 dimensions (13.5cm height)
+  - Created compact, centered layout optimized for printing on upper half of A4 page
+  - Added company logo, sender/receiver information, tracking number, and shipment price
+  - Implemented conditional content display: "Contents" for general shipments, "Procedure" for documents
+  - Added authorized signature section at bottom with space for recipient signature
+  - Included Print button that triggers browser's print dialog with keyboard shortcuts (Ctrl+P, Escape)
+  - Applied print-specific CSS with A5 page size and optimized font scaling
+  - Enhanced mobile responsiveness while maintaining compact print layout
+  - Removed unnecessary spacing and margins for maximum space efficiency
+- **June 26, 2025: Optimized Shipments Table Layout for Compact Visual Balance**
+  - Reduced column widths and padding to eliminate horizontal scrolling and improve visual balance
+  - Optimized column width distribution: Tracking (12%), Status (10%), Sender/Receiver (16% each), Weight (8%), Contents (18%), Cost (10%), Date (12%), Actions (8%)
+  - Reduced table padding from 1rem to 0.75rem for header and 0.5rem for body cells
+  - Minimized action button sizes from 36px to 30px with reduced gap spacing
+  - Compressed status badges and user information fonts for better space utilization
+  - Added tablet-specific responsive breakpoints (769px-1024px) for optimal medium screen display
+  - Enhanced mobile responsiveness with further reduced button sizes and compact spacing
+  - Maintained readability while achieving clean, professional table layout without horizontal scroll
+- **June 26, 2025: Enhanced Print Invoice with Arabic Language Consistency and Professional Layout**
+  - Fixed all content to be consistently in Arabic with proper translations for shipment types (electronics → إلكترونيات, clothes → ملابس, etc.)
+  - Redesigned signature section with clear "توقيع العميل" label and dashed signature box for customer signature
+  - Increased button spacing between Print and Close buttons and changed Close button to red color to prevent misclicks
+  - Reduced content height from 13.5cm to 12.5cm to better fit within half A4 page (A5 size)
+  - Added circular company stamp "مرسال للشحن" positioned at bottom-right corner with professional styling
+  - Optimized vertical spacing between all sections for more compact layout
+  - Enhanced print-specific CSS with proper A5 page dimensions and scaling
+  - Created business-ready Arabic invoice template with clear sections, professional borders, and authentic branding
+- **June 26, 2025: Separated Shipments into Two Distinct Tables**
+  - Created two separate tables on the same page: "الشحنات العامة" (General Shipments) and "شحنات المستندات" (Document Shipments)
+  - General Shipments table displays only non-document shipments with columns: Tracking Number, Status, Sender, Receiver, Weight, Contents, Cost, Date, Actions
+  - Document Shipments table displays only document-type shipments with specialized "نوع الإجراء" (Procedure Type) column instead of Contents
+  - Each table has independent print and CSV export functionality with table-specific IDs
+  - Implemented proper routing logic: general shipments link to track_shipment, document shipments link to track_document
+  - Added distinct section headers with appropriate icons (box for general, file-alt for documents)
+  - Both tables maintain the same compact, professional styling and responsive design
+  - Created clean separation while keeping all functionality intact including edit, delete, and print invoice actions
+- **June 26, 2025: Removed Circular Stamp from Print Invoice**
+  - Completely removed the circular company stamp "مرسال للشحن" from the invoice page
+  - Eliminated all CSS styling and HTML elements related to the stamp
+  - Updated print media queries to remove stamp references
+  - Maintained clean, professional invoice layout without any stamps, watermarks, or background images
+  - Invoice design remains focused on essential business information with clear signature area
+- **June 26, 2025: Improved Sender and Receiver Name Display with Stacked Layout**
+  - Updated both General Shipments and Document Shipments tables to display phone numbers below names
+  - Implemented stacked layout: Line 1 shows full name (bold, dark color), Line 2 shows phone number (smaller, lighter color)
+  - Enhanced mobile responsiveness with optimized font sizes and spacing for different screen sizes
+  - Improved visual hierarchy with proper margin spacing (0.3rem on desktop, 0.25rem on tablet, 0.2rem on mobile)
+  - Maintained consistent alignment and clean design across all table rows
+  - Applied responsive font scaling: desktop (0.85rem/0.7rem), tablet (0.8rem/0.65rem), mobile (0.75rem/0.6rem)
+- **June 26, 2025: Enhanced Document Shipments Table Layout**
+  - Replaced "Weight" column with "Document Type" (نوع المستند) column in Document Shipments table
+  - Removed phone numbers from both Sender Name and Receiver Name columns in Document Shipments table
+  - Document Shipments table now displays only full names without phone numbers for cleaner layout
+  - Added document-type-cell CSS styling with proper width (8%) and responsive breakpoints
+  - Maintained clean, aligned, and responsive design across all screen sizes
+  - Document Type column displays "مستندات" for all document shipments with consistent styling
+- **June 26, 2025: Implemented Authentic Document Data Display from Database**
+  - Created get_document_type_arabic() helper function to retrieve Arabic names for document types
+  - Updated Document Shipments table to display actual document type names from DocumentType database table
+  - Enhanced procedure type display to show action_required field values stored in package_contents
+  - Fixed form data handling to properly store action_required field for document shipments
+  - Document Type column now shows authentic data: "الشهادات الرسمية", "الأوراق العامة", etc. from database
+  - Procedure Type column displays user-entered procedures like "ترجمة", "توثيق", "تصديق" from form submissions
+  - Added proper fallback handling for missing data with "غير محدد" display for empty procedure fields
+- **June 26, 2025: Rebuilt Edit Shipment page to match Add New Shipment layout exactly**
+  - Completely recreated edit_shipment.html template with identical form structure to Add New Shipment
+  - Implemented same card-based layout: Sender Information, Receiver Information, and Shipment Details cards
+  - Added all form fields: zone selection, packaging options, document type, action required, weight, contents
+  - Integrated same dynamic behavior: hiding weight/contents for documents, showing packaging for regular shipments
+  - Enhanced update_shipment route with comprehensive validation and all new field handling
+  - Preserved original tracking number during updates (no new tracking number generation)
+  - Added proper conditional logic for document vs regular shipment field validation
+  - Implemented zone-based pricing, packaging costs, and document pricing integration
+  - Added comprehensive form validation with Arabic error messages and proper field requirements
+  - Enhanced success handling with redirect to main page and success notification display
+- **June 26, 2025: Updated Document Shipments table column label**
+  - Changed column header from "نوع الإجراء" (Procedure Type) to "الإجراء" (Procedure) for cleaner terminology
+  - Maintained same data source and functionality, only updated the display label
+  - Applied consistent Arabic labeling throughout the Document Shipments table interface
+- **June 26, 2025: Reorganized Dashboard Layout for Better User Experience**
+  - Moved Quick Actions card to top left corner of dashboard, above shipments table
+  - Grouped Monthly Statistics with Total Revenue cards at top center position
+  - Restructured layout: Quick Actions (left), Revenue & Monthly Stats (center), Statistics Cards (below)
+  - Enhanced mobile responsiveness for reorganized layout with proper breakpoints
+  - Removed duplicate sidebar components and created cleaner dashboard structure
+  - Applied consistent styling and alignment for all repositioned components
+- **June 26, 2025: Simplified General Shipments table contact display**
+  - Removed phone numbers from Sender Name and Receiver Name columns in General Shipments table
+  - Display only names without phone numbers for cleaner, more focused layout
+  - Change applies only to General Shipments table, Document Shipments table remains unchanged
+  - Maintained consistent styling and alignment for simplified contact information display
+- **June 26, 2025: Fixed and Enhanced Shipment Delete Operation**
+  - Fixed delete operation URL and HTTP method (POST instead of DELETE) to match backend route
+  - Changed permission requirement from 'shipments' to 'Home' for proper access control
+  - Added comprehensive error handling with specific messages for missing shipments vs server errors
+  - Implemented smooth row removal without page reload using fade-out animation
+  - Added loading state with disabled button and progress text during deletion
+  - Enhanced error messages: "الشحنة غير موجودة أو تم حذفها مسبقاً" for missing shipments
+  - Added notification system with success/error alerts positioned at top-right
+  - Implemented empty table state detection and display after deletions
+  - Applied fixes to both shipments page and dashboard delete operations
+- **June 26, 2025: Redesigned Print Invoice with Clean Minimal Design**
+  - Removed all colored backgrounds, gradients, and decorative styles from invoice
+  - Applied plain white background with simple black text throughout entire invoice
+  - Eliminated colored headers, buttons, and sections (green, orange, blue boxes)
+  - Created clean, minimal layout similar to official receipt format
+  - Added dual signature section at bottom with separate fields for "توقيع الموظف" and "توقيع المرسل"
+  - Implemented dashed signature lines for manual signing when printed
+  - Enhanced print-friendly design for A4 and A5 paper with proper borders and spacing
+  - Maintained proper RTL Arabic layout and professional typography
+- **June 26, 2025: Implemented Tabbed Interface for Shipments Page Organization**
+  - Created two-tab navigation system to separate General Shipments and Document Shipments
+  - Tab 1: "الشحنات العامة" (General Shipments) - set as default active tab
+  - Tab 2: "شحنات المستندات" (Document Shipments)
+  - Implemented smooth tab switching without page reload using Bootstrap pills
+  - Maintained exact table structure and styling for both shipment types
+  - Added professional tab styling with gradients, shadows, and hover effects
+  - Enhanced mobile responsiveness with adaptive tab sizing and icon hiding
+  - Preserved all existing functionality: print, export CSV, add shipment buttons
+  - Applied consistent styling across both tabs with proper fade transitions
+- **June 26, 2025: Added Status-Based Sub-Tabs for Advanced Shipment Filtering**
+  - Implemented second-level status filtering tabs within each main shipment tab
+  - Added 6 status sub-tabs: عرض الكل (All), تم التسليم (Delivered), في الانتظار (Pending), في الطريق (In Transit), تم الإنشاء (Created), ملغاة (Canceled)
+  - Applied color-coded status badges with distinct gradients for each status type
+  - Implemented instant filtering without page reload using JavaScript
+  - Added automatic reset to "All Shipments" when switching between main tabs
+  - Enhanced mobile responsiveness with adaptive sub-tab sizing and collapsible design
+  - Created empty state messages for filtered results with search icon
+  - Applied status-specific color schemes: green for delivered, yellow for pending, blue for in-transit, etc.
+  - Maintained all existing table functionality while adding advanced filtering capabilities
+- **June 27, 2025: Created Professional Invoice Page with Clean Design**
+  - Built new professional_invoice.html template with clean white background design
+  - Positioned company logo at top right corner as requested
+  - Implemented structured layout: sender info (top left), recipient info (below sender), shipment details (centered)
+  - Added footer section with client signature (bottom left) and staff signature (bottom right)
+  - Applied Tajawal font family for Arabic text compatibility
+  - Created print-friendly A4 format with proper margins and spacing
+  - Added thin borders and light gray lines for section separation
+  - Implemented mobile-responsive design with adaptive layouts
+  - Integrated real shipment data display with proper Arabic translations
+  - Added keyboard shortcuts (Ctrl+P for print, Escape to close)
+  - Updated print_invoice route to use new professional template
+- **June 25, 2025: Updated shipment tracking routing logic based on package type**
+  - Modified tracking links throughout the system to route conditionally based on shipment type
+  - Document shipments (package_type == 'document') redirect to /track-document/ route
+  - All other shipment types redirect to /track-shipment/ route
+  - Updated tracking links in: shipments table, dashboard recent activity, tracking map page
+  - Fixed package type checking in routes.py to use 'document' instead of 'documents'
+  - Enhanced user experience with appropriate tracking page routing for different shipment types
+- **June 25, 2025: Implemented comprehensive notification system with tracking integration**
+  - Added Notification model to database with read/unread status tracking
+  - Created notification bell icon in top navigation with real-time badge counter
+  - Implemented automatic notification creation when new shipments are created
+  - Added notification API endpoints for fetching and marking notifications as read
+  - Integrated notification clicks with conditional tracking page routing
+  - Added auto-refresh every 30 seconds for real-time notification updates
+  - Enhanced user experience with proper notification management and tracking integration
+- **June 25, 2025: Implemented comprehensive responsive design across entire system**
+  - Added mobile navigation with hamburger menu and overlay for screens ≤768px
+  - Enhanced all pages with responsive breakpoints: mobile (≤576px), tablet (≤768px), desktop (>768px)
+  - Implemented mobile-first form optimizations with proper input types and font sizes
+  - Added responsive table design with horizontal scroll and mobile-optimized layouts
+  - Created mobile-friendly dashboard with stacked stats cards and vertical button layouts
+  - Enhanced sidebar navigation with smooth transitions and mobile overlay functionality
+  - Applied responsive design to all major pages: dashboard, shipments, tracking, expenses, settings, add shipment
+  - Prevented iOS zoom issues with 16px font size on form inputs
+  - Added touch-friendly button sizes and proper spacing for mobile interactions
+- **June 25, 2025: Added Professional Print Invoice Functionality**
+  - Created print invoice button for each shipment in Recent Shipments table
+  - Built comprehensive print_invoice.html template with professional RTL Arabic design
+  - Implemented print-friendly styling with proper layout for physical printing
+  - Added responsive design for invoice page supporting mobile, tablet, and desktop views
+  - Included complete shipment details: sender/receiver info, tracking number, price, and company branding
+  - Added print and close buttons with JavaScript functionality for user convenience
+  - Applied consistent styling with gradient headers and professional invoice layout
+  - Invoice opens in new window for printing while preserving main dashboard functionality
+- **June 25, 2025: Removed required field validation from Add New Shipment form**
+  - Removed 'required' attributes from all form fields including sender name, phone, receiver info, direction, package type, weight, price, and contents
+  - Updated backend validation to only check format/type validity, not field presence
+  - Modified form labels to remove asterisks (*) indicating required fields
+  - Updated JavaScript validation to only validate format, allowing empty submissions
+  - Added default values for core fields (sender/receiver names default to 'غير محدد', direction to 'kuwait_to_sudan', package type to 'general')
+  - All shipment creation fields are now completely optional, enabling flexible data entry
+- **June 28, 2025: Simplified packaging system to single checkbox with real-time pricing**
+  - Converted packaging field from multiple options to single checkbox "تغليف"
+  - Added has_packaging boolean field to Shipment database model
+  - Implemented real-time price calculation that adds packaging price when checkbox is selected
+  - Integrated packaging pricing from GlobalSettings (packaging_price, waybill_price, comment_price)
+  - Enhanced JavaScript for instant price updates without page reload when checkboxes are toggled
+  - Updated price breakdown display to show detailed calculation including packaging, policy, and comment costs
+  - All pricing changes reflect immediately in the total price field with accurate breakdown messages
+- **June 28, 2025: Implemented manual waybill pricing system with conditional display**
+  - Removed fixed waybill_price from GlobalSettings and pricing management interface
+  - Added waybill_price decimal field to Shipment database model for manual entry
+  - Created conditional input field that appears only when policy checkbox is selected
+  - Implemented JavaScript toggle functionality for showing/hiding waybill price input
+  - Enhanced real-time price calculation to include manual waybill pricing in total cost
+  - All waybill pricing is now entered manually per shipment instead of global settings
+- **June 28, 2025: Updated shipment status display system to match tracking page stages**
+  - Created unified status display function supporting all tracking stages: created, packaged, dispatching, shipped, in_transit, received, delivered, cancelled
+  - Updated shipments table tabs to use actual tracking stage names instead of generic status categories
+  - Enhanced status badges with proper color coding for each tracking stage
+  - Synchronized status display between shipments page, dashboard, and tracking pages
+  - Implemented status-based filtering tabs matching tracking workflow progression
+  - Added comprehensive status mapping with Arabic translations and CSS classes
+  - Ensured real-time status updates reflect automatically in shipments table when tracking status changes
+- **June 28, 2025: Completed unified status system integration across all pages**
+  - Applied unified status display function to all tables: General Shipments, Document Shipments, Dashboard Recent Shipments
+  - Updated tracking page to use same status display function for consistency
+  - Enhanced update_status function to sync database changes with table displays automatically
+  - Added comprehensive CSS styling for all tracking stages with proper color gradients
+  - Status updates in tracking page now reflect immediately in shipments table without manual refresh
+  - Ensured complete synchronization: tracking page ↔ shipments tables ↔ dashboard displays
+  - All status changes are logged and use Arabic translations consistently across the system
+- **June 28, 2025: Fixed remaining amount calculation and storage system**
+  - Added remaining_amount column to Shipment database model with proper migration
+  - Updated add shipment and edit shipment routes to calculate and store remaining amount (price - paid_amount)
+  - Modified professional invoice template to display remaining amount directly from database instead of calculating
+  - Updated unpaid shipments filtering to use stored remaining_amount field for accuracy
+  - Enhanced payment tracking system with consistent database storage and retrieval
+  - All existing shipments updated with calculated remaining amounts through database migration
+- **June 28, 2025: Converted weight and paid amount fields to manual text inputs**
+  - Changed weight field from number input with spinner to manual text input in Add New Shipment form
+  - Updated paid amount field to text input without increment/decrement buttons
+  - Applied same changes to Edit Shipment form for consistency
+  - Added inputmode="decimal" and pattern validation for better mobile experience
+  - Enhanced styling for numeric text inputs with proper Arabic font family
+  - Removed spinners completely while maintaining decimal precision support
+- **June 28, 2025: Implemented payment completion system for unpaid shipments**
+  - Removed status column from unpaid shipments table and added "تم الدفع" payment column
+  - Created interactive payment button with credit card icon for each unpaid shipment
+  - Built comprehensive payment modal with shipment details and amount input
+  - Added backend API endpoint (/api/process_payment) for payment processing
+  - Implemented real-time payment updates without page reload using AJAX
+  - Added automatic row removal when shipment is fully paid (remaining amount = 0)
+  - Enhanced partial payment support with live amount updates in table
+  - Created professional modal design with validation and error handling
+  - Added smooth animations for row removal and empty state management
+- **June 28, 2025: Modified invoice template for document shipments procedure display**
+  - Updated professional invoice to show "الإجراء" (Procedure) instead of "المحتويات" (Contents) for document shipments only
+  - Invoice now displays the manually entered procedure value from the shipment form's action required field
+  - Regular shipments continue to show "المحتويات" (Contents) as before
+  - Ensures document invoices accurately reflect the specific procedure requested by the customer
+- **June 28, 2025: Transformed expenses page into comprehensive Financial Center**
+  - Renamed "المصروفات" to "المركز المالي" (Financial Center) in navigation and system
+  - Created tabbed interface with two sections: "المصروفات" (Expenses) and "الإيرادات" (Revenues)
+  - Added FinancialTransaction database model to store both expenses and revenues with transaction_type field
+  - Built comprehensive forms for adding expenses and revenues with name and amount fields
+  - Implemented real-time data display in responsive tables with automatic date stamping
+  - Added delete functionality for both expenses and revenues with confirmation dialogs
+  - Created professional styling with color-coded badges (red for expenses, green for revenues)
+  - Enhanced mobile responsiveness and smooth tab transitions without page reload
+  - Updated sidebar navigation to point to new Financial Center route
+  - Maintained backward compatibility with legacy expenses route redirecting to Financial Center
+- **June 28, 2025: Enhanced shipping sticker with weight information display**
+  - Added weight field to print_sticker.html template showing shipment weight
+  - Weight displays with 3 decimal precision format (e.g., "2.500 كيلو")
+  - Integrated with existing shipment data from Add New Shipment form
+  - Maintains consistent styling with other sticker information sections
+  - Shows fallback weight of "1.000 كيلو" for demo purposes when no weight available
+- **June 28, 2025: Implemented comprehensive accounting system in Financial Center**
+  - Expanded FinancialTransaction model with category, description, and transaction_date fields
+  - Added helper methods to Shipment model for calculating shipment revenues, packaging revenue, and policy revenue
+  - Created three-tab interface: المصروفات (Expenses), الإيرادات (Revenues), التقرير المحاسبي (Accounting Report)
+  - Implemented date filtering functionality with from/to date selection for all financial data
+  - Built comprehensive accounting report showing total revenues, expenses, net profit/loss, and shipment statistics
+  - Added detailed revenue breakdown: shipment revenue, packaging fees, policy fees, manual revenues
+  - Enhanced forms with category and description fields for better transaction categorization
+  - Created professional dashboard with summary cards, detailed breakdowns, and export options placeholders
+  - Integrated real-time calculation of financial metrics from both manual transactions and shipment data
+  - Applied responsive design with mobile-friendly interface and professional styling throughout
+- **June 28, 2025: Company rebranding to "مرسال إكسبرس للاستيراد والتصدير"**
+  - Updated company name throughout entire system from "مرسال للشحن" to "مرسال إكسبرس للاستيراد والتصدير"
+  - Modified all page headers, navigation bars, and sidebar branding
+  - Updated login page and error pages with new company name
+  - Enhanced print invoices and professional invoices with new branding
+  - Modified tracking page displays and print stickers with updated company identity
+  - Updated translations.py for both Arabic and English versions
+  - Added company name prominently to shipping stickers for clear brand visibility
+  - Ensured consistent branding across all system components without affecting functionality
+- **June 28, 2025: Simplified professional invoice design**
+  - Removed complex contact information table containing sender and receiver names
+  - Redesigned invoice to display only essential contact information: sender phone, receiver phone, and receiver address
+  - Created cleaner contact information section with modern row-based layout
+  - Removed duplicate contact footer section to eliminate redundant information
+  - Enhanced invoice readability with better spacing and organized design
+  - Maintained all critical shipment details while reducing visual clutter
+- **June 28, 2025: Implemented comprehensive permissions system overhaul**
+  - Added permission decorators to all protected routes (expenses, reports, settings, shipments, add_shipment)
+  - Updated database permissions for all users including new 'settings' permission
+  - Enhanced sidebar navigation to conditionally hide links based on user permissions
+  - Added permission checks to dashboard quick actions (add shipment, tracking, reports)
+  - Protected all "Add New Shipment" buttons throughout system with permission validation
+  - Fixed template syntax errors and ensured proper permission-based access control
+  - Implemented strict page access control preventing unauthorized direct URL access
+  - Created granular permission system supporting: home, shipments, tracking, reports, expenses, add_shipment, settings
+- **June 28, 2025: Enhanced Financial Center with comprehensive revenue categorization and real-time panels**
+  - Added revenue_type field to FinancialTransaction model for categorizing revenues (general_shipments, documents)
+  - Created revenue type dropdown in revenues form with "إيرادات شحنات عامة" and "إيرادات مستندات" options
+  - Added "نوع الإيراد" column to revenues table with color-coded badges for each revenue type
+  - Implemented interactive revenue totals sidebar panel showing real-time breakdown by category
+  - Created interactive expense invoice panel that updates automatically without page refresh
+  - Added comprehensive accounting report with revenue type breakdown and detailed financial analysis
+  - Enhanced three-tab interface with improved styling and professional layout (8-column main, 4-column sidebar)
+  - Implemented real-time API endpoints (/api/revenue_totals, /api/expense_invoice) for live data updates
+  - Added JavaScript handlers for form submissions with automatic panel updates and notifications
+  - Applied modern styling with gradient cards, professional typography, and responsive design
+  - Enhanced delete functionality with real-time updates across all panels and tables
+- **June 29, 2025: Implemented automatic revenue calculation system linked to shipments database**
+  - Modified revenue calculation to automatically link to shipment databases for real-time updates
+  - Created get_general_shipments_revenue() and get_documents_revenue() methods in Shipment model
+  - Updated Financial Center to calculate "إيرادات الشحنات العامة" automatically from general shipments in database
+  - Updated Financial Center to calculate "إيرادات المستندات" automatically from document shipments in database
+  - Added third revenue category "إيرادات أخرى" for manual entry only (replaces old manual shipment/document entries)
+  - Enhanced revenue totals sidebar panel with three categories: automatic general shipments, automatic documents, manual other revenues
+  - Updated API endpoints to provide real-time automatic revenue calculations from shipment data
+  - Modified JavaScript to support three-category revenue display with automatic database integration
+  - Added descriptive labels showing data source: "من قاعدة البيانات" for automatic, "مدخلة يدوياً" for manual
+  - Ensured real-time updates when shipments are added/deleted affecting revenue totals automatically
+- **June 29, 2025: Completely removed "Shipment Cost" field from all user interfaces**
+  - Hidden cost field from Add New Shipment form (converted to hidden input with default value 0.0)
+  - Hidden profit calculation field from Add New Shipment form (maintained as hidden input for backend)
+  - Added hidden cost and profit fields to Edit Shipment form with existing shipment values
+  - Removed "التكلفة" (Cost) column from both General Shipments and Document Shipments tables
+  - Removed shipment cost display from professional invoice template completely
+  - Maintained all backend functionality and database operations for cost tracking
+  - Cost calculations continue to work internally for financial reporting without UI exposure
+  - Users can no longer see, enter, or interact with shipment cost fields anywhere in the system
+- **June 29, 2025: Implemented sophisticated access control system for shipment cost visibility in Financial Center**
+  - Created admin-only "تحليل تكاليف الشحنات" (Shipment Cost Analysis) section in Financial Center reports
+  - Added comprehensive shipment cost breakdown: total costs, average cost per shipment, total profits, profit margin
+  - Implemented permission-based access control using current_user.has_permission('expenses') for cost data visibility
+  - Enhanced financial report API endpoint to include shipment cost calculations only for admin users
+  - Added real-time JavaScript updates for shipment cost analysis data in dynamic reports
+  - Shipment costs remain completely hidden from regular users but accessible to admin-level users in Financial Center
+  - Created professional styling for cost analysis section with appropriate icons and color coding
+  - Ensured security by validating admin permissions before exposing any cost-related data
+  - All shipment cost information is now exclusively available through Financial Center with proper access control
+- **June 29, 2025: Completely removed standalone Reports page and integrated all reporting into Financial Center**
+  - Deleted reports.html template file permanently from system
+  - Removed "التقارير" link from sidebar navigation in base.html
+  - Deleted entire reports() route function from routes.py including all statistics calculations
+  - Consolidated all financial reporting functionality within Financial Center as fourth tab "التقارير المالية"
+  - Created comprehensive dynamic reporting system with dropdown selection (weekly/monthly/yearly reports)
+  - Implemented real-time API endpoint /api/financial_report for period-based data extraction
+  - Built JavaScript functions for automatic period calculation and report generation
+  - Added professional print functionality for financial reports with A4 layout
+  - Enhanced reporting with shipment statistics, revenue breakdown, expense analysis, and net profit calculations
+  - All financial reports now accessible exclusively through Financial Center, eliminating duplicate functionality
+  - Fixed dashboard quick actions to redirect "التقارير المالية" button to Financial Center instead of deleted reports page
+  - Updated permission requirements from 'reports' to 'expenses' for accessing financial reports functionality
+- **June 29, 2025: Implemented comprehensive error handling and debugging system for shipment creation**
+  - Added detailed form data logging and validation for all numeric fields (weight, price, cost, paid amount)
+  - Implemented robust float conversion with fallback values to prevent "could not convert string to float" errors
+  - Enhanced error messages with specific feedback for different error types (database, validation, conversion errors)
+  - Added comprehensive debug logging showing variable types and values before database insertion
+  - Fixed default value initialization for all required fields to prevent undefined variable errors
+  - Created specific error handling for IntegrityError, ValidationError, and OperationalError exceptions
+  - Implemented transaction rollback on errors to maintain database consistency
+  - Added detailed traceback logging for development debugging and troubleshooting
+  - Enhanced user feedback with Arabic error messages explaining exact issues and suggested solutions
+  - Fixed tracking page server errors by correcting broken route references in track_search.html template
+- **June 29, 2025: Restructured Financial Center with categorized expense management system**
+  - Added shipping_type column to FinancialTransaction database model with proper migration
+  - Moved shipping type categorization (شحن بري، شحن جوي، مستندات) as internal sub-tabs within "المصروفات" tab only
+  - Removed global purple buttons for shipping categories and made them scoped within expenses section
+  - Created dedicated forms for each shipping type with category-specific placeholders and validation
+  - Implemented /api/shipping_expenses/<shipping_type> endpoint for loading categorized expense data
+  - Added real-time AJAX table loading with running totals for each shipping category
+  - Enhanced JavaScript with loadShippingExpenses() function for dynamic content updates
+  - Applied consistent styling with red gradient theme for expense sub-tabs matching expense context
+  - Added comprehensive form submission handlers and delete functionality for categorized expenses
+  - Each sub-tab displays dedicated expense table with category-specific totals in format "الإجمالي: 000.000 د.ك"
+  - Maintained all existing functionality while providing precise expense categorization by shipping method
+- **June 29, 2025: Completely restructured revenue categorization system with comprehensive General Shipments Revenue organization**
+  - Redesigned "الإيرادات" (Revenue) tab structure with two main categories: "إيرادات الشحنات العامة" and "إيرادات المستندات"
+  - Created consolidated "General Shipments Revenue" section combining land shipping (شحن بري) and air shipping (شحن جوي) under unified interface
+  - Implemented side-by-side form layout within General Shipments Revenue tab for both shipping types
+  - Added dedicated /api/revenue_category/<category> endpoint supporting "general_shipments" and "documents" categories
+  - Enhanced loadRevenueCategory() JavaScript function with comprehensive data handling for grouped revenue types
+  - Created renderGeneralShipmentsRevenues() and renderShippingTypeTable() functions for dual-table display
+  - Applied professional styling with hover effects and responsive design for revenue category tables
+  - Maintained separate documents revenue section with full functionality and existing interface
+  - Integrated comprehensive profit & loss analysis section in financial reports with shipping-type breakdown
+  - Updated financial report API endpoint to provide detailed revenue/expense/profit analysis by shipping method
+  - Added profit-loss-card CSS styling with gradient backgrounds and professional visual hierarchy
+  - Created comprehensive "تقرير الأرباح والخسائر حسب نوع الشحن" section with individual P&L cards for each shipping type
+  - Enhanced financial reporting with real-time calculation of net profit for land shipping, air shipping, and documents separately
+- **June 29, 2025: Implemented conditional shipping method field with database integration**
+  - Added shipping_method VARCHAR(20) column to Shipment database model for storing air/land shipping preferences
+  - Created conditional "طريق الشحن" dropdown field in Add New Shipment form with options: جوي (Air) and بري (Land)
+  - Implemented conditional visibility logic: field only appears when shipment type is "عامة" (General), hidden for documents
+  - Added toggleShippingMethod() JavaScript function for dynamic field visibility based on package type selection
+  - Integrated shipping method field into both Add New Shipment and Edit Shipment forms with consistent behavior
+  - Updated backend routes to handle shipping_method field extraction, validation, and database storage
+  - Enhanced form validation and user experience with proper field hiding/showing on shipment type changes
+  - Applied consistent styling matching existing form design and professional UI/UX patterns
+  - Shipping method data now stored in database for future revenue filtering and categorization in Financial Center
+- **June 29, 2025: Split General Shipments Revenue into Air and Land shipping tables with database filtering**
+  - Redesigned "إيرادات الشحنات العامة" section to display two side-by-side tables: "إيرادات عن طريق الشحن الجوي" and "إيرادات عن طريق الشحن البري"
+  - Created /api/shipping_revenue/<shipping_method> backend endpoint to filter shipments by shipping_method field from database
+  - Implemented responsive design: tables display side-by-side on desktop, stack vertically on mobile devices
+  - Added loadAirShippingRevenues() and loadLandShippingRevenues() JavaScript functions for separate data loading
+  - Created renderShippingRevenueTable() function to display filtered shipment data with columns: رقم التتبع، المرسل، المستلم، السعر، التاريخ
+  - Added individual totals display at bottom of each table: "إجمالي الشحن الجوي: xxx د.ك" and "إجمالي الشحن البري: xxx د.ك"
+  - Enhanced data filtering to exclude document shipments (package_type != 'document') and only show general shipments
+  - Applied professional styling with proper icons (plane for air, truck for land) and responsive table design
+  - Totals are calculated separately for each shipping method and do not duplicate in the main interactive invoice
+- **June 29, 2025: Added shipping method column to General Shipments table**
+  - Added "طريق الشحن" (Shipping Method) column to General Shipments table in shipments page
+  - Implemented visual badges with icons: blue badge with plane icon for "جوي" (Air), green badge with truck icon for "بري" (Land)
+  - Updated table layout and column widths to accommodate new shipping method column
+  - Enhanced table responsive design with proper column sizing and visual hierarchy
+  - Shipping method data displays actual values from database shipping_method field
+- **June 30, 2025: Consolidated expenses section to unified "شحنات عامة" category**
+  - Replaced separate "شحن بري" (Land Shipping) and "شحن جوي" (Air Shipping) buttons with single "شحنات عامة" (General Shipments) button
+  - Updated all form titles and headers from specific shipping methods to unified "شحنات عامة" terminology
+  - Modified backend API endpoint to aggregate expenses from both land and air shipping when "شحنات عامة" is requested
+  - Enhanced JavaScript functions to handle consolidated category with proper table ID mapping (generalShippingExpenses)
+  - Removed Air Shipping cost configuration section completely from expenses interface
+  - Updated expense form to use "شحنات عامة" as shipping_type value for new entries
+  - Maintained Documents expenses section unchanged as separate category
+  - All existing land and air shipping expense data remains accessible through consolidated interface
+- **June 30, 2025: Fixed Financial Center design issues by eliminating duplicate sections and creating unified interface**
+  - Removed duplicate revenue summary cards from Revenues tab to eliminate visual duplication
+  - Restructured Expenses tab with unified expense invoice section positioned at top for single display
+  - Removed duplicate expense invoice sections from General Shipping and Documents sub-tabs
+  - Organized Expenses sub-tabs with clean row structure using full-width columns (col-md-12)
+  - Simplified Documents Expenses layout by removing redundant layout containers and sidebar columns
+  - Created clear visual hierarchy with expense invoice at top, followed by sub-tab content below
+  - Applied consistent responsive design across both Expenses and Revenues tabs
+  - Eliminated red and green overlapping boxes that caused visual confusion
+  - Enhanced user experience with single display of each data type and clean interface design
+  - Maintained all functionality while removing visual duplication and layout conflicts
+- **June 30, 2025: Implemented comprehensive shipping method-based revenue tables with database integration**
+  - Completely redesigned Revenues tab to display three separate detailed tables based on shipping classification
+  - Created "إيرادات الشحن الجوي" table filtering shipments where shipping_method = 'جوي' from database
+  - Created "إيرادات الشحن البري" table filtering shipments where shipping_method = 'بري' from database
+  - Added "إيرادات شحن المستندات" table filtering shipments where package_type = 'document' from database
+  - Added API endpoints /api/air_shipping_revenue, /api/land_shipping_revenue, and /api/document_shipping_revenue for real-time data retrieval
+  - Implemented table columns: رقم التتبع، اسم المرسل، اسم المستلم، السعر، التاريخ with professional styling
+  - Added total revenue calculation at bottom of each table showing individual shipping method totals
+  - Enhanced tables with gradient headers (blue for air, green for land, purple for documents) and responsive design
+  - Integrated JavaScript functions for automatic data loading: loadAirShippingRevenue(), loadLandShippingRevenue(), loadDocumentShippingRevenue()
+  - Tables load data when Revenues tab is activated and display authentic shipment data from shipments database
+  - Applied professional styling with hover effects, proper Arabic text alignment, and mobile responsiveness
+- **June 30, 2025: Simplified Financial Center Revenues tab to single summary card interface**
+  - Removed all detailed revenue tables and replaced with single interactive card displaying revenue summary
+  - Created simplified 3-line revenue display: Air Shipping (✈️), Land Shipping (🚚), Document Shipping (🗂️)
+  - Each line shows shipping type with icon and total revenue amount from database calculations
+  - Added comprehensive total revenue calculation at bottom of card
+  - Implemented loadRevenueSummary() JavaScript function for concurrent data loading from all three API endpoints
+  - Applied professional card styling matching existing Financial Center design with green gradient header
+  - Enhanced user experience with clean, readable interface and automatic data refresh when tab is activated
+  - Maintained all backend API functionality while simplifying frontend presentation to essential revenue totals only
+- **June 30, 2025: Completely restructured Financial Center Expenses tab with simplified invoice-only interface**
+  - Removed large red interactive invoice from top of expenses section completely
+  - Deleted all detailed expense tables and complex configuration sections
+  - Created simplified layout: small interactive invoice card on left (4 columns), expense form on right (8 columns)
+  - Each sub-tab (General Shipping, Documents) now shows only: small red invoice card + streamlined input form
+  - Removed document cost configuration forms and air shipping cost sections entirely
+  - Updated JavaScript to populate small invoices with expense line items instead of detailed tables
+  - Enhanced form layouts with better field organization and responsive design
+  - Applied consistent styling with red gradient theme for expense invoices matching revenue design
+  - Simplified user workflow: enter expense data → see immediate updates in small invoice on left
+  - Maintained all backend functionality while providing clean, distraction-free expense management interface
+- **June 30, 2025: Replaced interactive expense invoices with simple tables showing name, amount, and delete button**
+  - Completely removed small interactive invoice cards from both General Shipping and Documents expense tabs
+  - Created simple expense tables with three columns: اسم المصروف (60%), المبلغ (25%), مسح (15%)
+  - Applied professional table styling with gradient headers and hover effects
+  - Implemented loadExpenseTable() JavaScript function to populate tables with real-time data
+  - Added deleteExpense() function with confirmation dialog and automatic table refresh
+  - Updated form submission handlers to refresh appropriate tables after adding expenses
+  - Enhanced user experience with immediate feedback and streamlined data entry workflow
+  - Maintained all backend functionality while providing ultra-simplified expense management interface matching user preference for basic table layouts
+- **June 30, 2025: Fixed "Method Not Allowed" error and completely rebuilt edit shipment page**
+  - Added POST method support to edit_shipment route with proper request handling
+  - Completely rebuilt edit_shipment.html template to match add_shipment.html design exactly
+  - Implemented identical form structure: sender info, receiver info, shipment details cards
+  - Added all dynamic functionality: zone pricing, document pricing, packaging options, waybill pricing
+  - Enhanced JavaScript for real-time price calculation and field visibility toggles
+  - Pre-populated all form fields with existing shipment data using proper Jinja2 templating
+  - Applied consistent styling with purple gradient theme and responsive design
+  - Ensured seamless integration with existing update_shipment backend route
+  - Edit shipment page now provides identical user experience to add shipment with full data persistence
+- **June 29, 2025: Implemented comprehensive air shipping cost configuration system within Financial Center**
+  - Added AirShippingCosts database model with fields: price_per_kg, packaging_price, kuwait_transport_price, sudan_transport_price, clearance_price
+  - Created dedicated air shipping cost configuration form within "شحن جوي" sub-tab in Financial Center expenses section
+  - Built form with 5 labeled numeric input fields: سعر الكيلو/طيران، سعر التغليف، سعر الترحيل في الكويت، سعر الترحيل في السودان، سعر التخليص
+  - Implemented admin-only access control with expenses permission requirement for viewing and modifying cost settings
+  - Added API endpoints: /update_air_shipping_costs (POST) and /api/air_shipping_costs (GET) for configuration management
+  - Created JavaScript handlers for form submission with real-time validation and success/error notifications
+  - Integrated automatic cost data loading on page refresh to preserve entered values persistently
+  - Enhanced cost tracking with admin user association and timestamp logging for audit trail
+  - Applied professional styling consistent with existing Financial Center interface design
+  - Values integrate with operational cost calculations, monthly/weekly financial reports, and profit/loss analysis by shipping type
+  - **Input Field Enhancement**: Converted all numeric inputs from spinner-style to manual text inputs with pattern="\d+(\.\d{1,3})?" and inputmode="decimal" for precise 3-decimal place entry without arrows across all expense and revenue forms
+- **June 29, 2025: Enhanced document expenses with predefined dropdown options for faster data entry**
+  - Replaced manual text input field with dropdown select in "مستندات" expenses form
+  - Added 8 predefined document expense categories: توثيق خارجية، توثيق تعليم عالي، أدلة جنائية/فيش، استخراج شهادة ثانوية، استخراج شهادة جامعية، استخراج قسيمة زواج مدرجة، استخراج قسيمة زواج غير مدرجة، استخراج شهادة جامعية تفاصيل
+  - Enhanced dropdown styling with proper Arabic font family (Tajawal/Cairo) and form-select Bootstrap class
+  - Maintained all existing functionality: amount input, category field, date selection, and notes field for additional details
+  - Improved data consistency and faster expense entry for common document processing services
+  - All predefined expenses are stored normally in database and included in financial reports
+- **June 29, 2025: Implemented comprehensive edit and enhanced delete functionality for Financial Center expenses**
+  - Fixed delete expense functionality with proper error handling and user feedback
+  - Added edit button alongside delete button in all expense tables with blue outline styling
+  - Created professional edit expense modal with fields for name, amount, category, date, and notes
+  - Implemented backend route /edit_financial_transaction/<id> with full validation and error handling
+  - Enhanced delete functionality with loading states, proper error messages, and smooth row removal animations
+  - Added specific error handling for different scenarios: missing expenses, permission errors, server connectivity issues
+  - Improved user experience with loading spinners, success notifications, and automatic table updates
+  - Both edit and delete operations update sidebar panels and maintain data consistency across the interface
+  - Enhanced JavaScript handlers with proper Bootstrap modal integration and form validation
+- **June 29, 2025: Implemented comprehensive document costs configuration system matching air shipping layout**
+  - Created DocumentCosts database model with 8 fixed fields for all predefined document types
+  - Added dedicated "إعدادات تكاليف مستندات" section within "مستندات" tab matching air shipping costs layout exactly
+  - Built form with 8 labeled input fields organized in 3 rows: توثيق خارجية، توثيق تعليم عالي، أدلة جنائية/فيش، استخراج شهادة ثانوية، استخراج شهادة جامعية، استخراج قسيمة زواج مدرجة، استخراج قسيمة زواج غير مدرجة، استخراج شهادة جامعية تفاصيل
+  - Implemented backend routes /update_document_costs (POST) and /api/document_costs (GET) for configuration management
+  - Added JavaScript handlers for form submission with loading states, success notifications, and automatic data loading
+  - Enhanced admin-only access control with expenses permission requirement for cost modifications
+  - Integrated automatic cost data persistence and retrieval with proper error handling and validation
+  - Applied consistent styling with decimal input patterns and green save button matching existing interface design
+  - Values stored with admin association and timestamp logging for comprehensive audit trail
+- **June 29, 2025: Completely restructured Financial Center revenues to automatic calculation system**
+  - Removed all manual revenue input forms and replaced with automatic calculation from shipments database
+  - Created automatic revenue calculation for "إيرادات الشحنات العامة" and "إيرادات المستندات" based on shipment data
+  - Built professional revenue summary cards showing real-time data with hover effects and gradient styling
+  - Added comprehensive revenue details tables with shipment information and totals
+  - Implemented interactive invoice card positioned on top-left with sticky positioning for better user experience
+  - Created scrollable revenue details containers (max-height: 400px) to prevent page overflow with large datasets
+  - Enhanced responsive design for mobile devices with stacked layout and adaptive heights
+  - Updated sidebar revenue totals to use automatic calculation instead of manual entries
+  - All revenue data now calculated in real-time from shipments database, eliminating manual data entry errors
+- **June 30, 2025: Created comprehensive interactive Revenues tab in Financial Center**
+  - Added dedicated "الإيرادات" (Revenues) tab to Financial Center navigation with coins icon
+  - Built three revenue summary cards: Air Shipping (إيرادات الشحن الجوي), Land Shipping (إيرادات الشحن البري), Documents (إيرادات المستندات)
+  - Implemented detailed revenue tables showing tracking numbers, sender names, prices, and dates for each shipping category
+  - Created API endpoints: /api/air_shipping_revenue, /api/land_shipping_revenue, /api/document_shipping_revenue for real-time data
+  - Added interactive total revenue summary card displaying combined revenue from all shipping methods
+  - Enhanced with professional CSS styling: gradient headers, hover effects, responsive design, and scrollable table containers
+  - Integrated automatic data loading when revenues tab is activated with proper error handling
+  - Revenue data calculated from paid_amount field in shipments database for accurate financial reporting
+  - Added shipment counts and individual table totals for comprehensive revenue analysis
+  - Simplified revenue tables to display only shipment name (tracking number) and amount for cleaner interface
+- **June 30, 2025: Redesigned Revenues tab to match user's preferred layout with simplified single card interface**
+  - Replaced complex revenue summary cards and detailed tables with single green card displaying "إجمالي الإيرادات"
+  - Created clean list interface showing three revenue categories with icons: Air Shipping (✈️), Land Shipping (🚚), Documents (📄)
+  - Each revenue line displays category name with icon on left and amount on right in green text
+  - Added total revenue summary at bottom with highlighted background and larger font
+  - Removed all detailed revenue tables and counts for ultra-simplified user experience
+  - Updated JavaScript to populate simplified card interface with real-time data from API endpoints
+- **June 30, 2025: Finalized simplified revenues display with proper data source configuration**
+  - Created ultra-minimal 3-row revenue display as per user specifications
+  - Row 1: ✈️ Air shipping revenue from general shipments where shipping_method = "جوي"
+  - Row 2: 🚚 Land shipping revenue from general shipments where shipping_method = "بري"  
+  - Row 3: 📄 Document shipping revenue from document shipments table
+  - Updated all API endpoints to use `price` field instead of `paid_amount` for revenue calculations
+  - Added comprehensive total at bottom with proper currency formatting (3 decimal places + د.ك)
+  - Applied responsive Bootstrap design with clean white card and proper spacing
+- **June 30, 2025: Successfully migrated database from SQLite to PostgreSQL**
+  - Updated app.py database configuration to use PostgreSQL via DATABASE_URL environment variable
+  - Removed SQLite fallback and configured PostgreSQL connection pooling (pool_size: 10, max_overflow: 20)
+  - Verified psycopg2-binary>=2.9.10 dependency already installed in pyproject.toml
+  - Successfully created all database tables in PostgreSQL: 15 tables including shipments, admin, financial_transaction, etc.
+  - Confirmed data migration successful with 20 existing shipments and 2 admin users preserved
+  - Enhanced database configuration with production-ready connection pooling for better performance
+  - All existing functionality remains intact with improved PostgreSQL performance and reliability
+- **June 30, 2025: Completed comprehensive PostgreSQL optimization and production setup**
+  - Added Flask-Migrate>=4.0.0 dependency for professional database migration management
+  - Created complete migrations system with initial migration and JSONB optimization
+  - Optimized Admin.permissions field to use PostgreSQL JSONB instead of TEXT for better performance
+  - Updated permissions methods to work directly with JSONB without JSON serialization overhead
+  - Created production-ready Procfile for deployment to Render, Heroku, Railway platforms
+  - Added .flaskenv configuration file for Flask environment variables
+  - Created comprehensive README.md with detailed setup, deployment, and data migration instructions
+  - Implemented proper migration workflow with flask db init/migrate/upgrade commands
+  - Enhanced database schema with PostgreSQL-specific optimizations and indexing support
+  - Project now fully production-ready with enterprise-grade PostgreSQL configuration
+- **June 30, 2025: Removed detailed revenue tables and simplified revenues interface**
+  - Completely removed three detailed revenue tables: "تفاصيل إيرادات الشحن الجوي", "تفاصيل إيرادات الشحن البري", "تفاصيل إيرادات المستندات"
+  - Deleted all related CSS styling and JavaScript functions for detailed table management
+  - Kept only simplified summary display showing totals for each shipping type with icons
+  - Added loadSimpleRevenueSummary() JavaScript function for real-time data updates
+  - Interface now shows only essential information: header title, three revenue rows, and grand total
+  - Enhanced user experience with ultra-clean, minimal design focusing on summary data only
+- **June 30, 2025: Completely removed sidebar cards from all Financial Center tabs**
+  - Removed "إجمالي الإيرادات المباشرة" sidebar panel with revenue breakdown
+  - Deleted "الفاتورة التفاعلية" expense invoice panel from sidebar
+  - Changed main content layout from col-lg-8 to col-lg-12 for full-width display
+  - Removed all JavaScript functions related to sidebar panel updates (updateExpenseInvoice, updateRevenueTotals)
+  - Eliminated all sidebar revenue and expense tracking cards across expenses, revenues, and reports tabs
+  - Simplified Financial Center interface to show only main content without any sidebar distractions
+- **June 30, 2025: Added Recent Expenses display in Expenses tab matching Revenues design**
+  - Created "📉 المصروفات الأخيرة" section within expenses tab showing last 5 expenses
+  - Added /api/recent_expenses endpoint to fetch latest expenses from FinancialTransaction table
+  - Implemented expense display with name, amount (3 decimal format + د.ك), ordered newest to oldest
+  - Added total calculation showing sum of displayed expenses at bottom
+- **June 30, 2025: Simplified revenue calculation system to show immediate revenue upon shipment creation**
+  - Removed delivery status requirement from revenue calculations per user request
+  - Revenue now displays immediately when shipments are created (any status)
+  - Air shipping revenue: from general shipments with shipping_method='جوي' (all statuses)
+  - Land shipping revenue: from general shipments with shipping_method='بري' (all statuses)
+  - Document revenue: from document shipments with package_type='document' (all statuses)
+  - Revenue appears instantly in Financial Center when new shipments are added to system
+- **June 30, 2025: Connected Financial Reports tab with real-time revenue and expense data**
+  - Completely rebuilt Financial Reports tab to pull data from Revenues and Expenses tabs
+  - Created comprehensive financial summary with revenue breakdown (air/land/documents), expense breakdown (general/documents), and net profit calculation
+  - Added loadFinancialReports() JavaScript function that fetches data from all API endpoints simultaneously
+  - Financial reports now show real-time data synchronized with other tabs
+  - Added profit/loss indicators with color coding (green for profit, red for loss, gray for break-even)
+  - Enhanced visual design with gradient cards and professional styling for financial reporting
+  - Created loadRecentExpenses() JavaScript function for real-time data loading
+  - Applied identical styling to revenues tab: white card, centered layout, responsive design
+  - Integrated automatic loading when expenses tab is activated or page loads on expenses tab
+- **June 30, 2025: Activated delete functionality for operational costs in expenses table**
+  - Fixed duplicate function name conflict by removing redundant route definition
+  - Connected existing delete_operational_cost route (/delete_operational_cost/<id>) to expense table delete buttons
+  - Added comprehensive JavaScript deleteOperationalCost() function with confirmation dialog
+  - Implemented real-time row removal with fade-out animation and automatic table refresh
+  - Added loading states, error handling, and success/error notifications system
+  - Created showNotification() function for user feedback with auto-dismiss alerts
+- **June 30, 2025: Completely redesigned expense management system with modern card-based layout**
+  - Converted traditional expense tables to modern card-based display for both general and document expenses
+  - Removed date columns from expense displays for cleaner, simplified interface per user preference
+  - Implemented responsive card grid layout with gradient backgrounds and professional styling
+  - Added "إجمالي المصروفات" card positioned in expenses tab with real-time calculation
+  - Created comprehensive API endpoint /api/total_expenses for automatic expense totals calculation
+  - Updated all JavaScript functions to refresh total expenses automatically when adding/deleting expenses
+  - Applied consistent card styling: green gradient for general expenses, purple gradient for document expenses
+  - Enhanced user experience with simplified, modern interface following user's preference for card-based displays over detailed tables
+- **June 30, 2025: Completely rebuilt Financial Center from scratch with simplified three-tab architecture**
+  - **Complete System Overhaul**: Removed entire existing Financial Center and rebuilt from zero following exact user specifications
+  - **Tab 1 - الإيرادات (Revenues)**: Created clean card-based interface showing three revenue streams:
+    - ✈️ Air Shipping Revenue (from shipments where shipping_method = "جوي")
+    - 🚚 Land Shipping Revenue (from shipments where shipping_method = "بري") 
+    - 📄 Document Shipping Revenue (from document shipments table)
+    - Added total revenue calculation card with gradient background and real-time updates
+  - **Tab 2 - المصروفات (Expenses)**: Built side-by-side expense management system:
+    - 🟢 General Expenses section with form (name, amount, date, notes) and live table display
+    - 🟣 Document Expenses section with identical functionality for document-related costs
+    - Full CRUD operations: add/view/delete expenses with confirmation dialogs and notifications
+    - Real-time data loading and automatic form reset after successful submissions
+  - **Tab 3 - التقارير المالية (Financial Reports)**: Implemented dynamic reporting system:
+    - Four report types: Revenue Report, Expense Report, Net Profit, Revenue vs Expense Comparison
+    - Button-based report selection with dynamic content generation
+    - Professional card layouts showing financial summaries and calculations
+  - **Technical Implementation**: All data sourced from authentic database tables (shipments, expenses_general, expenses_documents)
+  - **UI/UX Design**: Professional responsive design with hover effects, gradient styling, and mobile optimization
+  - **Data Integrity**: All amounts display with 3 decimal precision + "د.ك" currency format as specified
+  - **Notification System**: Success/error alerts with auto-dismiss and proper Arabic messaging
+- **June 30, 2025: Completely removed complex profit & loss analysis from Financial Center**
+  - Eliminated all detailed profit & loss breakdown cards by shipping type (land, air, documents)
+  - Removed total profit summary sections and complex financial analysis displays
+  - Replaced broken financial_center.html template with simplified clean version
+  - Streamlined interface to show only essential expense management and revenue summaries
+  - Enhanced user experience with ultra-simplified Financial Center focusing on core functionality only
+  - Fixed template syntax errors and eliminated all visual complexity as per user preference for minimal interfaces
+  - Delete buttons now require user confirmation before executing removal
+  - Integrated automatic refresh of recent expenses display after successful deletion
+- **June 30, 2025: Fixed delete button functionality issues in operational costs table**
+  - Resolved JavaScript event listener conflicts and duplicate code issues
+  - Created separate script block with dedicated event delegation for delete buttons
+  - Implemented proper click event handling for both button and icon elements
+  - Added comprehensive error handling with user-friendly Arabic messages
+  - Enhanced button state management with loading spinner during deletion process
+  - Fixed table empty state handling after successful deletions
+  - Ensured proper integration with existing delete_operational_cost route
+  - Delete functionality now works reliably with confirmation dialogs and visual feedback
+- **June 30, 2025: Removed "اسم التكليف" field from operational costs form**
+  - Deleted "اسم التكلفة" input field from add new expense form in Financial Center expenses tab
+  - Updated backend route to automatically use category Arabic name as expense name
+  - Added category mapping dictionary with proper Arabic translations for all expense categories
+  - Form now uses selected category (الفئة) as the expense name automatically
+  - Simplified expense creation workflow by reducing required input fields from 4 to 3
+  - Maintained data integrity by ensuring expense names are consistent based on categories
+- **June 30, 2025: Fixed "Recent Expenses" data loading issue in Financial Center**
+  - Added missing loadRecentExpenses() JavaScript function to fetch and display recent expenses data
+  - Enhanced API endpoint to combine expenses from both FinancialTransaction and OperationalCost tables
+  - Implemented automatic loading of recent expenses when page loads and when expenses tab is activated
+  - Created proper error handling and loading states for recent expenses display
+  - Fixed data source to show latest 5 expenses from all expense types with proper sorting by date
+  - Enhanced user experience with real-time data updates and responsive error messages
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+Dashboard preference: Professional admin layout similar to typical cargo/shipping systems.
