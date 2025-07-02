@@ -793,6 +793,15 @@
                 </a>
             </li>
             {% endif %}
+            
+            {% if current_user.is_authenticated and current_user.has_permission('reports') %}
+            <li>
+                <a href="{{ url_for('shipment_reports') }}" class="{{ 'active' if request.endpoint == 'shipment_reports' }}">
+                    <i class="fas fa-chart-bar"></i>
+                    تقارير الربح والخسارة
+                </a>
+            </li>
+            {% endif %}
 
             {% if current_user.is_authenticated and current_user.has_permission('settings') %}
             <li>

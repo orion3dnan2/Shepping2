@@ -144,6 +144,13 @@
                                                 <input type="date" class="form-control form-control-lg" name="expense_date" required>
                                             </div>
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">ربط بشحنة (اختياري)</label>
+                                            <select class="form-select form-select-lg" name="shipment_id" id="generalExpenseShipmentSelect">
+                                                <option value="">-- غير مرتبط بشحنة --</option>
+                                            </select>
+                                            <small class="text-muted">اختر شحنة لحساب الربح والخسارة</small>
+                                        </div>
                                         <div class="mb-4">
                                             <label class="form-label fw-bold">الملاحظات (اختياري)</label>
                                             <textarea class="form-control" name="notes" rows="3" placeholder="تفاصيل إضافية حول المصروف"></textarea>
@@ -193,6 +200,13 @@
                                                 <label class="form-label fw-bold">التاريخ</label>
                                                 <input type="date" class="form-control form-control-lg" name="expense_date" required>
                                             </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">ربط بشحنة (اختياري)</label>
+                                            <select class="form-select form-select-lg" name="shipment_id" id="generalShipmentsShipmentSelect">
+                                                <option value="">-- غير مرتبط بشحنة --</option>
+                                            </select>
+                                            <small class="text-muted">اختر شحنة لحساب الربح والخسارة</small>
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label fw-bold">الملاحظات (اختياري)</label>
@@ -253,6 +267,13 @@
                                                 <label class="form-label fw-bold">التاريخ</label>
                                                 <input type="date" class="form-control form-control-lg" name="expense_date" required>
                                             </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">ربط بشحنة (اختياري)</label>
+                                            <select class="form-select form-select-lg" name="shipment_id" id="documentExpenseShipmentSelect">
+                                                <option value="">-- غير مرتبط بشحنة --</option>
+                                            </select>
+                                            <small class="text-muted">اختر شحنة لحساب الربح والخسارة</small>
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label fw-bold">الملاحظات (اختياري)</label>
@@ -1238,5 +1259,59 @@ function deleteGeneralShipmentsExpense(expenseId) {
         });
     }
 }
+
+// Load shipments for expense linking
+function loadShipmentsForLinking() {
+    fetch('/api/shipments_for_linking')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            populateShipmentSelects(data.shipments);
+        } else {
+            console.error('Failed to load shipments:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading shipments:', error);
+    });
+}
+
+// Populate all shipment select dropdowns
+function loadShipmentsForLinking() {
+    fetch('/api/shipments_for_linking')
+        .then(response => response.json())
+        .then(data => {
+            // Populate general shipment selects
+            populateShipmentSelect('generalExpenseShipmentSelect', data.general);
+            populateShipmentSelect('generalShipmentsShipmentSelect', data.general);
+            
+            // Populate document shipment select
+            populateShipmentSelect('documentExpenseShipmentSelect', data.documents);
+        })
+        .catch(error => {
+            console.error('Error loading shipments for linking:', error);
+        });
+}
+
+function populateShipmentSelect(selectId, shipments) {
+    const select = document.getElementById(selectId);
+    if (select) {
+        // Clear existing options except first
+        select.innerHTML = '<option value="">-- غير مرتبط بشحنة --</option>';
+        
+        // Add shipment options
+        shipments.forEach(shipment => {
+            const option = document.createElement('option');
+            option.value = shipment.id;
+            option.textContent = `${shipment.tracking_number} - ${shipment.sender_name} → ${shipment.receiver_name}`;
+            select.appendChild(option);
+        });
+    }
+}
+
+// Call on page load to load shipments
+document.addEventListener('DOMContentLoaded', function() {
+    loadShipmentsForLinking();
+});
 </script>
 {% endblock %}

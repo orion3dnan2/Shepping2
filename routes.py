@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash
 from app import app, db
 from models import Admin, Shipment, ShipmentType, DocumentType, Notification, ZonePricing, PackagingType, GlobalSettings, FinancialTransaction, OperationalCost, ExpenseGeneral, ExpenseDocuments
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import func, extract
 from translations import get_text
 import json
@@ -713,6 +713,7 @@ def financial_center():
             category = request.form.get('category', '').strip()
             description = request.form.get('description', '').strip()
             transaction_date_str = request.form.get('transaction_date', '').strip()
+            shipment_id = request.form.get('shipment_id') or None
             
 
             
@@ -781,7 +782,8 @@ def financial_center():
                 category=category or None,
                 description=description or None,
                 transaction_date=transaction_date,
-                admin_id=current_user.id
+                admin_id=current_user.id,
+                shipment_id=int(shipment_id) if shipment_id else None
             )
             
             db.session.add(transaction)
@@ -3163,6 +3165,7 @@ def add_expense_general():
         amount_str = request.form.get('amount', '').strip()
         notes = request.form.get('notes', '').strip()
         expense_date_str = request.form.get('expense_date', '').strip()
+        shipment_id = request.form.get('shipment_id') or None
         
         # Validate inputs
         if not name:
@@ -3186,12 +3189,13 @@ def add_expense_general():
         except ValueError:
             return jsonify({'success': False, 'message': 'تنسيق التاريخ غير صحيح'})
         
-        # Create new expense
+        # Create new expense  
         expense = ExpenseGeneral(
             name=name,
             amount=amount,
             notes=notes if notes else None,
-            expense_date=expense_date
+            expense_date=expense_date,
+            shipment_id=int(shipment_id) if shipment_id else None
         )
         
         db.session.add(expense)
@@ -3215,6 +3219,7 @@ def add_expense_documents():
         amount_str = request.form.get('amount', '').strip()
         notes = request.form.get('notes', '').strip()
         expense_date_str = request.form.get('expense_date', '').strip()
+        shipment_id = request.form.get('shipment_id') or None
         
         # Validate inputs
         if not name:
@@ -3243,7 +3248,8 @@ def add_expense_documents():
             name=name,
             amount=amount,
             notes=notes if notes else None,
-            expense_date=expense_date
+            expense_date=expense_date,
+            shipment_id=int(shipment_id) if shipment_id else None
         )
         
         db.session.add(expense)
@@ -3484,3 +3490,224 @@ def api_total_expenses():
     except Exception as e:
         app.logger.error(f"Error calculating total expenses: {str(e)}")
         return jsonify({'success': False, 'message': 'خطأ في حساب المصروفات'})
+
+
+# Shipment Reports Routes
+@app.route('/shipment_reports')
+@login_required
+@permission_required('reports')
+def shipment_reports():
+    """Shipment profit and loss reports page"""
+    return render_template('shipment_reports.html')
+
+
+@app.route('/api/shipment_reports')
+@login_required
+@permission_required('reports')
+def api_shipment_reports():
+    """API endpoint for shipment P&L reports"""
+    try:
+        period = request.args.get('period', 'all')
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        
+        # Build query based on period
+        query = Shipment.query
+        
+        if period == 'today':
+            today = datetime.now().date()
+            query = query.filter(db.func.date(Shipment.created_at) == today)
+        elif period == 'week':
+            week_start = datetime.now().date() - timedelta(days=7)
+            query = query.filter(db.func.date(Shipment.created_at) >= week_start)
+        elif period == 'month':
+            month_start = datetime.now().replace(day=1).date()
+            query = query.filter(db.func.date(Shipment.created_at) >= month_start)
+        elif period == 'custom' and start_date and end_date:
+            query = query.filter(
+                db.func.date(Shipment.created_at) >= start_date,
+                db.func.date(Shipment.created_at) <= end_date
+            )
+        
+        shipments = query.order_by(Shipment.created_at.desc()).all()
+        
+        # Calculate totals and build response data
+        shipments_data = []
+        total_revenue = 0.0
+        total_expenses = 0.0
+        
+        for shipment in shipments:
+            # Calculate expenses for this shipment
+            expenses = shipment.calculate_total_expenses()
+            net_profit = shipment.calculate_net_profit()
+            
+            # Update shipment's linked_expenses field
+            shipment.linked_expenses = expenses
+            
+            shipments_data.append({
+                'id': shipment.id,
+                'tracking_number': shipment.tracking_number,
+                'package_type': shipment.package_type,
+                'sender_name': shipment.sender_name,
+                'receiver_name': shipment.receiver_name,
+                'price': float(shipment.price),
+                'total_expenses': expenses,
+                'net_profit': net_profit,
+                'status': shipment.status,
+                'created_at': shipment.created_at.strftime('%Y-%m-%d')
+            })
+            
+            total_revenue += float(shipment.price)
+            total_expenses += expenses
+        
+        # Commit the linked_expenses updates
+        db.session.commit()
+        
+        summary = {
+            'total_shipments': len(shipments),
+            'total_revenue': total_revenue,
+            'total_expenses': total_expenses,
+            'net_profit': total_revenue - total_expenses
+        }
+        
+        return jsonify({
+            'success': True,
+            'shipments': shipments_data,
+            'summary': summary
+        })
+        
+    except Exception as e:
+        logging.error(f'Error generating shipment reports: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في تحميل التقارير: {str(e)}'})
+
+
+@app.route('/api/shipment_details/<int:shipment_id>')
+@login_required 
+@permission_required('reports')
+def api_shipment_details(shipment_id):
+    """API endpoint for detailed shipment P&L analysis"""
+    try:
+        shipment = Shipment.query.get_or_404(shipment_id)
+        
+        # Get all expenses linked to this shipment
+        expenses = []
+        
+        # Financial transactions
+        financial_expenses = FinancialTransaction.query.filter_by(
+            transaction_type='expense',
+            shipment_id=shipment.id
+        ).all()
+        
+        for expense in financial_expenses:
+            expenses.append({
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'date': expense.transaction_date.strftime('%Y-%m-%d'),
+                'type': 'مصروف شحنات عامة'
+            })
+        
+        # General expenses
+        general_expenses = ExpenseGeneral.query.filter_by(shipment_id=shipment.id).all()
+        for expense in general_expenses:
+            expenses.append({
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'date': expense.expense_date.strftime('%Y-%m-%d'),
+                'type': 'مصروف مكتب'
+            })
+        
+        # Document expenses
+        document_expenses = ExpenseDocuments.query.filter_by(shipment_id=shipment.id).all()
+        for expense in document_expenses:
+            expenses.append({
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'date': expense.expense_date.strftime('%Y-%m-%d'),
+                'type': 'مصروف مستندات'
+            })
+        
+        shipment_data = {
+            'tracking_number': shipment.tracking_number,
+            'sender_name': shipment.sender_name,
+            'receiver_name': shipment.receiver_name,
+            'package_type': shipment.package_type,
+            'price': float(shipment.price),
+            'total_expenses': shipment.calculate_total_expenses(),
+            'net_profit': shipment.calculate_net_profit(),
+            'created_at': shipment.created_at.strftime('%Y-%m-%d %H:%M'),
+            'expenses': expenses
+        }
+        
+        return jsonify({
+            'success': True,
+            'shipment': shipment_data
+        })
+        
+    except Exception as e:
+        logging.error(f'Error loading shipment details: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في تحميل تفاصيل الشحنة: {str(e)}'})
+
+
+@app.route('/api/shipments_for_linking')
+@login_required
+@permission_required('expenses')
+def api_shipments_for_linking():
+    """API endpoint to get shipments list for expense linking"""
+    try:
+        # Get general shipments
+        general_shipments = Shipment.query.filter(Shipment.package_type != 'document').all()
+        
+        # Get document shipments
+        document_shipments = Shipment.query.filter(Shipment.package_type == 'document').all()
+        
+        shipments_data = {
+            'general': [
+                {
+                    'id': s.id,
+                    'tracking_number': s.tracking_number,
+                    'sender_name': s.sender_name,
+                    'receiver_name': s.receiver_name,
+                    'price': float(s.price) if s.price else 0.0
+                }
+                for s in general_shipments
+            ],
+            'documents': [
+                {
+                    'id': s.id,
+                    'tracking_number': s.tracking_number,
+                    'sender_name': s.sender_name,
+                    'receiver_name': s.receiver_name,
+                    'price': float(s.price) if s.price else 0.0
+                }
+                for s in document_shipments
+            ]
+        }
+        
+        return jsonify(shipments_data)
+        
+    except Exception as e:
+        logging.error(f'Error getting shipments for linking: {str(e)}')
+        return jsonify({'error': 'Failed to get shipments list'})
+    try:
+        shipments = Shipment.query.order_by(Shipment.created_at.desc()).limit(50).all()
+        
+        shipments_data = []
+        for shipment in shipments:
+            shipments_data.append({
+                'id': shipment.id,
+                'tracking_number': shipment.tracking_number,
+                'sender_name': shipment.sender_name,
+                'receiver_name': shipment.receiver_name,
+                'package_type': shipment.package_type,
+                'price': float(shipment.price),
+                'created_at': shipment.created_at.strftime('%Y-%m-%d')
+            })
+        
+        return jsonify({
+            'success': True,
+            'shipments': shipments_data
+        })
+        
+    except Exception as e:
+        logging.error(f'Error loading shipments for linking: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في تحميل الشحنات: {str(e)}'})

@@ -86,10 +86,50 @@ class Shipment(db.Model):
     current_longitude = db.Column(db.Float, nullable=True)
     last_location_update = db.Column(db.DateTime, nullable=True)
     
+    # Linked expenses for individual shipment P&L calculation
+    linked_expenses = db.Column(db.Float, nullable=False, default=0.0)  # إجمالي المصروفات المرتبطة بالشحنة
+    
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<Shipment {self.tracking_number}>'
+    
+    def calculate_total_expenses(self):
+        """Calculate total expenses linked to this shipment"""
+        total = 0.0
+        
+        # Get expenses from FinancialTransaction table
+        financial_expenses = FinancialTransaction.query.filter_by(
+            transaction_type='expense', 
+            shipment_id=self.id
+        ).all()
+        
+        for expense in financial_expenses:
+            total += float(expense.amount)
+        
+        # Get expenses from ExpenseGeneral table (office expenses linked to shipment)
+        general_expenses = ExpenseGeneral.query.filter_by(shipment_id=self.id).all()
+        for expense in general_expenses:
+            total += float(expense.amount)
+        
+        # Get expenses from ExpenseDocuments table (document expenses linked to shipment)
+        document_expenses = ExpenseDocuments.query.filter_by(shipment_id=self.id).all()
+        for expense in document_expenses:
+            total += float(expense.amount)
+        
+        return total
+    
+    def calculate_net_profit(self):
+        """Calculate net profit for this shipment (Revenue - Expenses)"""
+        revenue = float(self.price)  # Customer price
+        expenses = self.calculate_total_expenses()
+        return revenue - expenses
+    
+    def update_linked_expenses(self):
+        """Update the linked_expenses field with calculated total"""
+        self.linked_expenses = self.calculate_total_expenses()
+        db.session.commit()
+        return self.linked_expenses
 
     @staticmethod
     def generate_tracking_number():
@@ -347,6 +387,8 @@ class FinancialTransaction(db.Model):
     transaction_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # Allows custom date
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True)
+    # Link to specific shipment for P&L analysis
+    shipment_id = db.Column(db.Integer, db.ForeignKey('shipment.id'), nullable=True)
     
     def __repr__(self):
         return f'<FinancialTransaction {self.name}: {self.amount}>'
@@ -522,6 +564,8 @@ class ExpenseGeneral(db.Model):
     notes = db.Column(db.Text)
     expense_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Link to specific shipment for P&L analysis
+    shipment_id = db.Column(db.Integer, db.ForeignKey('shipment.id'), nullable=True)
     
     def __repr__(self):
         return f'<ExpenseGeneral {self.name}: {self.amount}>'
@@ -537,6 +581,8 @@ class ExpenseDocuments(db.Model):
     notes = db.Column(db.Text)
     expense_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Link to specific shipment for P&L analysis
+    shipment_id = db.Column(db.Integer, db.ForeignKey('shipment.id'), nullable=True)
     
     def __repr__(self):
         return f'<ExpenseDocuments {self.name}: {self.amount}>'
