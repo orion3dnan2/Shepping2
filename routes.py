@@ -2163,6 +2163,23 @@ def get_price_per_kg():
         return jsonify({'success': False, 'message': 'حدث خطأ في تحميل سعر الكيلو'})
 
 
+@app.route('/api/packaging_price')
+@login_required
+def get_packaging_price():
+    """Get current packaging price setting from database"""
+    try:
+        # Get packaging price from GlobalSettings database
+        packaging_price = GlobalSettings.get_setting('packaging_price', 2.000)
+        
+        return jsonify({
+            'success': True,
+            'packaging_price': float(packaging_price)
+        })
+    except Exception as e:
+        logging.error(f'Error getting packaging price: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل سعر التغليف'})
+
+
 @app.route('/api/air_shipping_costs')
 @login_required
 @permission_required('expenses')

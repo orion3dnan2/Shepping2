@@ -699,10 +699,11 @@
         });
     }
     
-    // Global variable to store price per kg from settings
+    // Global variables to store prices from settings
     let globalPricePerKg = 0;
+    let globalPackagingPrice = 0;
     
-    // Fetch price per kg from settings when page loads
+    // Fetch prices from settings when page loads
     async function loadPricePerKg() {
         try {
             const response = await fetch('/api/price_per_kg');
@@ -710,13 +711,26 @@
             if (data.success) {
                 globalPricePerKg = data.price_per_kg;
                 console.log('Loaded price per kg:', globalPricePerKg);
-                
-                // Recalculate price if weight is already entered
-                calculateZoneBasedPrice();
             }
         } catch (error) {
             console.error('Error loading price per kg:', error);
         }
+        
+        // Also load packaging price
+        try {
+            const response = await fetch('/api/packaging_price');
+            const data = await response.json();
+            if (data.success) {
+                globalPackagingPrice = data.packaging_price;
+                console.log('Loaded packaging price:', globalPackagingPrice);
+            }
+        } catch (error) {
+            console.error('Error loading packaging price:', error);
+            globalPackagingPrice = 2.000; // Default fallback
+        }
+        
+        // Recalculate price if inputs are already filled
+        calculateZoneBasedPrice();
     }
     
     // Refresh price per kg from settings (can be called from external sources)
@@ -724,12 +738,15 @@
         loadPricePerKg();
     };
     
-    // Calculate price based only on weight × price per kg (simplified version)
+    // Calculate price including weight, packaging, and policy costs
     function calculateZoneBasedPrice() {
         const packageType = document.getElementById('package_type').value;
         const weightInput = document.getElementById('weight');
         const totalPriceField = document.getElementById('total_price');
         const priceStatus = document.getElementById('price_status');
+        const hasPackaging = document.getElementById('has_packaging').checked;
+        const hasPolicy = document.getElementById('has_policy').checked;
+        const waybillPriceInput = document.getElementById('waybill_price');
         
         // Only calculate for non-document shipments
         if (packageType === 'document' || packageType === '' || !packageType) {
@@ -754,19 +771,54 @@
             pricePerKg = 1.500; // Default price per kg
         }
         
-        // Simple calculation: total price = weight × price per kg only
-        const totalPrice = weight * pricePerKg;
+        // Base calculation: weight × price per kg
+        let totalPrice = weight * pricePerKg;
+        let breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك = ${totalPrice.toFixed(3)} د.ك`;
+        
+        // Add packaging cost if selected
+        if (hasPackaging) {
+            const packagingCost = globalPackagingPrice || 2.000; // Use global packaging price from settings
+            totalPrice += packagingCost;
+            breakdown += `\n+ تغليف = ${packagingCost.toFixed(3)} د.ك`;
+        }
+        
+        // Add policy cost if selected and manual price entered
+        if (hasPolicy) {
+            const waybillPrice = parseFloat(waybillPriceInput.value) || 0;
+            if (waybillPrice > 0) {
+                totalPrice += waybillPrice;
+                breakdown += `\n+ بوليصة = ${waybillPrice.toFixed(3)} د.ك`;
+            }
+        }
         
         totalPriceField.value = totalPrice.toFixed(3);
         
-        // Simple price breakdown message
-        const breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك = ${totalPrice.toFixed(3)} د.ك`;
+        // Enhanced price breakdown message
+        breakdown += `\n\nالإجمالي: ${totalPrice.toFixed(3)} د.ك`;
         
-        priceStatus.textContent = breakdown;
+        priceStatus.innerHTML = breakdown.replace(/\n/g, '<br>');
         priceStatus.className = 'text-success mt-1';
         
         applyDiscount();
         calculateProfit();
+    }
+    
+    // Toggle waybill price input visibility
+    function toggleWaybillPrice() {
+        const hasPolicy = document.getElementById('has_policy').checked;
+        const waybillContainer = document.getElementById('waybill_price_container');
+        const waybillInput = document.getElementById('waybill_price');
+        
+        if (hasPolicy) {
+            waybillContainer.style.display = 'block';
+            waybillInput.required = true;
+        } else {
+            waybillContainer.style.display = 'none';
+            waybillInput.required = false;
+            waybillInput.value = '';
+            // Recalculate price when policy is unchecked
+            calculateZoneBasedPrice();
+        }
     }
     
     // Calculate profit automatically (Price - Cost)
