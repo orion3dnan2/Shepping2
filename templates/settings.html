@@ -57,20 +57,22 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for shipment_type in shipment_types %}
                                         <tr>
                                             <td>
-                                                <span class="fw-medium">{{ shipment_type.name_ar }}</span>
+                                                <span class="fw-medium">عامة</span>
                                             </td>
                                             <td>
-                                                {% if shipment_type.is_active %}
-                                                    <span class="badge bg-success">نشط</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">غير نشط</span>
-                                                {% endif %}
+                                                <span class="badge bg-success">نشط</span>
                                             </td>
                                         </tr>
-                                        {% endfor %}
+                                        <tr>
+                                            <td>
+                                                <span class="fw-medium">مستندات</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">نشط</span>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -79,7 +81,7 @@
                         <!-- Document Types Section -->
                         <div class="types-container">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4 class="section-title">أنواع الوثائق</h4>
+                                <h4 class="section-title">نوع المستند</h4>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentTypeModal">
                                     <i class="fas fa-plus me-2"></i>
                                     إضافة نوع وثيقة
