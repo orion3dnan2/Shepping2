@@ -633,6 +633,19 @@ document.addEventListener('DOMContentLoaded', function() {
         loadTotalExpenses(); // Load total expenses when expenses tab is activated
     });
     document.getElementById('reports-tab').addEventListener('shown.bs.tab', loadFinancialReports);
+    document.getElementById('profit-loss-tab').addEventListener('shown.bs.tab', function() {
+        // Set default dates if not already set
+        if (!document.getElementById('profitStartDate').value || !document.getElementById('profitEndDate').value) {
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('profitEndDate').value = today.toISOString().split('T')[0];
+            document.getElementById('profitStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+        }
+        // Auto-load the report when tab is shown
+        loadProfitLossReport();
+    });
 });
 
 // Revenue Functions
