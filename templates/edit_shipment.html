@@ -258,37 +258,7 @@
                             </div>
                         </div>
 
-                        <!-- الحقول الخاصة بالمستندات -->
-                        <div id="document_fields" style="{{ 'display: block;' if shipment.package_type == 'document' else 'display: none;' }}">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="document_type" class="form-label">نوع المستند</label>
-                                    <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
-                                        <option value="">اختر نوع المستند</option>
-                                        {% for doc_type in document_types %}
-                                        <option value="{{ doc_type.name_ar }}" data-price="{{ doc_type.price }}" 
-                                                {{ 'selected' if shipment.document_type == doc_type.name_ar else '' }}>
-                                            {{ doc_type.name_ar }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="action_required" class="form-label">الإجراء المطلوب</label>
-                                    <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
-                                        <option value="">اختر نوع الإجراء</option>
-                                        {% for document_type in document_types %}
-                                        <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}" 
-                                                {{ 'selected' if document_type.name_ar == shipment.package_contents else '' }}>
-                                            {{ document_type.name_ar }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- الحقول الخاصة بالشحنات العامة -->
+                        <!-- الحقول الخاصة بالشحنات العامة (الوزن قبل السعر) -->
                         <div id="general_fields" style="{{ 'display: none;' if shipment.package_type == 'document' else 'display: block;' }}">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
@@ -315,6 +285,36 @@
                                     <label for="package_contents" class="form-label">محتويات الطرد</label>
                                     <input type="text" class="form-control" id="package_contents" name="package_contents" 
                                            value="{{ shipment.package_contents or '' }}" placeholder="وصف محتويات الطرد">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الحقول الخاصة بالمستندات (قبل السعر) -->
+                        <div id="document_fields" style="{{ 'display: block;' if shipment.package_type == 'document' else 'display: none;' }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="document_type" class="form-label">نوع المستند</label>
+                                    <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
+                                        <option value="">اختر نوع المستند</option>
+                                        {% for doc_type in document_types %}
+                                        <option value="{{ doc_type.name_ar }}" data-price="{{ doc_type.price }}" 
+                                                {{ 'selected' if shipment.document_type == doc_type.name_ar else '' }}>
+                                            {{ doc_type.name_ar }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="action_required" class="form-label">الإجراء المطلوب</label>
+                                    <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
+                                        <option value="">اختر نوع الإجراء</option>
+                                        {% for document_type in document_types %}
+                                        <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}" 
+                                                {{ 'selected' if document_type.name_ar == shipment.package_contents else '' }}>
+                                            {{ document_type.name_ar }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>

@@ -403,6 +403,41 @@
                             </div>
                         </div>
                         
+                        <!-- Weight field for non-document shipments (positioned before price) -->
+                        <div class="weight-field" id="weight_field">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="weight" class="form-label required-field">الوزن (بالكيلوغرام)</label>
+                                    <input type="text" class="form-control" id="weight" name="weight" placeholder="0.0" oninput="calculateZoneBasedPrice()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Document Type and Action Fields (positioned before price for documents) -->
+                        <div class="document-type-field" id="document_type_field">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="document_type" class="form-label required-field">نوع المستند</label>
+                                    <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
+                                        <option value="">اختر نوع المستند</option>
+                                        {% for document_type in document_types %}
+                                        <option value="{{ document_type.name_en }}" data-price="{{ document_type.price }}">{{ document_type.name_ar }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="action_required" class="form-label required-field">الإجراء</label>
+                                    <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
+                                        <option value="">اختر نوع الإجراء</option>
+                                        {% for document_type in document_types %}
+                                        <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}">{{ document_type.name_ar }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Hidden cost field - maintained for backend functionality -->
                         <input type="hidden" id="cost" name="cost" value="0.0">
                         
@@ -429,41 +464,6 @@
                                 <label for="remaining_amount" class="form-label">المبلغ المتبقي</label>
                                 <input type="number" step="0.01" class="form-control" id="remaining_amount" name="remaining_amount" readonly placeholder="0.00" style="background-color: #f8f9fa;">
                                 <div class="text-muted mt-1">يتم حسابه تلقائياً</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Weight field for non-document shipments -->
-                        <div class="weight-field" id="weight_field">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="weight" class="form-label required-field">الوزن (بالكيلوغرام)</label>
-                                    <input type="text" class="form-control" id="weight" name="weight" placeholder="0.0" oninput="calculateZoneBasedPrice()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Document Type and Action Fields (Conditional) -->
-                        <div class="document-type-field" id="document_type_field">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="document_type" class="form-label required-field">نوع المستند</label>
-                                    <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
-                                        <option value="">اختر نوع المستند</option>
-                                        {% for document_type in document_types %}
-                                        <option value="{{ document_type.name_en }}" data-price="{{ document_type.price }}">{{ document_type.name_ar }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label for="action_required" class="form-label required-field">الإجراء</label>
-                                    <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
-                                        <option value="">اختر نوع الإجراء</option>
-                                        {% for document_type in document_types %}
-                                        <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}">{{ document_type.name_ar }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
                             </div>
                         </div>
                         
