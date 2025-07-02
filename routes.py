@@ -1391,8 +1391,8 @@ def settings():
     # Calculate total pricing
     total_pricing = sum([st.price for st in shipment_types]) + sum([dt.price for dt in document_types])
     
-    # Get price per kg from session
-    price_per_kg = session.get('price_per_kg', 0.000)
+    # Get price per kg from database
+    price_per_kg = GlobalSettings.get_setting('price_per_kg', 1.500)
     
     # Get additional pricing from GlobalSettings
     packaging_price = GlobalSettings.get_setting('packaging_price', 0.000)
@@ -2126,12 +2126,10 @@ def update_air_shipping_costs():
 @app.route('/api/price_per_kg')
 @login_required
 def get_price_per_kg():
-    """Get current price per kg setting"""
+    """Get current price per kg setting from database"""
     try:
-        # Get price per kg from session or GlobalSettings
-        price_per_kg = session.get('price_per_kg', 0.000)
-        if price_per_kg == 0.000:
-            price_per_kg = GlobalSettings.get_setting('price_per_kg', 0.000)
+        # Get price per kg from GlobalSettings database
+        price_per_kg = GlobalSettings.get_setting('price_per_kg', 1.500)
         
         return jsonify({
             'success': True,
@@ -2656,8 +2654,8 @@ def update_price_per_kg():
     try:
         price_per_kg = float(request.form.get('price_per_kg', 0))
         
-        # Store in session or database - for now using session
-        session['price_per_kg'] = price_per_kg
+        # Store in database using GlobalSettings
+        GlobalSettings.set_setting('price_per_kg', price_per_kg)
         
         flash(f'تم تحديث سعر الكيلو إلى {price_per_kg:.3f} د.ك', 'success')
     except ValueError:
