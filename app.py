@@ -21,13 +21,19 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-here")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for to generate with https
 
-# configure the database - PostgreSQL configuration
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+# configure the database - PostgreSQL configuration for Render
+database_url = os.environ.get("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
-    "pool_size": 10,
-    "max_overflow": 20,
+    "pool_size": 5,
+    "max_overflow": 10,
+    "pool_timeout": 30,
+    "pool_reset_on_return": "commit"
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -50,24 +56,32 @@ def load_user(user_id):
     return Admin.query.get(int(user_id))
 
 with app.app_context():
-    # Make sure to import the models here or their tables won't be created
-    import models  # noqa: F401
-    
-    db.create_all()
-    
-    # Create default super admin if it doesn't exist
-    from models import Admin
-    admin = Admin.query.filter_by(username='admin').first()
-    if not admin:
-        admin = Admin(username='admin', is_super_admin=True)
-        admin.set_password('admin123')
-        db.session.add(admin)
-        db.session.commit()
-        logging.info('Default super admin created: admin/admin123')
-    elif not admin.is_super_admin:
-        admin.is_super_admin = True
-        db.session.commit()
-        logging.info('Updated existing admin to super admin')
+    try:
+        # Make sure to import the models here or their tables won't be created
+        import models  # noqa: F401
+        
+        # Create all database tables
+        db.create_all()
+        logging.info('Database tables created/verified successfully')
+        
+        # Create default super admin if it doesn't exist
+        from models import Admin
+        admin = Admin.query.filter_by(username='admin').first()
+        if not admin:
+            admin = Admin(username='admin', is_super_admin=True)
+            admin.set_password('admin123')
+            db.session.add(admin)
+            db.session.commit()
+            logging.info('Default super admin created: admin/admin123')
+        elif not admin.is_super_admin:
+            admin.is_super_admin = True
+            db.session.commit()
+            logging.info('Updated existing admin to super admin')
+            
+    except Exception as e:
+        logging.error(f'Database initialization error: {str(e)}')
+        # Don't crash the app, let it start without database for debugging
+        pass
 
 # Import routes after app initialization
 import routes  # noqa: F401

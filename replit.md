@@ -1033,6 +1033,14 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Automatic calculation of profit margins and percentage displays
   - Default date range set to last 30 days with option to customize
   - Real-time loading states and error handling for better user experience
+- **July 2, 2025: Optimized for Render deployment**
+  - Fixed PostgreSQL connection issues by updating DATABASE_URL format (postgres:// to postgresql://)
+  - Added database connection pooling optimizations for production environments
+  - Enhanced error handling in database initialization to prevent crashes
+  - Created runtime.txt specifying Python 3.11.7 for Render compatibility
+  - Updated Procfile for proper Render deployment with gunicorn
+  - Added comprehensive logging for database operations and troubleshooting
+  - Reduced connection pool size and added timeout settings for cloud hosting stability
   - Land shipping revenue: from general shipments with shipping_method='بري' (all statuses)
   - Document revenue: from document shipments with package_type='document' (all statuses)
   - Revenue appears instantly in Financial Center when new shipments are added to system
