@@ -1169,68 +1169,74 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    function loadGeneralShipmentsExpenses() {
-        fetch('/api/expenses_general_shipments')
-        .then(response => response.json())
-        .then(data => {
-            const tableBody = document.querySelector('#generalShipmentsExpensesTable tbody');
-            const noExpensesDiv = document.getElementById('generalShipmentsNoExpenses');
-            
-            if (data.success && data.expenses.length > 0) {
-                tableBody.innerHTML = '';
-                noExpensesDiv.style.display = 'none';
-                document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'block';
-                
-                data.expenses.forEach(expense => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="fw-bold">${expense.name}</td>
-                        <td class="text-success fw-bold">${expense.amount.toFixed(3)} د.ك</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-danger" 
-                                    onclick="deleteGeneralShipmentsExpense(${expense.id})"
-                                    title="حذف المصروف">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } else {
-                tableBody.innerHTML = '';
-                noExpensesDiv.style.display = 'block';
-                document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'none';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading general shipments expenses:', error);
-        });
-    }
+
     
-    function deleteGeneralShipmentsExpense(expenseId) {
-        if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
-            fetch(`/delete_expense_general_shipments/${expenseId}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    loadGeneralShipmentsExpenses();
-                    loadTotalExpenses(); // Update total expenses
-                } else {
-                    showNotification(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('حدث خطأ في حذف المصروف', 'error');
-            });
-        }
-    }
+
     
     // Load general shipments expenses on page load
     loadGeneralShipmentsExpenses();
 });
+
+// Global function for loading general shipments expenses
+function loadGeneralShipmentsExpenses() {
+    fetch('/api/expenses_general_shipments')
+    .then(response => response.json())
+    .then(data => {
+        const tableBody = document.querySelector('#generalShipmentsExpensesTable tbody');
+        const noExpensesDiv = document.getElementById('generalShipmentsNoExpenses');
+        
+        if (data.success && data.expenses.length > 0) {
+            tableBody.innerHTML = '';
+            noExpensesDiv.style.display = 'none';
+            document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'block';
+            
+            data.expenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="fw-bold">${expense.name}</td>
+                    <td class="text-success fw-bold">${expense.amount.toFixed(3)} د.ك</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                onclick="deleteGeneralShipmentsExpense(${expense.id})"
+                                title="حذف المصروف">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            tableBody.innerHTML = '';
+            noExpensesDiv.style.display = 'block';
+            document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading general shipments expenses:', error);
+    });
+}
+
+// Global function for deleting general shipments expenses
+function deleteGeneralShipmentsExpense(expenseId) {
+    if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
+        fetch(`/delete_expense_general_shipments/${expenseId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                loadGeneralShipmentsExpenses();
+                loadTotalExpenses(); // Update total expenses
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في حذف المصروف', 'error');
+        });
+    }
+}
 </script>
 {% endblock %}
