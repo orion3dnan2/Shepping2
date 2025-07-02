@@ -110,6 +110,7 @@
                                         <tr>
                                             <th>الاسم بالعربية</th>
                                             <th>الحالة</th>
+                                            <th>الإجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -125,7 +126,6 @@
                                                     <span class="badge bg-secondary">غير نشط</span>
                                                 {% endif %}
                                             </td>
-                                            <!-- Actions column hidden
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary me-2" 
                                                         onclick="editDocumentType({{ document_type.id }}, '{{ document_type.name_ar }}', '{{ document_type.name_en }}', {{ document_type.is_active|lower }})">
@@ -138,7 +138,6 @@
                                                     </button>
                                                 </form>
                                             </td>
-                                            -->
                                         </tr>
                                         {% endfor %}
                                     </tbody>
