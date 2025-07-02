@@ -945,6 +945,7 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Verified application startup and functionality on port 5000
   - Added "عامة" (General) option to shipment type dropdown in Add New Shipment form
   - Removed "تعليق" (Comment) checkbox option from shipment details form
+  - Hidden shipment types table in Settings → Manage Types page (document types table remains visible)
 - **June 30, 2025: Completed comprehensive PostgreSQL optimization and production setup**
   - Added Flask-Migrate>=4.0.0 dependency for professional database migration management
   - Created complete migrations system with initial migration and JSONB optimization
