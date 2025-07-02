@@ -3365,3 +3365,6 @@ def api_total_expenses():
     except Exception as e:
         app.logger.error(f"Error calculating total expenses: {str(e)}")
         return jsonify({'success': False, 'message': 'خطأ في حساب المصروفات'})
+
+
+
