@@ -54,7 +54,6 @@
                                         <tr>
                                             <th>الاسم بالعربية</th>
                                             <th>الحالة</th>
-                                            <th>الإجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -69,18 +68,6 @@
                                                 {% else %}
                                                     <span class="badge bg-secondary">غير نشط</span>
                                                 {% endif %}
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary me-2" 
-                                                        onclick="editShipmentType({{ shipment_type.id }}, '{{ shipment_type.name_ar }}', '{{ shipment_type.name_en }}', {{ shipment_type.price }}, {{ shipment_type.is_active|lower }})">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <form method="post" action="{{ url_for('delete_shipment_type', type_id=shipment_type.id) }}" style="display: inline;" 
-                                                      onsubmit="return confirm('هل أنت متأكد من حذف هذا النوع؟')">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
                                             </td>
                                         </tr>
                                         {% endfor %}
