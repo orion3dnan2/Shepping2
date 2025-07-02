@@ -3257,6 +3257,112 @@ def add_expense_documents():
         return jsonify({'success': False, 'message': f'حدث خطأ في حفظ المصروف: {str(e)}'})
 
 
+# General Shipments Expenses Routes
+@app.route('/add_expense_general_shipments', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def add_expense_general_shipments():
+    """Add a new general shipments expense"""
+    try:
+        name = request.form.get('name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        notes = request.form.get('notes', '').strip()
+        expense_date_str = request.form.get('expense_date', '').strip()
+        
+        if not name or not amount_str or not expense_date_str:
+            return jsonify({'success': False, 'message': 'جميع الحقول مطلوبة'})
+        
+        # Convert amount to float
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ غير صحيح'})
+        
+        # Parse date
+        try:
+            expense_date = datetime.strptime(expense_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'success': False, 'message': 'تاريخ غير صحيح'})
+        
+        # Create new expense with shipping_type for general shipments
+        expense = FinancialTransaction(
+            name=name,
+            amount=amount,
+            transaction_type='expense',
+            shipping_type='شحنات عامة',
+            category='شحنات عامة',
+            description=notes if notes else None,
+            transaction_date=datetime.combine(expense_date, datetime.min.time()),
+            admin_id=current_user.id
+        )
+        
+        db.session.add(expense)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم حفظ مصروف الشحنات العامة بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error adding general shipments expense: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في حفظ المصروف: {str(e)}'})
+
+
+@app.route('/api/expenses_general_shipments')
+@login_required
+@permission_required('expenses')
+def get_expenses_general_shipments():
+    """Get all general shipments expenses"""
+    try:
+        expenses = FinancialTransaction.query.filter_by(
+            transaction_type='expense',
+            shipping_type='شحنات عامة'
+        ).order_by(FinancialTransaction.transaction_date.desc()).all()
+        
+        expenses_data = []
+        for expense in expenses:
+            expenses_data.append({
+                'id': expense.id,
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'notes': expense.description,
+                'date': expense.transaction_date.strftime('%Y-%m-%d')
+            })
+        
+        return jsonify({'success': True, 'expenses': expenses_data})
+        
+    except Exception as e:
+        logging.error(f'Error fetching general shipments expenses: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في جلب المصروفات: {str(e)}'})
+
+
+@app.route('/delete_expense_general_shipments/<int:expense_id>', methods=['DELETE'])
+@login_required
+@permission_required('expenses')
+def delete_expense_general_shipments(expense_id):
+    """Delete a general shipments expense"""
+    try:
+        expense = FinancialTransaction.query.filter_by(
+            id=expense_id,
+            transaction_type='expense',
+            shipping_type='شحنات عامة'
+        ).first()
+        
+        if not expense:
+            return jsonify({'success': False, 'message': 'المصروف غير موجود'})
+        
+        db.session.delete(expense)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم حذف مصروف الشحنات العامة بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error deleting general shipments expense: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في حذف المصروف: {str(e)}'})
+
+
 @app.route('/api/expenses_general')
 @login_required
 @permission_required('expenses')
@@ -3349,22 +3455,29 @@ def delete_expense_documents(expense_id):
 @login_required
 @permission_required('expenses')
 def api_total_expenses():
-    """Calculate total expenses from both general and document expenses"""
+    """Calculate total expenses from office, general shipments, and document expenses"""
     try:
         from sqlalchemy import func
         
-        # Calculate total general expenses
-        general_total = db.session.query(func.sum(ExpenseGeneral.amount)).scalar() or 0
+        # Calculate total office expenses (ExpenseGeneral)
+        office_total = db.session.query(func.sum(ExpenseGeneral.amount)).scalar() or 0
+        
+        # Calculate total general shipments expenses (FinancialTransaction with shipping_type = 'شحنات عامة')
+        general_shipments_total = db.session.query(func.sum(FinancialTransaction.amount)).filter_by(
+            transaction_type='expense',
+            shipping_type='شحنات عامة'
+        ).scalar() or 0
         
         # Calculate total document expenses
         document_total = db.session.query(func.sum(ExpenseDocuments.amount)).scalar() or 0
         
         # Calculate grand total
-        grand_total = float(general_total) + float(document_total)
+        grand_total = float(office_total) + float(general_shipments_total) + float(document_total)
         
         return jsonify({
             'success': True,
-            'general_total': float(general_total),
+            'office_total': float(office_total),
+            'general_shipments_total': float(general_shipments_total),
             'document_total': float(document_total),
             'grand_total': grand_total
         })

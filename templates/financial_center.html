@@ -116,13 +116,13 @@
                     </div>
                     
                     <div class="row">
-                        <!-- General Expenses Section -->
-                        <div class="col-lg-6 mb-4">
+                        <!-- Office Expenses Section -->
+                        <div class="col-lg-4 mb-4">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header text-white" style="background: linear-gradient(135deg, #28a745, #20c997);">
                                     <h5 class="mb-0 text-center">
                                         <i class="fas fa-box me-2"></i>
-                                        مصروفات عامة
+                                        مصروفات المكتب
                                     </h5>
                                 </div>
                                 <div class="card-body p-4">
@@ -166,8 +166,68 @@
                             </div>
                         </div>
                         
+                        <!-- General Shipments Expenses Section -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #007bff, #6610f2);">
+                                    <h5 class="mb-0 text-center">
+                                        <i class="fas fa-shipping-fast me-2"></i>
+                                        مصروفات شحنات عامة
+                                    </h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <!-- General Shipments Expense Form -->
+                                    <form id="generalShipmentsExpenseForm" class="mb-4">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">اسم المصروف</label>
+                                            <input type="text" class="form-control form-control-lg" name="name" placeholder="مثال: تكاليف النقل" required>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">المبلغ (د.ك)</label>
+                                                <input type="text" class="form-control form-control-lg" name="amount" 
+                                                       pattern="[0-9]+(\.[0-9]{1,3})?" placeholder="0.000" required
+                                                       inputmode="decimal">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">التاريخ</label>
+                                                <input type="date" class="form-control form-control-lg" name="expense_date" required>
+                                            </div>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">الملاحظات (اختياري)</label>
+                                            <textarea class="form-control" name="notes" rows="3" placeholder="تفاصيل إضافية حول المصروف"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-lg w-100" style="border-radius: 10px;">
+                                            <i class="fas fa-save me-2"></i>حفظ المصروف
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- General Shipments Expenses Display -->
+                                    <div id="generalShipmentsExpensesContainer">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="generalShipmentsExpensesTable">
+                                                <thead class="table-primary">
+                                                    <tr>
+                                                        <th style="width: 60%">اسم المصروف</th>
+                                                        <th style="width: 25%">المبلغ</th>
+                                                        <th style="width: 15%">مسح</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                        <div class="text-center text-muted py-4" id="generalShipmentsNoExpenses">
+                                            <i class="fas fa-inbox me-2 fa-lg"></i>
+                                            <br><small>لا توجد مصروفات شحنات عامة</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Document Expenses Section -->
-                        <div class="col-lg-6 mb-4">
+                        <div class="col-lg-4 mb-4">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header text-white" style="background: linear-gradient(135deg, #6f42c1, #e83e8c);">
                                     <h5 class="mb-0 text-center">
@@ -1063,6 +1123,114 @@ document.addEventListener('DOMContentLoaded', function() {
     if (activeTab) {
         startRevenueAutoUpdate();
     }
+    
+    // General Shipments Expense Functions
+    document.getElementById('generalShipmentsExpenseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const submitButton = this.querySelector('button[type="submit"]');
+        
+        // Convert amount to proper number format
+        const amountInput = this.querySelector('input[name="amount"]');
+        const amountValue = parseFloat(amountInput.value);
+        if (isNaN(amountValue) || amountValue <= 0) {
+            showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+            return;
+        }
+        formData.set('amount', amountValue.toString());
+        
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+        submitButton.disabled = true;
+        
+        fetch('/add_expense_general_shipments', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                this.reset();
+                this.querySelector('input[name="expense_date"]').value = new Date().toISOString().split('T')[0];
+                loadGeneralShipmentsExpenses();
+                loadTotalExpenses(); // Update total expenses
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+        })
+        .finally(() => {
+            submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ المصروف';
+            submitButton.disabled = false;
+        });
+    });
+    
+    function loadGeneralShipmentsExpenses() {
+        fetch('/api/expenses_general_shipments')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.querySelector('#generalShipmentsExpensesTable tbody');
+            const noExpensesDiv = document.getElementById('generalShipmentsNoExpenses');
+            
+            if (data.success && data.expenses.length > 0) {
+                tableBody.innerHTML = '';
+                noExpensesDiv.style.display = 'none';
+                document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'block';
+                
+                data.expenses.forEach(expense => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="fw-bold">${expense.name}</td>
+                        <td class="text-success fw-bold">${expense.amount.toFixed(3)} د.ك</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="deleteGeneralShipmentsExpense(${expense.id})"
+                                    title="حذف المصروف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                tableBody.innerHTML = '';
+                noExpensesDiv.style.display = 'block';
+                document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading general shipments expenses:', error);
+        });
+    }
+    
+    function deleteGeneralShipmentsExpense(expenseId) {
+        if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
+            fetch(`/delete_expense_general_shipments/${expenseId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    loadGeneralShipmentsExpenses();
+                    loadTotalExpenses(); // Update total expenses
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('حدث خطأ في حذف المصروف', 'error');
+            });
+        }
+    }
+    
+    // Load general shipments expenses on page load
+    loadGeneralShipmentsExpenses();
 });
 </script>
 {% endblock %}
