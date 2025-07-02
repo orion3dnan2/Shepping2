@@ -57,7 +57,6 @@
                                     <thead class="table-header">
                                         <tr>
                                             <th>الاسم بالعربية</th>
-                                            <th>السعر (د.ك)</th>
                                             <th>الحالة</th>
                                             <th>الإجراءات</th>
                                         </tr>
@@ -69,9 +68,6 @@
                                                 <span class="fw-medium">{{ shipment_type.name_ar }}</span>
                                             </td>
                                             <td>
-                                                <span class="price-text">{{ "%.3f"|format(shipment_type.price) }}</span>
-                                            </td>
-                                            <td>
                                                 {% if shipment_type.is_active %}
                                                     <span class="badge bg-success">نشط</span>
                                                 {% else %}
@@ -80,7 +76,7 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary me-2" 
-                                                        onclick="editShipmentType({{ shipment_type.id }}, '{{ shipment_type.name_ar }}', '{{ shipment_type.name_en }}', {{ shipment_type.price }}, {{ shipment_type.is_active|lower }})">
+                                                        onclick="editShipmentType({{ shipment_type.id }}, '{{ shipment_type.name_ar }}', '{{ shipment_type.name_en }}', {{ shipment_type.is_active|lower }})">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <form method="post" action="{{ url_for('delete_shipment_type', type_id=shipment_type.id) }}" style="display: inline;" 
@@ -112,7 +108,6 @@
                                     <thead class="table-header">
                                         <tr>
                                             <th>الاسم بالعربية</th>
-                                            <th>السعر (د.ك)</th>
                                             <th>الحالة</th>
                                             <th>الإجراءات</th>
                                         </tr>
@@ -124,9 +119,6 @@
                                                 <span class="fw-medium">{{ document_type.name_ar }}</span>
                                             </td>
                                             <td>
-                                                <span class="price-text">{{ "%.3f"|format(document_type.price) }}</span>
-                                            </td>
-                                            <td>
                                                 {% if document_type.is_active %}
                                                     <span class="badge bg-success">نشط</span>
                                                 {% else %}
@@ -135,7 +127,7 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary me-2" 
-                                                        onclick="editDocumentType({{ document_type.id }}, '{{ document_type.name_ar }}', '{{ document_type.name_en }}', {{ document_type.price }}, {{ document_type.is_active|lower }})">
+                                                        onclick="editDocumentType({{ document_type.id }}, '{{ document_type.name_ar }}', '{{ document_type.name_en }}', {{ document_type.is_active|lower }})">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <form method="post" action="{{ url_for('delete_document_type', type_id=document_type.id) }}" style="display: inline;" 
@@ -1336,6 +1328,29 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePackagingPriceDisplay(packagingInput.value);
     }
 });
+
+// Edit functions for types without price parameter
+function editShipmentType(id, nameAr, nameEn, isActive) {
+    document.getElementById('editShipmentTypeId').value = id;
+    document.getElementById('editShipmentNameAr').value = nameAr;
+    document.getElementById('editShipmentNameEn').value = nameEn;
+    document.getElementById('editShipmentActive').checked = isActive;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editShipmentTypeModal'));
+    modal.show();
+}
+
+function editDocumentType(id, nameAr, nameEn, isActive) {
+    document.getElementById('editDocumentTypeId').value = id;
+    document.getElementById('editDocumentNameAr').value = nameAr;
+    document.getElementById('editDocumentNameEn').value = nameEn;
+    document.getElementById('editDocumentActive').checked = isActive;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editDocumentTypeModal'));
+    modal.show();
+}
 </script>
 
 <!-- Add Shipment Type Modal -->
