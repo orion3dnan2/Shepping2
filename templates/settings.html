@@ -44,12 +44,8 @@
 
                         <!-- Shipment Types Section -->
                         <div class="types-container mb-5">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="mb-3">
                                 <h4 class="section-title">أنواع الشحنات</h4>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addShipmentTypeModal">
-                                    <i class="fas fa-plus me-2"></i>
-                                    إضافة نوع شحنة
-                                </button>
                             </div>
 
                             <div class="table-responsive">
@@ -395,7 +391,6 @@
 </div>
 
 <!-- Include all modals from the original pages -->
-{% include 'modals/add_shipment_type_modal.html' %}
 {% include 'modals/edit_shipment_type_modal.html' %}
 {% include 'modals/add_document_type_modal.html' %}
 {% include 'modals/edit_document_type_modal.html' %}
