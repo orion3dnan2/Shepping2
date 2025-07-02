@@ -1,5 +1,6 @@
 import os
 import logging
+from datetime import timedelta
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -21,6 +22,9 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-here")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for to generate with https
 
+# Additional Flask configuration for production stability
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
 # configure the database - PostgreSQL configuration for Render
 database_url = os.environ.get("DATABASE_URL")
 if database_url and database_url.startswith("postgres://"):
@@ -28,12 +32,13 @@ if database_url and database_url.startswith("postgres://"):
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
+    "pool_recycle": 280,
     "pool_pre_ping": True,
-    "pool_size": 5,
-    "max_overflow": 10,
-    "pool_timeout": 30,
-    "pool_reset_on_return": "commit"
+    "pool_size": 3,
+    "max_overflow": 5,
+    "pool_timeout": 20,
+    "pool_reset_on_return": "commit",
+    "echo": False
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 

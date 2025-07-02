@@ -622,6 +622,7 @@ def add_shipment():
 # Removed senders and receivers routes as requested
 
 @app.route('/financial_center', methods=['GET', 'POST'])
+@app.route('/financial-center', methods=['GET', 'POST'])
 @login_required
 @permission_required('expenses')
 def financial_center():
