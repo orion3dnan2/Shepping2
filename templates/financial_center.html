@@ -510,12 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load revenues when page loads
     loadRevenues();
     
-    // Set today's date as default for expense forms
-    const dateInputs = document.querySelectorAll('input[name="expense_date"]');
-    const today = new Date().toISOString().split('T')[0];
-    dateInputs.forEach(input => {
-        input.value = today;
-    });
+    // Initialize expense forms (date inputs removed)
     
     // Tab event listeners
     document.getElementById('revenues-tab').addEventListener('shown.bs.tab', loadRevenues);
@@ -708,7 +703,6 @@ document.getElementById('generalExpenseForm').addEventListener('submit', functio
         if (data.success) {
             showNotification(data.message, 'success');
             this.reset();
-            this.querySelector('input[name="expense_date"]').value = new Date().toISOString().split('T')[0];
             loadGeneralExpenses();
             loadTotalExpenses(); // Update total expenses after adding new expense
             refreshFinancialReports(); // Update reports tab
@@ -819,7 +813,6 @@ document.getElementById('documentExpenseForm').addEventListener('submit', functi
         if (data.success) {
             showNotification(data.message, 'success');
             this.reset();
-            this.querySelector('input[name="expense_date"]').value = new Date().toISOString().split('T')[0];
             loadDocumentExpenses();
             loadTotalExpenses(); // Update total expenses after adding new expense
         } else {
@@ -1166,7 +1159,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 showNotification(data.message, 'success');
                 this.reset();
-                this.querySelector('input[name="expense_date"]').value = new Date().toISOString().split('T')[0];
                 loadGeneralShipmentsExpenses();
                 loadTotalExpenses(); // Update total expenses
             } else {
