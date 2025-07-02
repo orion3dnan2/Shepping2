@@ -937,6 +937,14 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Confirmed data migration successful with 20 existing shipments and 2 admin users preserved
   - Enhanced database configuration with production-ready connection pooling for better performance
   - All existing functionality remains intact with improved PostgreSQL performance and reliability
+- **July 2, 2025: Successfully migrated project from Replit Agent to standard Replit environment**
+  - Installed all required Python packages and dependencies
+  - Set up PostgreSQL database connection with proper environment variables
+  - Configured Flask application with session management and security middleware
+  - Created default admin user (admin/admin123) for system access
+  - Verified application startup and functionality on port 5000
+  - Added "عامة" (General) option to shipment type dropdown in Add New Shipment form
+  - Removed "تعليق" (Comment) checkbox option from shipment details form
 - **June 30, 2025: Completed comprehensive PostgreSQL optimization and production setup**
   - Added Flask-Migrate>=4.0.0 dependency for professional database migration management
   - Created complete migrations system with initial migration and JSONB optimization
