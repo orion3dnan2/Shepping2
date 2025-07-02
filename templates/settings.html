@@ -1247,12 +1247,19 @@ function editUser(id, username, permissions, isSuperAdmin) {
         superAdminCheckbox.checked = isSuperAdmin;
     }
     
-    // Set permissions checkboxes - direct mapping
+    // Reset all permission checkboxes first
     const permissionCheckboxes = document.querySelectorAll('#editUserModal input[name="permissions"]');
     permissionCheckboxes.forEach(checkbox => {
-        const permissionKey = checkbox.value; // home, shipments, etc. (already lowercase in HTML)
-        checkbox.checked = permissions[permissionKey] || false;
+        checkbox.checked = false;
     });
+    
+    // Set permissions checkboxes based on user permissions
+    if (permissions && typeof permissions === 'object') {
+        permissionCheckboxes.forEach(checkbox => {
+            const permissionKey = checkbox.value; // home, shipments, etc.
+            checkbox.checked = permissions[permissionKey] || false;
+        });
+    }
     
     // Update form action
     document.getElementById('editUserForm').action = `/edit_user/${id}`;
