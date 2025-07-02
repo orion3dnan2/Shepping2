@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}لوحة التحكم{% endblock %} - نظام إدارة الشحن</title>
     
     <!-- Bootstrap CSS -->
@@ -925,71 +924,6 @@
             // Here you would typically make an AJAX call to mark notifications as read
             // For now, we'll just hide the badge
             console.log('All notifications marked as read');
-        }
-        
-        // CSRF Protection for AJAX requests
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
-            
-            // Store CSRF token globally for easy access
-            window.csrfToken = csrfToken;
-            
-            // Override fetch to include CSRF token automatically
-            const originalFetch = window.fetch;
-            window.fetch = function(url, options = {}) {
-                if (!options.headers) {
-                    options.headers = {};
-                }
-                
-                // Add CSRF token for non-GET requests
-                if (options.method && !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(options.method.toUpperCase())) {
-                    options.headers['X-CSRFToken'] = csrfToken;
-                }
-                
-                return originalFetch(url, options);
-            };
-        });
-        
-        // Input sanitization functions
-        function sanitizeInput(input) {
-            if (typeof input !== 'string') return input;
-            
-            // Remove HTML tags and scripts
-            const div = document.createElement('div');
-            div.textContent = input;
-            let sanitized = div.innerHTML;
-            
-            // Remove common XSS patterns
-            sanitized = sanitized.replace(/<script[^>]*>.*?<\/script>/gi, '');
-            sanitized = sanitized.replace(/javascript:/gi, '');
-            sanitized = sanitized.replace(/on\w+\s*=/gi, '');
-            
-            return sanitized;
-        }
-        
-        // Form validation helpers
-        function validatePhoneNumber(phone) {
-            if (!phone) return true; // Allow empty
-            const phonePattern = /^[\+]?[\d\s\-\(\)]+$/;
-            return phonePattern.test(phone) && phone.replace(/[\s\-\(\)\+]/g, '').length >= 8;
-        }
-        
-        function validateEmail(email) {
-            if (!email) return true; // Allow empty
-            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            return emailPattern.test(email);
-        }
-        
-        function validateDecimal(value, min = 0, max = null) {
-            try {
-                const floatVal = parseFloat(value);
-                if (isNaN(floatVal) || floatVal < min) return false;
-                if (max !== null && floatVal > max) return false;
-                return true;
-            } catch (e) {
-                return false;
-            }
         }
     </script>
     

@@ -9,7 +9,6 @@ from sqlalchemy import func, extract
 from translations import get_text
 import json
 from functools import wraps
-from security_utils import sanitize_input, validate_phone_number, validate_email, validate_decimal, validate_required_fields, require_admin_permission, log_security_event, rate_limit_check
 
 # Helper function to get document type Arabic name
 def get_document_type_arabic(document_type_en):
@@ -82,50 +81,21 @@ def login():
         return redirect(url_for('index'))
     
     if request.method == 'POST':
-        # Rate limiting check
-        client_ip = request.remote_addr
-        if not rate_limit_check(f"login_{client_ip}", max_requests=5, window_minutes=15):
-            log_security_event('rate_limit_exceeded', ip_address=client_ip, details='Login attempts')
-            flash('تم تجاوز عدد محاولات تسجيل الدخول المسموحة. الرجاء المحاولة لاحقاً', 'error')
-            return render_template('login.html')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
         
-        # Sanitize input
-        username = sanitize_input(request.form.get('username', '')).strip()
-        password = request.form.get('password', '').strip()  # Don't sanitize passwords
-        
-        # Validate required fields
         if not username or not password:
-            log_security_event('invalid_login_attempt', ip_address=client_ip, details='Missing credentials')
             flash('يرجى إدخال اسم المستخدم وكلمة المرور', 'error')
-            return render_template('login.html')
-        
-        # Validate input length to prevent buffer overflow attacks
-        if len(username) > 100 or len(password) > 200:
-            log_security_event('invalid_login_attempt', ip_address=client_ip, details='Input too long')
-            flash('البيانات المدخلة غير صحيحة', 'error')
             return render_template('login.html')
         
         admin = Admin.query.filter_by(username=username).first()
         
         if admin and admin.check_password(password):
-            # Successful login
-            log_security_event('successful_login', user_id=admin.id, ip_address=client_ip)
             login_user(admin)
-            
-            # Validate next parameter to prevent open redirect attacks
             next_page = request.args.get('next')
-            if next_page:
-                from urllib.parse import urlparse
-                parsed_url = urlparse(next_page)
-                # Only allow relative URLs or same host
-                if parsed_url.netloc and parsed_url.netloc != request.host:
-                    next_page = None
-            
             flash(f'مرحباً {username}! تم تسجيل الدخول بنجاح', 'success')
             return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
-            # Failed login
-            log_security_event('failed_login_attempt', ip_address=client_ip, details=f'Username: {username}')
             flash('اسم المستخدم أو كلمة المرور غير صحيحة', 'error')
     
     return render_template('login.html')
@@ -385,37 +355,24 @@ def add_shipment():
             # Debug: Log all form data
             app.logger.debug(f"Form data received: {dict(request.form)}")
             
-            # Initialize errors list
-            errors = []
+            # Get form data with defaults
+            sender_name = request.form.get('sender_name', 'غير محدد').strip()
+            sender_phone = request.form.get('sender_phone', '').strip()
+            sender_address = request.form.get('sender_address', '').strip()
+            sender_email = request.form.get('sender_email', '').strip()
             
-            # Get form data with defaults and apply sanitization
-            sender_name = sanitize_input(request.form.get('sender_name', 'غير محدد')).strip()
-            sender_phone = sanitize_input(request.form.get('sender_phone', '')).strip()
-            sender_address = sanitize_input(request.form.get('sender_address', '')).strip()
-            sender_email = sanitize_input(request.form.get('sender_email', '')).strip()
+            receiver_name = request.form.get('receiver_name', 'غير محدد').strip()
+            receiver_phone = request.form.get('receiver_phone', '').strip()
+            receiver_address = request.form.get('receiver_address', '').strip()
+            receiver_email = request.form.get('receiver_email', '').strip()
             
-            receiver_name = sanitize_input(request.form.get('receiver_name', 'غير محدد')).strip()
-            receiver_phone = sanitize_input(request.form.get('receiver_phone', '')).strip()
-            receiver_address = sanitize_input(request.form.get('receiver_address', '')).strip()
-            receiver_email = sanitize_input(request.form.get('receiver_email', '')).strip()
-            
-            direction = sanitize_input(request.form.get('direction', 'kuwait_to_sudan')).strip()
-            package_type = sanitize_input(request.form.get('package_type', 'general')).strip()
-            shipping_method = sanitize_input(request.form.get('shipping_method', '')).strip()
-            package_contents = sanitize_input(request.form.get('package_contents', '')).strip()
-            action_required = sanitize_input(request.form.get('action_required', '')).strip()
-            document_type = sanitize_input(request.form.get('document_type', '')).strip()
-            zone = sanitize_input(request.form.get('zone', '')).strip()
-            
-            # Validate phone numbers and email addresses
-            if sender_phone and not validate_phone_number(sender_phone):
-                errors.append("رقم هاتف المرسل غير صحيح")
-            if receiver_phone and not validate_phone_number(receiver_phone):
-                errors.append("رقم هاتف المستلم غير صحيح")
-            if sender_email and not validate_email(sender_email):
-                errors.append("بريد المرسل الإلكتروني غير صحيح")
-            if receiver_email and not validate_email(receiver_email):
-                errors.append("بريد المستلم الإلكتروني غير صحيح")
+            direction = request.form.get('direction', 'kuwait_to_sudan').strip()
+            package_type = request.form.get('package_type', 'general').strip()
+            shipping_method = request.form.get('shipping_method', '').strip()
+            package_contents = request.form.get('package_contents', '').strip()
+            action_required = request.form.get('action_required', '').strip()
+            document_type = request.form.get('document_type', '').strip()
+            zone = request.form.get('zone', '').strip()
             
             # Handle packaging checkbox
             has_packaging = request.form.get('has_packaging') == '1'
@@ -443,22 +400,17 @@ def add_shipment():
             paid_amount_str = request.form.get('amount_paid', '0.0').strip()
             
             confirmed = request.form.get('confirmed') == 'on'
-            notes = sanitize_input(request.form.get('notes', '')).strip()
-            status = sanitize_input(request.form.get('status', 'created')).strip()
-            
-            # Validate decimal fields before processing
-            if not validate_decimal(weight_str):
-                errors.append("وزن الشحنة يجب أن يكون رقماً صحيحاً")
-            if not validate_decimal(price_str):
-                errors.append("سعر الشحنة يجب أن يكون رقماً صحيحاً")
-            if not validate_decimal(paid_amount_str):
-                errors.append("المبلغ المدفوع يجب أن يكون رقماً صحيحاً")
+            notes = request.form.get('notes', '').strip()
+            status = request.form.get('status', 'created').strip()
             
             app.logger.debug(f"Processed form data - weight: '{weight_str}', price: '{price_str}', paid_amount: '{paid_amount_str}'")
             
             # Initialize default values
             weight = 1.0
             price = 0.0
+            
+            # Validate required fields (all fields are now optional per requirements)
+            errors = []
             
             # Process weight and price with comprehensive error handling
             if package_type == 'document':
