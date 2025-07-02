@@ -30,6 +30,11 @@
                         <i class="fas fa-chart-bar me-2"></i>التقارير المالية
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profit-loss-tab" data-bs-toggle="pill" data-bs-target="#profit-loss" type="button" role="tab">
+                        <i class="fas fa-balance-scale me-2"></i>تقارير الربح والخسارة
+                    </button>
+                </li>
             </ul>
 
             <!-- Tab Content -->
@@ -408,6 +413,114 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profit & Loss Reports Tab -->
+                <div class="tab-pane fade" id="profit-loss" role="tabpanel">
+                    <!-- Date Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        تصفية حسب التاريخ
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">من تاريخ</label>
+                                            <input type="date" class="form-control" id="profitStartDate">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">إلى تاريخ</label>
+                                            <input type="date" class="form-control" id="profitEndDate">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="loadProfitLossReport()">
+                                        <i class="fas fa-search me-2"></i>عرض التقرير
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profit & Loss Report Table -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-balance-scale me-2"></i>
+                                        تقرير الربح والخسارة للشحنات
+                                    </h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0" id="profitLossTable">
+                                            <thead style="background: linear-gradient(135deg, #1e1e2f, #2d2d4a); color: white;">
+                                                <tr>
+                                                    <th class="text-center">رقم التتبع</th>
+                                                    <th class="text-center">نوع الشحنة</th>
+                                                    <th class="text-center">الإيراد (د.ك)</th>
+                                                    <th class="text-center">مصروفات الفئة (د.ك)</th>
+                                                    <th class="text-center">صافي الربح (د.ك)</th>
+                                                    <th class="text-center">نسبة الربح (%)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="profitLossTableBody">
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted py-4">
+                                                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                                        <br>اختر التواريخ وانقر "عرض التقرير" لإظهار البيانات
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="row mt-4" id="profitLossSummary" style="display: none;">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-coins fa-2x text-success mb-2"></i>
+                                    <h6 class="card-title">إجمالي الإيرادات</h6>
+                                    <h4 class="text-success" id="totalRevenueProfit">0.000 د.ك</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-minus-circle fa-2x text-danger mb-2"></i>
+                                    <h6 class="card-title">إجمالي المصروفات</h6>
+                                    <h4 class="text-danger" id="totalExpensesProfit">0.000 د.ك</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-balance-scale fa-2x text-primary mb-2"></i>
+                                    <h6 class="card-title">صافي الربح</h6>
+                                    <h4 class="text-primary" id="netProfitProfit">0.000 د.ك</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-percentage fa-2x text-warning mb-2"></i>
+                                    <h6 class="card-title">هامش الربح</h6>
+                                    <h4 class="text-warning" id="profitMarginProfit">0%</h4>
                                 </div>
                             </div>
                         </div>
@@ -1317,6 +1430,145 @@ function loadCategoryExpenses() {
 document.addEventListener('DOMContentLoaded', function() {
     loadShipmentsForLinking();
     loadCategoryExpenses();
+    
+    // Set default dates for profit/loss report (last 30 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    document.getElementById('profitEndDate').value = today.toISOString().split('T')[0];
+    document.getElementById('profitStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
 });
+
+// Profit & Loss Report Functions
+function loadProfitLossReport() {
+    const startDate = document.getElementById('profitStartDate').value;
+    const endDate = document.getElementById('profitEndDate').value;
+    
+    if (!startDate || !endDate) {
+        showNotification('يرجى تحديد تاريخ البداية والنهاية', 'error');
+        return;
+    }
+    
+    const tableBody = document.getElementById('profitLossTableBody');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                <br>جاري تحميل البيانات...
+            </td>
+        </tr>
+    `;
+    
+    // Fetch profit/loss data from shipment reports API
+    fetch(`/api/shipment_reports?start_date=${startDate}&end_date=${endDate}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.shipments.length > 0) {
+            displayProfitLossData(data.shipments);
+            calculateSummaryTotals(data.shipments);
+            document.getElementById('profitLossSummary').style.display = 'block';
+        } else {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <br>لا توجد شحنات في الفترة المحددة
+                    </td>
+                </tr>
+            `;
+            document.getElementById('profitLossSummary').style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading profit/loss data:', error);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <br>حدث خطأ في تحميل البيانات
+                </td>
+            </tr>
+        `;
+        showNotification('حدث خطأ في تحميل تقرير الربح والخسارة', 'error');
+    });
+}
+
+function displayProfitLossData(shipments) {
+    const tableBody = document.getElementById('profitLossTableBody');
+    tableBody.innerHTML = '';
+    
+    shipments.forEach(shipment => {
+        const revenue = parseFloat(shipment.price) || 0;
+        const categoryExpenses = parseFloat(shipment.category_expenses) || 0;
+        const netProfit = revenue - categoryExpenses;
+        const profitMargin = revenue > 0 ? ((netProfit / revenue) * 100) : 0;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center fw-bold">${shipment.tracking_number}</td>
+            <td class="text-center">
+                <span class="badge ${getShipmentTypeBadgeClass(shipment.package_type)}">
+                    ${getShipmentTypeDisplay(shipment.package_type)}
+                </span>
+            </td>
+            <td class="text-center text-success fw-bold">${revenue.toFixed(3)}</td>
+            <td class="text-center text-danger">${categoryExpenses.toFixed(3)}</td>
+            <td class="text-center ${netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">
+                ${netProfit.toFixed(3)}
+            </td>
+            <td class="text-center ${profitMargin >= 0 ? 'text-success' : 'text-danger'}">
+                ${profitMargin.toFixed(1)}%
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function calculateSummaryTotals(shipments) {
+    let totalRevenue = 0;
+    let totalExpenses = 0;
+    
+    shipments.forEach(shipment => {
+        totalRevenue += parseFloat(shipment.price) || 0;
+        totalExpenses += parseFloat(shipment.category_expenses) || 0;
+    });
+    
+    const netProfit = totalRevenue - totalExpenses;
+    const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100) : 0;
+    
+    document.getElementById('totalRevenueProfit').textContent = totalRevenue.toFixed(3) + ' د.ك';
+    document.getElementById('totalExpensesProfit').textContent = totalExpenses.toFixed(3) + ' د.ك';
+    document.getElementById('netProfitProfit').textContent = netProfit.toFixed(3) + ' د.ك';
+    document.getElementById('profitMarginProfit').textContent = profitMargin.toFixed(1) + '%';
+    
+    // Update colors based on profit/loss
+    const netProfitElement = document.getElementById('netProfitProfit');
+    const profitMarginElement = document.getElementById('profitMarginProfit');
+    
+    if (netProfit >= 0) {
+        netProfitElement.className = 'text-success';
+        profitMarginElement.className = 'text-success';
+    } else {
+        netProfitElement.className = 'text-danger';
+        profitMarginElement.className = 'text-danger';
+    }
+}
+
+function getShipmentTypeBadgeClass(packageType) {
+    switch(packageType) {
+        case 'document': return 'bg-info text-dark';
+        case 'general': return 'bg-primary';
+        default: return 'bg-secondary';
+    }
+}
+
+function getShipmentTypeDisplay(packageType) {
+    switch(packageType) {
+        case 'document': return 'مستندات';
+        case 'general': return 'عامة';
+        default: return 'غير محدد';
+    }
+}
 </script>
 {% endblock %}

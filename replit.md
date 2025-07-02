@@ -997,6 +997,16 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Simplified form validation to only require name and amount fields
   - Enhanced table layout with better column width distribution after removing direct expenses column
   - All expenses are now categorized automatically by type without manual date or shipment selection
+- **July 2, 2025: Integrated profit/loss reports into Financial Center**
+  - Added new "تقارير الربح والخسارة" tab to Financial Center navigation
+  - Created comprehensive profit/loss report table with columns: tracking number, shipment type, revenue, category expenses, net profit, profit margin
+  - Implemented date filtering functionality (from/to date selection) for custom report periods
+  - Added summary cards showing total revenue, total expenses, net profit, and profit margin
+  - Integrated with existing shipment reports API for real-time data retrieval
+  - Enhanced visual design with color-coded profit/loss indicators (green for profit, red for loss)
+  - Automatic calculation of profit margins and percentage displays
+  - Default date range set to last 30 days with option to customize
+  - Real-time loading states and error handling for better user experience
   - Land shipping revenue: from general shipments with shipping_method='بري' (all statuses)
   - Document revenue: from document shipments with package_type='document' (all statuses)
   - Revenue appears instantly in Financial Center when new shipments are added to system
