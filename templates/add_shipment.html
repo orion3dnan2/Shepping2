@@ -555,6 +555,41 @@
         toggleDocumentType();
         toggleShippingMethod();
         updateZonePricing();
+        updateShipmentTypePrice();
+    }
+    
+    // Update pricing based on selected shipment type
+    async function updateShipmentTypePrice() {
+        const packageType = document.getElementById('package_type').value;
+        const totalPriceField = document.getElementById('total_price');
+        const priceStatus = document.getElementById('price_status');
+        
+        // Skip for document types (handled separately)
+        if (packageType === 'document' || packageType === '' || !packageType) {
+            return;
+        }
+        
+        try {
+            // Fetch price for the selected shipment type
+            const response = await fetch(`/api/get_shipment_price?type=${encodeURIComponent(packageType)}`);
+            const data = await response.json();
+            
+            if (response.ok && data.price !== undefined) {
+                // If shipment type has a fixed price, use it
+                if (data.price > 0) {
+                    totalPriceField.value = data.price.toFixed(3);
+                    priceStatus.textContent = `سعر ${data.type_name}: ${data.price.toFixed(3)} د.ك`;
+                    priceStatus.className = 'text-success mt-1';
+                    calculateRemaining();
+                    return;
+                }
+            }
+        } catch (error) {
+            console.log('Using zone-based pricing for shipment type:', packageType);
+        }
+        
+        // Fallback to zone-based pricing calculation
+        calculateZoneBasedPrice();
     }
     
     // Show/hide shipping method field based on package type
