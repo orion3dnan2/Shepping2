@@ -1391,6 +1391,7 @@ function confirmDelete(shipmentId, trackingNumber) {
         
         fetch(`/delete_shipment/${shipmentId}`, {
             method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -1698,6 +1699,7 @@ function processPayment() {
     // Send payment request
     fetch('/api/process_payment', {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         headers: {
             'Content-Type': 'application/json',
         },

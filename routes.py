@@ -1,8 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
+from werkzeug.exceptions import BadRequest
 from app import app, db
 from models import Admin, Shipment, ShipmentType, DocumentType, Notification, ZonePricing, PackagingType, GlobalSettings, FinancialTransaction, OperationalCost, ExpenseGeneral, ExpenseDocuments
+from forms import LoginForm, ShipmentForm, FinancialTransactionForm, UserForm, PaymentForm, TrackingForm
+from security_utils import SecurityUtils, security_check
 import logging
 from datetime import datetime
 from sqlalchemy import func, extract
@@ -76,29 +79,50 @@ def permission_required(page):
     return decorator
 
 @app.route('/login', methods=['GET', 'POST'])
+@security_check
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        
-        if not username or not password:
-            flash('يرجى إدخال اسم المستخدم وكلمة المرور', 'error')
-            return render_template('login.html')
-        
-        admin = Admin.query.filter_by(username=username).first()
-        
-        if admin and admin.check_password(password):
-            login_user(admin)
-            next_page = request.args.get('next')
-            flash(f'مرحباً {username}! تم تسجيل الدخول بنجاح', 'success')
-            return redirect(next_page) if next_page else redirect(url_for('index'))
-        else:
-            flash('اسم المستخدم أو كلمة المرور غير صحيحة', 'error')
+    form = LoginForm()
     
-    return render_template('login.html')
+    if form.validate_on_submit():
+        try:
+            # Sanitize inputs
+            username = SecurityUtils.sanitize_input(form.username.data)
+            password = SecurityUtils.sanitize_input(form.password.data)
+            
+            if not username or not password:
+                flash('يرجى إدخال اسم المستخدم وكلمة المرور', 'error')
+                return render_template('login.html', form=form)
+            
+            admin = Admin.query.filter_by(username=username).first()
+            
+            if admin and admin.check_password(password):
+                login_user(admin)
+                next_page = request.args.get('next')
+                
+                # Log successful login
+                SecurityUtils.log_security_event('SUCCESSFUL_LOGIN', 
+                                               f'User {username} logged in successfully',
+                                               user_id=admin.id)
+                
+                flash(f'مرحباً {username}! تم تسجيل الدخول بنجاح', 'success')
+                return redirect(next_page) if next_page else redirect(url_for('index'))
+            else:
+                # Log failed login attempt
+                SecurityUtils.log_security_event('FAILED_LOGIN', 
+                                               f'Failed login attempt for username: {username}')
+                flash('اسم المستخدم أو كلمة المرور غير صحيحة', 'error')
+                
+        except BadRequest as e:
+            flash('بيانات غير صحيحة', 'error')
+            SecurityUtils.log_security_event('MALICIOUS_LOGIN_ATTEMPT', str(e))
+        except Exception as e:
+            flash('حدث خطأ أثناء تسجيل الدخول', 'error')
+            app.logger.error(f'Login error: {str(e)}')
+    
+    return render_template('login.html', form=form)
 
 @app.route('/logout')
 @login_required

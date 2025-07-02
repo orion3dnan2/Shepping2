@@ -214,6 +214,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ url_for('add_user') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -282,6 +283,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="" id="editUserForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -363,6 +365,7 @@ function deleteUser(userId, username) {
     if (confirm(`هل أنت متأكد من حذف المستخدم "${username}"؟\nهذا الإجراء لا يمكن التراجع عنه.`)) {
         fetch(`/delete_user/${userId}`, {
             method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             headers: {
                 'Content-Type': 'application/json',
             }

@@ -46,6 +46,7 @@
                     <div class="form-card">
                         <h5><i class="fas fa-plus-circle me-2"></i>إضافة مصروف جديد</h5>
                         <form method="POST" action="{{ url_for('financial_center') }}" id="operationalCostForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" name="transaction_type" value="operational_cost">
                             <div class="row">
                                 <div class="col-md-3">
@@ -1393,6 +1394,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             fetch('{{ url_for("financial_center") }}', {
                 method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 body: formData
             })
             .then(response => response.text())
@@ -2381,6 +2383,7 @@ document.getElementById('revenueForm').addEventListener('submit', function(e) {
     
     fetch('{{ url_for("financial_center") }}', {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.text())
@@ -2408,6 +2411,7 @@ document.getElementById('operationalCostForm').addEventListener('submit', functi
     
     fetch('{{ url_for("financial_center") }}', {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.text())
@@ -2430,6 +2434,7 @@ function deleteExpense(expenseId, shippingType) {
     if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
         fetch(`/delete_financial_transaction/${expenseId}`, {
             method: 'POST'
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         })
         .then(response => response.json())
         .then(data => {
@@ -2453,6 +2458,7 @@ function deleteTransaction(transactionId) {
     if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
         fetch(`/delete_financial_transaction/${transactionId}`, {
             method: 'POST'
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         })
         .then(response => response.json())
         .then(data => {
@@ -2476,6 +2482,7 @@ function deleteOperationalCost(costId) {
     if (confirm('هل أنت متأكد من حذف هذه التكلفة التشغيلية؟')) {
         fetch(`/delete_operational_cost/${costId}`, {
             method: 'POST'
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         })
         .then(response => response.json())
         .then(data => {
@@ -2518,6 +2525,7 @@ document.getElementById('airShippingCostsForm').addEventListener('submit', funct
     
     fetch('{{ url_for("update_air_shipping_costs") }}', {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.json())
@@ -2708,6 +2716,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             fetch('{{ url_for("financial_center") }}', {
                 method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 body: formData
             })
             .then(response => {
@@ -2863,6 +2872,7 @@ function deleteExpense(expenseId) {
     
     fetch(`/delete_financial_transaction/${expenseId}`, {
         method: 'POST'
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     })
     .then(response => response.json())
     .then(data => {
@@ -3032,6 +3042,7 @@ function deleteOperationalCost(costId, button) {
     // Send delete request
     fetch(`/delete_operational_cost/${costId}`, {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         headers: {
             'Content-Type': 'application/json',
         }
@@ -3571,6 +3582,7 @@ function attachDeleteExpenseHandlers() {
                 
                 fetch(`/delete_financial_transaction/${expenseId}`, {
                     method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     headers: {
                         'Content-Type': 'application/json',
                     }
@@ -3672,6 +3684,7 @@ if (editExpenseForm) {
     
     fetch(`/edit_financial_transaction/${expenseId}`, {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.json())
@@ -3720,6 +3733,7 @@ if (documentCostsForm) {
     
     fetch('/update_document_costs', {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.json())
@@ -4004,6 +4018,7 @@ function attachDeleteExpenseHandlers() {
                 
                 fetch(`/delete_financial_transaction/${expenseId}`, {
                     method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     headers: {
                         'Content-Type': 'application/json',
                     }
@@ -4052,6 +4067,7 @@ function clearAllExpenseData() {
         // Send request to delete all expenses
         fetch('/api/clear_all_expenses', {
             method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -4133,6 +4149,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Send delete request
                 fetch('/delete_operational_cost/' + costId, {
                     method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     headers: {
                         'Content-Type': 'application/json'
                     }

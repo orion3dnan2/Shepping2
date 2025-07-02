@@ -5,11 +5,20 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+# Configure logging based on environment
+log_level = logging.INFO if os.environ.get('FLASK_ENV') == 'production' else logging.DEBUG
+logging.basicConfig(
+    level=log_level,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
 
 class Base(DeclarativeBase):
     pass
@@ -18,7 +27,30 @@ db = SQLAlchemy(model_class=Base)
 
 # create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-here")
+
+# Security Configuration
+app.secret_key = os.environ.get("SESSION_SECRET")
+if not app.secret_key:
+    if os.environ.get('FLASK_ENV') == 'production':
+        raise RuntimeError("SESSION_SECRET environment variable is required for security in production")
+    else:
+        # Use a secure default for development (should be changed in production)
+        app.secret_key = "dev-secret-key-change-in-production-2024-secure"
+        logging.warning("Using default secret key for development. Set SESSION_SECRET environment variable for production.")
+
+# Additional security headers
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+
+# WTF CSRF Configuration
+app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # 1 hour
+app.config['WTF_CSRF_SSL_STRICT'] = os.environ.get('FLASK_ENV') == 'production'
+
+# Disable debug mode in production
+app.config['DEBUG'] = os.environ.get('FLASK_ENV') != 'production'
+
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for to generate with https
 
 # configure the database - PostgreSQL configuration
@@ -43,6 +75,9 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'يرجى تسجيل الدخول للوصول إلى هذه الصفحة.'
 login_manager.login_message_category = 'info'
+
+# Initialize CSRF Protection
+csrf = CSRFProtect(app)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -69,5 +104,8 @@ with app.app_context():
         db.session.commit()
         logging.info('Updated existing admin to super admin')
 
-# Import routes after app initialization
+# Import error handlers and routes after app initialization
+from error_handlers import register_error_handlers
+register_error_handlers(app)
+
 import routes  # noqa: F401

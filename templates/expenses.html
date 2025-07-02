@@ -457,6 +457,7 @@
     </div>
     
     <form method="POST" id="ratesForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="action" value="update_rates">
         
         <div class="rates-grid">

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}طلب غير صحيح - مرسال إكسبرس{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow">
+                <div class="card-body text-center p-5">
+                    <div class="error-icon mb-4">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="mb-3">طلب غير صحيح</h2>
+                    <p class="text-muted mb-4">
+                        البيانات المرسلة غير صحيحة أو غير مكتملة.
+                        يرجى التحقق من البيانات والمحاولة مرة أخرى.
+                    </p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>العودة للصفحة الرئيسية
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

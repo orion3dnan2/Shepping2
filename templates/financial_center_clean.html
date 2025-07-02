@@ -585,6 +585,7 @@ function submitExpenseForm(form, shippingType) {
     
     fetch('/add_financial_transaction', {
         method: 'POST',
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.json())
@@ -610,6 +611,7 @@ function deleteExpense(expenseId, shippingType) {
     
     fetch(`/delete_financial_transaction/${expenseId}`, {
         method: 'POST'
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     })
     .then(response => response.json())
     .then(data => {

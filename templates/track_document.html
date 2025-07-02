@@ -372,6 +372,7 @@
                 {% if current_user.is_authenticated %}
                 <!-- Hidden form for status updates -->
                 <form method="POST" action="{{ url_for('update_document_status', shipment_id=shipment.id) }}" style="display: none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <select id="new_status" name="new_status">
                         <option value="document_received">تم استلام المستند</option>
                         <option value="document_sent">تم إرسال المستند</option>
