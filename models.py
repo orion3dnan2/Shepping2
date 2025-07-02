@@ -69,6 +69,8 @@ class Shipment(db.Model):
     waybill_price = db.Column(db.Float, nullable=False, default=0.0)  # Manual waybill price
     status = db.Column(db.String(50), nullable=False, default='created')
     price = db.Column(db.Float, nullable=False, default=0.0)  # سعر الشحن للعميل
+    discount = db.Column(db.Float, nullable=False, default=0.0)  # خصم للعميل
+    final_price = db.Column(db.Float, nullable=False, default=0.0)  # السعر النهائي بعد الخصم
     cost = db.Column(db.Float, nullable=False, default=0.0)  # تكلفة الشحنة الفعلية
     profit = db.Column(db.Float, nullable=False, default=0.0)  # ربح الشحنة (محسوب تلقائياً)
     paid_amount = db.Column(db.Float, nullable=False, default=0.0)  # Amount paid by customer

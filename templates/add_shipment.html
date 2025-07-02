@@ -396,6 +396,19 @@
                                 <input type="number" step="0.01" class="form-control" id="total_price" name="total_price" readonly placeholder="0.00" style="background-color: #f8f9fa;" required>
                                 <div class="text-muted mt-1" id="price_status">يتم تحديده تلقائياً حسب النوع</div>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="discount" class="form-label">الخصم (د.ك)</label>
+                                <input type="text" class="form-control" id="discount" name="discount" placeholder="0.00" oninput="applyDiscount()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
+                                <div class="text-muted mt-1">يتم خصمه من السعر النهائي للعميل</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="final_price" class="form-label">السعر النهائي بعد الخصم</label>
+                                <input type="number" step="0.01" class="form-control" id="final_price" name="final_price" readonly placeholder="0.00" style="background-color: #e9ecef; font-weight: bold;">
+                                <div class="text-muted mt-1">السعر بعد تطبيق الخصم</div>
+                            </div>
                         </div>
                         
                         <!-- Hidden profit field - maintained for backend functionality -->
@@ -752,7 +765,7 @@
         priceStatus.textContent = breakdown;
         priceStatus.className = 'text-success mt-1';
         
-        calculateRemaining();
+        applyDiscount();
         calculateProfit();
     }
     
@@ -824,7 +837,7 @@
             totalPriceField.value = parseFloat(data.price).toFixed(2);
             priceStatus.textContent = `تم تحديد سعر ${data.type_name}: ${parseFloat(data.price).toFixed(2)} د.ك`;
             priceStatus.className = 'text-success mt-1';
-            calculateRemaining();
+            applyDiscount();
             
         } catch (error) {
             console.error('Network or parsing error:', error);
@@ -837,7 +850,7 @@
                 totalPriceField.value = parseFloat(fallbackPrice).toFixed(2);
                 priceStatus.textContent = `تم تحديد السعر: ${parseFloat(fallbackPrice).toFixed(2)} د.ك`;
                 priceStatus.className = 'text-success mt-1';
-                calculateRemaining();
+                applyDiscount();
             } else {
                 totalPriceField.value = '';
                 priceStatus.textContent = 'لا يوجد سعر لهذا النوع';
@@ -847,9 +860,23 @@
         }
     }
     
+    // Apply discount calculation
+    function applyDiscount() {
+        const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        const finalPriceField = document.getElementById('final_price');
+        
+        // Calculate final price after discount
+        const finalPrice = Math.max(0, totalPrice - discount);
+        finalPriceField.value = finalPrice.toFixed(2);
+        
+        // Update remaining amount calculation
+        calculateRemaining();
+    }
+    
     // Auto-calculate remaining amount
     function calculateRemaining() {
-        const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
+        const finalPrice = parseFloat(document.getElementById('final_price').value) || 0;
         const amountPaid = parseFloat(document.getElementById('amount_paid').value) || 0;
         const remainingField = document.getElementById('remaining_amount');
         const amountPaidField = document.getElementById('amount_paid');
@@ -857,7 +884,7 @@
         // Clear any previous error styling
         amountPaidField.classList.remove('is-invalid');
         
-        if (amountPaid > totalPrice && totalPrice > 0) {
+        if (amountPaid > finalPrice && finalPrice > 0) {
             // Show warning for overpayment
             amountPaidField.classList.add('is-invalid');
             remainingField.value = '';
@@ -868,12 +895,12 @@
                 warningDiv = document.createElement('div');
                 warningDiv.id = 'payment-warning';
                 warningDiv.className = 'alert alert-warning mt-2';
-                warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>المبلغ المدفوع أكبر من السعر الإجمالي';
+                warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>المبلغ المدفوع أكبر من السعر النهائي';
                 amountPaidField.parentNode.appendChild(warningDiv);
             }
         } else {
             // Calculate remaining amount
-            const remaining = totalPrice - amountPaid;
+            const remaining = finalPrice - amountPaid;
             remainingField.value = remaining >= 0 ? remaining.toFixed(2) : '0.00';
             
             // Remove warning if exists

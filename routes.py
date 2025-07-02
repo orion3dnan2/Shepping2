@@ -483,8 +483,27 @@ def add_shipment():
             
             profit = price - cost
             
-            # Calculate remaining amount
-            remaining_amount = price - paid_amount
+            # Process discount and final price
+            discount_str = request.form.get('discount', '0').strip()
+            try:
+                discount = float(discount_str) if discount_str else 0.0
+                if discount < 0:
+                    discount = 0.0
+            except ValueError:
+                discount = 0.0
+                app.logger.debug(f"Invalid discount value: '{discount_str}', defaulting to 0.0")
+            
+            final_price_str = request.form.get('final_price', '0').strip()
+            try:
+                final_price = float(final_price_str) if final_price_str else price - discount
+                if final_price < 0:
+                    final_price = 0.0
+            except ValueError:
+                final_price = price - discount
+                app.logger.debug(f"Invalid final_price value: '{final_price_str}', calculating from price-discount")
+            
+            # Calculate remaining amount based on final price
+            remaining_amount = final_price - paid_amount
             
             # Debug: Log all variables before database insertion
             app.logger.debug(f"Creating shipment with values:")
@@ -492,6 +511,8 @@ def add_shipment():
             app.logger.debug(f"  sender_name: {sender_name}")
             app.logger.debug(f"  weight: {weight} (type: {type(weight)})")
             app.logger.debug(f"  price: {price} (type: {type(price)})")
+            app.logger.debug(f"  discount: {discount} (type: {type(discount)})")
+            app.logger.debug(f"  final_price: {final_price} (type: {type(final_price)})")
             app.logger.debug(f"  cost: {cost} (type: {type(cost)})")
             app.logger.debug(f"  profit: {profit} (type: {type(profit)})")
             app.logger.debug(f"  paid_amount: {paid_amount} (type: {type(paid_amount)})")
@@ -521,6 +542,8 @@ def add_shipment():
                 waybill_price=waybill_price,
                 weight=weight,
                 price=price,
+                discount=discount,
+                final_price=final_price,
                 cost=cost,
                 profit=profit,
                 paid_amount=paid_amount,
