@@ -557,9 +557,30 @@
 
     // Handle shipment type change
     function handleShipmentTypeChange() {
+        // Reset price when changing shipment type
+        const totalPriceField = document.getElementById('total_price');
+        const priceStatus = document.getElementById('price_status');
+        
+        totalPriceField.value = '';
+        
         toggleDocumentType();
         toggleShippingMethod();
         updateZonePricing();
+        
+        // Set appropriate price status message based on shipment type
+        const packageType = document.getElementById('package_type').value;
+        if (packageType === 'document') {
+            priceStatus.textContent = 'يرجى اختيار نوع المستند لتحديد السعر';
+            priceStatus.className = 'text-muted mt-1';
+        } else if (packageType && packageType !== '') {
+            priceStatus.textContent = 'أدخل الوزن لحساب السعر الإجمالي';
+            priceStatus.className = 'text-muted mt-1';
+        } else {
+            priceStatus.textContent = 'اختر نوع الشحنة أولاً';
+            priceStatus.className = 'text-muted mt-1';
+        }
+        
+        calculateRemaining();
     }
     
     // Show/hide shipping method field based on package type
@@ -656,15 +677,24 @@
         loadPricePerKg();
     };
     
-    // Calculate price based on settings price per kg + packaging cost
+    // Calculate price based on settings price per kg + packaging cost (for general shipments only)
     function calculateZoneBasedPrice() {
         const packageType = document.getElementById('package_type').value;
         const weightInput = document.getElementById('weight');
         const totalPriceField = document.getElementById('total_price');
         const priceStatus = document.getElementById('price_status');
         
-        // Only calculate for non-document shipments
-        if (packageType === 'document' || packageType === '' || !packageType) {
+        // Skip calculation for document shipments - they use document type pricing
+        if (packageType === 'document') {
+            return;
+        }
+        
+        // Only calculate for general shipments (عامة) when weight is provided
+        if (packageType === '' || !packageType) {
+            totalPriceField.value = '';
+            priceStatus.textContent = 'اختر نوع الشحنة أولاً';
+            priceStatus.className = 'text-muted mt-1';
+            calculateRemaining();
             return;
         }
         
@@ -776,12 +806,18 @@
         calculateZoneBasedPrice();
     }
     
-    // Update document price
+    // Update document price (only for document shipments)
     async function updateDocumentPrice() {
+        const packageType = document.getElementById('package_type').value;
         const documentTypeSelect = document.getElementById('document_type');
         const documentType = documentTypeSelect.value;
         const totalPriceField = document.getElementById('total_price');
         const priceStatus = document.getElementById('price_status');
+        
+        // Only process if the shipment type is documents
+        if (packageType !== 'document') {
+            return;
+        }
         
         if (!documentType || documentType === '') {
             totalPriceField.value = '';
@@ -814,8 +850,8 @@
             }
             
             // Successfully got price
-            totalPriceField.value = parseFloat(data.price).toFixed(2);
-            priceStatus.textContent = `تم تحديد سعر ${data.type_name}: ${parseFloat(data.price).toFixed(2)} د.ك`;
+            totalPriceField.value = parseFloat(data.price).toFixed(3);
+            priceStatus.textContent = `تم تحديد سعر ${data.type_name}: ${parseFloat(data.price).toFixed(3)} د.ك`;
             priceStatus.className = 'text-success mt-1';
             calculateRemaining();
             
@@ -827,8 +863,8 @@
             const fallbackPrice = selectedOption ? selectedOption.getAttribute('data-price') : null;
             
             if (fallbackPrice && fallbackPrice !== 'null') {
-                totalPriceField.value = parseFloat(fallbackPrice).toFixed(2);
-                priceStatus.textContent = `تم تحديد السعر: ${parseFloat(fallbackPrice).toFixed(2)} د.ك`;
+                totalPriceField.value = parseFloat(fallbackPrice).toFixed(3);
+                priceStatus.textContent = `تم تحديد السعر: ${parseFloat(fallbackPrice).toFixed(3)} د.ك`;
                 priceStatus.className = 'text-success mt-1';
                 calculateRemaining();
             } else {
@@ -840,11 +876,17 @@
         }
     }
     
-    // Function to update price based on selected procedure
+    // Function to update price based on selected procedure (only for document shipments)
     async function updateProcedurePrice() {
+        const packageType = document.getElementById('package_type').value;
         const actionSelect = document.getElementById('action_required');
         const totalPriceField = document.getElementById('total_price');
         const priceStatus = document.getElementById('price_status');
+        
+        // Only process if the shipment type is documents
+        if (packageType !== 'document') {
+            return;
+        }
         
         if (!actionSelect.value) {
             totalPriceField.value = '';

@@ -489,6 +489,13 @@ function toggleWaybillPrice() {
 }
 
 function updateDocumentPrice() {
+    const packageType = document.getElementById('package_type').value;
+    
+    // Only process if the shipment type is documents
+    if (packageType !== 'document') {
+        return;
+    }
+    
     const documentTypeSelect = document.getElementById('document_type');
     const selectedOption = documentTypeSelect.options[documentTypeSelect.selectedIndex];
     let price = parseFloat(selectedOption.getAttribute('data-price') || 0);
@@ -514,12 +521,12 @@ function updateDocumentPrice() {
 function updatePrice() {
     const packageType = document.getElementById('package_type').value;
     
-    if (packageType === 'document') {
-        updateDocumentPrice();
+    // Only process for general shipments - documents use updateDocumentPrice()
+    if (packageType === 'document' || packageType === '' || !packageType) {
         return;
     }
     
-    // General shipment pricing calculation
+    // General shipment pricing calculation (only for non-document shipments)
     const zoneSelect = document.getElementById('zone');
     const selectedZone = zoneSelect.options[zoneSelect.selectedIndex];
     const pricePerKg = parseFloat(selectedZone.getAttribute('data-price') || 0);
@@ -607,10 +614,16 @@ function hidePriceBreakdown() {
     priceBreakdown.style.display = 'none';
 }
 
-// Function to update price based on selected procedure
+// Function to update price based on selected procedure (only for document shipments)
 function updateProcedurePrice() {
+    const packageType = document.getElementById('package_type').value;
     const actionSelect = document.getElementById('action_required');
     const totalPriceField = document.getElementById('total_price');
+    
+    // Only process if the shipment type is documents
+    if (packageType !== 'document') {
+        return;
+    }
     
     if (!actionSelect.value) {
         return;
