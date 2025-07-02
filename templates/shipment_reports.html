@@ -83,14 +83,13 @@
                                 <tr>
                                     <th style="width: 12%">رقم التتبع</th>
                                     <th style="width: 10%">النوع</th>
-                                    <th style="width: 12%">المرسل</th>
-                                    <th style="width: 12%">المستلم</th>
-                                    <th style="width: 8%">الإيراد</th>
-                                    <th style="width: 10%">مصروفات الفئة</th>
-                                    <th style="width: 8%">مصروفات مباشرة</th>
-                                    <th style="width: 10%">صافي الربح</th>
+                                    <th style="width: 14%">المرسل</th>
+                                    <th style="width: 14%">المستلم</th>
+                                    <th style="width: 10%">الإيراد</th>
+                                    <th style="width: 12%">مصروفات الفئة</th>
+                                    <th style="width: 12%">صافي الربح</th>
                                     <th style="width: 8%">الحالة</th>
-                                    <th style="width: 10%">الإجراءات</th>
+                                    <th style="width: 8%">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="shipmentsTableBody">
@@ -257,7 +256,6 @@ function updateShipmentsTable(shipments) {
             <td class="fw-bold">${shipment.receiver_name}</td>
             <td class="text-primary fw-bold">${shipment.price.toFixed(3)} د.ك</td>
             <td class="text-warning fw-bold">${shipment.category_expenses.toFixed(3)} د.ك</td>
-            <td class="text-danger fw-bold">${shipment.direct_expenses.toFixed(3)} د.ك</td>
             <td class="${profitClass} fw-bold">${shipment.net_profit.toFixed(3)} د.ك</td>
             <td>${statusBadge}</td>
             <td>

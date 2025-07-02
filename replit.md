@@ -989,6 +989,14 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Modified profit/loss calculations to use distributed expenses for accurate per-shipment analysis
   - Updated shipment reports table with separate columns for category expenses vs direct expenses
   - System now automatically calculates profit/loss using: Revenue - (Distributed Category Expenses + Direct Expenses)
+- **July 2, 2025: Simplified expense input forms and profit/loss table**
+  - Removed date field from all expense input forms (office, general shipments, documents)
+  - Removed shipment linking field from all expense forms
+  - Expenses now use current date automatically for timestamp tracking
+  - Removed "مصروفات مباشرة" (Direct Expenses) column from shipment reports profit/loss table
+  - Simplified form validation to only require name and amount fields
+  - Enhanced table layout with better column width distribution after removing direct expenses column
+  - All expenses are now categorized automatically by type without manual date or shipment selection
   - Land shipping revenue: from general shipments with shipping_method='بري' (all statuses)
   - Document revenue: from document shipments with package_type='document' (all statuses)
   - Revenue appears instantly in Financial Center when new shipments are added to system
