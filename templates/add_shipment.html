@@ -447,6 +447,11 @@
                                 <input type="number" step="0.01" class="form-control" id="total_price" name="total_price" readonly placeholder="0.00" style="background-color: #f8f9fa;" required>
                                 <div class="text-muted mt-1" id="price_status">يتم تحديده تلقائياً حسب النوع</div>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="discount" class="form-label">الخصم (د.ك)</label>
+                                <input type="text" class="form-control" id="discount" name="discount" placeholder="0.00" oninput="applyDiscount()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
+                                <div class="text-muted mt-1">يتم خصمه من السعر الإجمالي</div>
+                            </div>
                         </div>
                         
                         <!-- Hidden profit field - maintained for backend functionality -->
@@ -685,7 +690,7 @@
         zoneSelect.appendChild(firstOption);
         
         // Get all zones from server data
-        const allZones = {{ zone_pricings | tojsonfilter | safe }};
+        const allZones = {{ zone_pricings | tojson | safe }};
         
         allZones.forEach(zone => {
             if (direction === '' || zone.direction === direction) {
@@ -702,6 +707,29 @@
         zoneSelect.value = '';
     }
     
+    // Apply discount to the total price
+    function applyDiscount() {
+        const totalPriceField = document.getElementById('total_price');
+        const discountField = document.getElementById('discount');
+        const originalPrice = parseFloat(totalPriceField.getAttribute('data-original-price') || totalPriceField.value || 0);
+        const discount = parseFloat(discountField.value || 0);
+        
+        // Calculate final price after discount
+        const finalPrice = Math.max(0, originalPrice - discount);
+        totalPriceField.value = finalPrice.toFixed(2);
+        
+        // Update remaining amount calculation
+        calculateRemaining();
+        
+        // Show discount info
+        const priceStatus = document.getElementById('price_status');
+        if (discount > 0) {
+            priceStatus.innerHTML = `السعر الأصلي: ${originalPrice.toFixed(2)} د.ك - الخصم: ${discount.toFixed(2)} د.ك = ${finalPrice.toFixed(2)} د.ك`;
+        } else {
+            priceStatus.innerHTML = 'يتم تحديده تلقائياً حسب النوع';
+        }
+    }
+
     // Calculate price based on settings price per kg + packaging cost (for general shipments only)
     function calculateZoneBasedPrice() {
         const packageType = document.getElementById('package_type').value;
@@ -781,7 +809,12 @@
         const weightCost = weight * pricePerKg;
         const totalPrice = weightCost + packagingCost + policyPrice + commentPrice;
         
+        // Store original price before discount
+        totalPriceField.setAttribute('data-original-price', totalPrice.toFixed(3));
         totalPriceField.value = totalPrice.toFixed(3);
+        
+        // Apply discount if exists
+        applyDiscount();
         
         // Build detailed price breakdown message
         const priceSource = globalPricePerKg > 0 ? '(من الإعدادات)' : '(من المنطقة)';
@@ -797,10 +830,14 @@
         }
         breakdown += ` = ${totalPrice.toFixed(3)} د.ك`;
         
-        priceStatus.textContent = breakdown;
-        priceStatus.className = 'text-success mt-1';
+        // Show breakdown only if no discount applied
+        const discountField = document.getElementById('discount');
+        const discount = parseFloat(discountField.value || 0);
+        if (discount === 0) {
+            priceStatus.textContent = breakdown;
+            priceStatus.className = 'text-success mt-1';
+        }
         
-        calculateRemaining();
         calculateProfit();
     }
     
@@ -902,7 +939,12 @@
             // Calculate total price with all costs
             totalDocumentPrice += packagingCost + policyPrice + commentPrice;
             
+            // Store original price before discount
+            totalPriceField.setAttribute('data-original-price', totalDocumentPrice.toFixed(3));
             totalPriceField.value = totalDocumentPrice.toFixed(3);
+            
+            // Apply discount if exists
+            applyDiscount();
             
             // Build price breakdown message
             let breakdown = `سعر ${data.type_name}: ${parseFloat(data.price).toFixed(3)} د.ك`;
@@ -957,7 +999,12 @@
                 // Calculate total price with all costs
                 totalDocumentPrice += packagingCost + policyPrice + commentPrice;
                 
+                // Store original price before discount
+                totalPriceField.setAttribute('data-original-price', totalDocumentPrice.toFixed(3));
                 totalPriceField.value = totalDocumentPrice.toFixed(3);
+                
+                // Apply discount if exists
+                applyDiscount();
                 
                 // Build price breakdown message
                 let breakdown = `سعر المستند: ${parseFloat(fallbackPrice).toFixed(3)} د.ك`;

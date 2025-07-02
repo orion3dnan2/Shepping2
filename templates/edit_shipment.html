@@ -378,6 +378,12 @@
                                 <input type="hidden" name="has_comment" value="0">
                             </div>
                             <div class="col-md-4 mb-3">
+                                <label for="discount" class="form-label">الخصم (د.ك)</label>
+                                <input type="text" class="form-control" id="discount" name="discount" 
+                                       value="{{ '%.2f'|format(shipment.discount) if shipment.discount else '' }}" placeholder="0.00" oninput="applyDiscount()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
+                                <div class="text-muted mt-1">يتم خصمه من السعر الإجمالي</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label for="amount_paid" class="form-label">المبلغ المدفوع (د.ك)</label>
                                 <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
                                        id="amount_paid" name="amount_paid" value="{{ '%.2f'|format(shipment.paid_amount) if shipment.paid_amount else '' }}" 
@@ -671,7 +677,7 @@ function filterZonesByDirection() {
     zoneSelect.appendChild(firstOption);
     
     // Get all zones from server data
-    const allZones = {{ zone_pricings | tojsonfilter | safe }};
+    const allZones = {{ zone_pricings | tojson | safe }};
     
     allZones.forEach(zone => {
         if (direction === '' || zone.direction === direction) {
@@ -693,6 +699,21 @@ function filterZonesByDirection() {
 }
 
 // Function to update price based on selected procedure (only for document shipments)
+// Apply discount to the total price
+function applyDiscount() {
+    const totalPriceField = document.getElementById('total_price');
+    const discountField = document.getElementById('discount');
+    const originalPrice = parseFloat(totalPriceField.getAttribute('data-original-price') || totalPriceField.value || 0);
+    const discount = parseFloat(discountField.value || 0);
+    
+    // Calculate final price after discount
+    const finalPrice = Math.max(0, originalPrice - discount);
+    totalPriceField.value = finalPrice.toFixed(2);
+    
+    // Update remaining amount calculation
+    updateRemainingAmount();
+}
+
 function updateProcedurePrice() {
     const packageType = document.getElementById('package_type').value;
     const actionSelect = document.getElementById('action_required');

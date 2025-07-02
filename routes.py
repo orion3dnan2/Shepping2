@@ -397,17 +397,19 @@ def add_shipment():
             # Handle numeric fields with proper validation
             weight_str = request.form.get('weight', '1.0').strip()
             price_str = request.form.get('total_price', '0.0').strip()
+            discount_str = request.form.get('discount', '0.0').strip()
             paid_amount_str = request.form.get('amount_paid', '0.0').strip()
             
             confirmed = request.form.get('confirmed') == 'on'
             notes = request.form.get('notes', '').strip()
             status = request.form.get('status', 'created').strip()
             
-            app.logger.debug(f"Processed form data - weight: '{weight_str}', price: '{price_str}', paid_amount: '{paid_amount_str}'")
+            app.logger.debug(f"Processed form data - weight: '{weight_str}', price: '{price_str}', discount: '{discount_str}', paid_amount: '{paid_amount_str}'")
             
             # Initialize default values
             weight = 1.0
             price = 0.0
+            discount = 0.0
             
             # Validate required fields (all fields are now optional per requirements)
             errors = []
@@ -448,6 +450,16 @@ def add_shipment():
                 except ValueError:
                     app.logger.debug(f"Invalid price '{price_str}', defaulting to 0.0")
                     price = 0.0
+                
+                # Process discount with error handling
+                try:
+                    discount = float(discount_str) if discount_str else 0.0
+                    if discount < 0:
+                        discount = 0.0
+                    app.logger.debug(f"Processed discount: {discount}")
+                except ValueError:
+                    app.logger.debug(f"Invalid discount '{discount_str}', defaulting to 0.0")
+                    discount = 0.0
             
             # Process paid amount with error handling
             paid_amount = 0.0
@@ -492,6 +504,7 @@ def add_shipment():
             app.logger.debug(f"  sender_name: {sender_name}")
             app.logger.debug(f"  weight: {weight} (type: {type(weight)})")
             app.logger.debug(f"  price: {price} (type: {type(price)})")
+            app.logger.debug(f"  discount: {discount} (type: {type(discount)})")
             app.logger.debug(f"  cost: {cost} (type: {type(cost)})")
             app.logger.debug(f"  profit: {profit} (type: {type(profit)})")
             app.logger.debug(f"  paid_amount: {paid_amount} (type: {type(paid_amount)})")
@@ -521,6 +534,7 @@ def add_shipment():
                 waybill_price=waybill_price,
                 weight=weight,
                 price=price,
+                discount=discount,
                 cost=cost,
                 profit=profit,
                 paid_amount=paid_amount,
@@ -583,10 +597,21 @@ def add_shipment():
     # Get additional pricing from GlobalSettings
     packaging_price = GlobalSettings.get_setting('packaging_price', 0.000)
     
+    # Convert zone_pricings to dict for JSON serialization
+    zone_pricings_dict = [
+        {
+            'id': zp.id,
+            'zone_name_ar': zp.zone_name_ar,
+            'zone_name_en': zp.zone_name_en,
+            'price_per_kg': float(zp.price_per_kg),
+            'direction': zp.direction
+        } for zp in zone_pricings
+    ]
+    
     return render_template('add_shipment.html', 
                          shipment_types=shipment_types, 
                          document_types=document_types,
-                         zone_pricings=zone_pricings,
+                         zone_pricings=zone_pricings_dict,
                          packaging_types=packaging_types,
                          price_per_kg=price_per_kg,
                          packaging_price=packaging_price,
@@ -2723,11 +2748,22 @@ def edit_shipment(shipment_id):
     zone_pricings = ZonePricing.query.filter_by(is_active=True).order_by(ZonePricing.zone_name_ar).all()
     packaging_types = PackagingType.query.filter_by(is_active=True).order_by(PackagingType.name_ar).all()
     
+    # Convert zone_pricings to dict for JSON serialization
+    zone_pricings_dict = [
+        {
+            'id': zp.id,
+            'zone_name_ar': zp.zone_name_ar,
+            'zone_name_en': zp.zone_name_en,
+            'price_per_kg': float(zp.price_per_kg),
+            'direction': zp.direction
+        } for zp in zone_pricings
+    ]
+    
     return render_template("edit_shipment.html", 
                          shipment=shipment,
                          shipment_types=shipment_types,
                          document_types=document_types,
-                         zone_pricings=zone_pricings,
+                         zone_pricings=zone_pricings_dict,
                          packaging_types=packaging_types)
 
 @app.route("/update_shipment/<int:shipment_id>", methods=["POST"])
@@ -2758,6 +2794,7 @@ def update_shipment(shipment_id):
         shipping_method = request.form.get('shipping_method', '').strip()
         weight_str = request.form.get('weight', '').strip()
         price_str = request.form.get('total_price', '').strip()
+        discount_str = request.form.get('discount', '0').strip()
         paid_amount_str = request.form.get('amount_paid', '0').strip()
         notes = request.form.get('notes', '').strip()
         
@@ -2772,6 +2809,7 @@ def update_shipment(shipment_id):
         # Process numeric fields
         weight = 0.0
         price = 0.0
+        discount = 0.0
         paid_amount = 0.0
         waybill_price = 0.0
         cost = 0.0
@@ -2786,6 +2824,11 @@ def update_shipment(shipment_id):
             price = float(price_str) if price_str else 0.0
         except ValueError:
             price = 0.0
+            
+        try:
+            discount = float(discount_str) if discount_str else 0.0
+        except ValueError:
+            discount = 0.0
             
         try:
             paid_amount = float(paid_amount_str) if paid_amount_str else 0.0
@@ -2833,6 +2876,7 @@ def update_shipment(shipment_id):
         shipment.shipping_method = shipping_method
         shipment.weight = weight
         shipment.price = price
+        shipment.discount = discount
         shipment.cost = cost
         shipment.profit = profit
         shipment.paid_amount = paid_amount
