@@ -498,21 +498,59 @@ function updateDocumentPrice() {
     
     const documentTypeSelect = document.getElementById('document_type');
     const selectedOption = documentTypeSelect.options[documentTypeSelect.selectedIndex];
-    let price = parseFloat(selectedOption.getAttribute('data-price') || 0);
+    let basePrice = parseFloat(selectedOption.getAttribute('data-price') || 0);
     
     // If no document type selected, try to get current price from form
-    if (price === 0) {
+    if (basePrice === 0) {
         const currentPrice = parseFloat(document.getElementById('total_price').value || 0);
         if (currentPrice > 0) {
-            price = currentPrice;
+            basePrice = currentPrice;
         }
     }
     
-    document.getElementById('total_price').value = price.toFixed(2);
+    // Get packaging cost from simple checkbox
+    let packagingCost = 0;
+    const packagingCheckbox = document.getElementById('has_packaging');
+    if (packagingCheckbox && packagingCheckbox.checked) {
+        packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
+    }
+    
+    // Get waybill cost if policy is checked
+    let policyPrice = 0;
+    const hasPolicy = document.getElementById('has_policy').checked;
+    if (hasPolicy) {
+        const waybillPriceInput = document.getElementById('waybill_price');
+        policyPrice = parseFloat(waybillPriceInput.value) || 0;
+    }
+    
+    // Get comment cost
+    let commentPrice = 0;
+    const hasComment = document.getElementById('has_comment').checked;
+    if (hasComment) {
+        commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
+    }
+    
+    // Calculate total price with all costs
+    const totalPrice = basePrice + packagingCost + policyPrice + commentPrice;
+    
+    document.getElementById('total_price').value = totalPrice.toFixed(2);
     updateRemainingAmount();
     
-    if (price > 0) {
-        showPriceBreakdown(`سعر المستند: ${price.toFixed(3)} د.ك`);
+    if (totalPrice > 0) {
+        // Build price breakdown message
+        let breakdown = `سعر المستند: ${basePrice.toFixed(3)} د.ك`;
+        if (packagingCost > 0) {
+            breakdown += ` + ${packagingCost.toFixed(3)} د.ك (تغليف)`;
+        }
+        if (policyPrice > 0) {
+            breakdown += ` + ${policyPrice.toFixed(3)} د.ك (بوليصة)`;
+        }
+        if (commentPrice > 0) {
+            breakdown += ` + ${commentPrice.toFixed(3)} د.ك (تعليق)`;
+        }
+        breakdown += ` = ${totalPrice.toFixed(3)} د.ك`;
+        
+        showPriceBreakdown(breakdown);
     } else {
         hidePriceBreakdown();
     }

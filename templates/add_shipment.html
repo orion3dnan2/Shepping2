@@ -849,9 +849,50 @@
                 return;
             }
             
-            // Successfully got price
-            totalPriceField.value = parseFloat(data.price).toFixed(3);
-            priceStatus.textContent = `تم تحديد سعر ${data.type_name}: ${parseFloat(data.price).toFixed(3)} د.ك`;
+            // Successfully got price - now add packaging and waybill costs
+            let totalDocumentPrice = parseFloat(data.price);
+            
+            // Get packaging cost from simple checkbox
+            let packagingCost = 0;
+            const packagingCheckbox = document.getElementById('has_packaging');
+            if (packagingCheckbox && packagingCheckbox.checked) {
+                packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
+            }
+            
+            // Get waybill cost if policy is checked
+            let policyPrice = 0;
+            const hasPolicy = document.getElementById('has_policy').checked;
+            if (hasPolicy) {
+                const waybillPriceInput = document.getElementById('waybill_price');
+                policyPrice = parseFloat(waybillPriceInput.value) || 0;
+            }
+            
+            // Get comment cost
+            let commentPrice = 0;
+            const hasComment = document.getElementById('has_comment').checked;
+            if (hasComment) {
+                commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
+            }
+            
+            // Calculate total price with all costs
+            totalDocumentPrice += packagingCost + policyPrice + commentPrice;
+            
+            totalPriceField.value = totalDocumentPrice.toFixed(3);
+            
+            // Build price breakdown message
+            let breakdown = `سعر ${data.type_name}: ${parseFloat(data.price).toFixed(3)} د.ك`;
+            if (packagingCost > 0) {
+                breakdown += ` + ${packagingCost.toFixed(3)} د.ك (تغليف)`;
+            }
+            if (policyPrice > 0) {
+                breakdown += ` + ${policyPrice.toFixed(3)} د.ك (بوليصة)`;
+            }
+            if (commentPrice > 0) {
+                breakdown += ` + ${commentPrice.toFixed(3)} د.ك (تعليق)`;
+            }
+            breakdown += ` = ${totalDocumentPrice.toFixed(3)} د.ك`;
+            
+            priceStatus.textContent = breakdown;
             priceStatus.className = 'text-success mt-1';
             calculateRemaining();
             
@@ -863,8 +904,50 @@
             const fallbackPrice = selectedOption ? selectedOption.getAttribute('data-price') : null;
             
             if (fallbackPrice && fallbackPrice !== 'null') {
-                totalPriceField.value = parseFloat(fallbackPrice).toFixed(3);
-                priceStatus.textContent = `تم تحديد السعر: ${parseFloat(fallbackPrice).toFixed(3)} د.ك`;
+                // Use fallback price and add packaging/waybill costs
+                let totalDocumentPrice = parseFloat(fallbackPrice);
+                
+                // Get packaging cost from simple checkbox
+                let packagingCost = 0;
+                const packagingCheckbox = document.getElementById('has_packaging');
+                if (packagingCheckbox && packagingCheckbox.checked) {
+                    packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
+                }
+                
+                // Get waybill cost if policy is checked
+                let policyPrice = 0;
+                const hasPolicy = document.getElementById('has_policy').checked;
+                if (hasPolicy) {
+                    const waybillPriceInput = document.getElementById('waybill_price');
+                    policyPrice = parseFloat(waybillPriceInput.value) || 0;
+                }
+                
+                // Get comment cost
+                let commentPrice = 0;
+                const hasComment = document.getElementById('has_comment').checked;
+                if (hasComment) {
+                    commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
+                }
+                
+                // Calculate total price with all costs
+                totalDocumentPrice += packagingCost + policyPrice + commentPrice;
+                
+                totalPriceField.value = totalDocumentPrice.toFixed(3);
+                
+                // Build price breakdown message
+                let breakdown = `سعر المستند: ${parseFloat(fallbackPrice).toFixed(3)} د.ك`;
+                if (packagingCost > 0) {
+                    breakdown += ` + ${packagingCost.toFixed(3)} د.ك (تغليف)`;
+                }
+                if (policyPrice > 0) {
+                    breakdown += ` + ${policyPrice.toFixed(3)} د.ك (بوليصة)`;
+                }
+                if (commentPrice > 0) {
+                    breakdown += ` + ${commentPrice.toFixed(3)} د.ك (تعليق)`;
+                }
+                breakdown += ` = ${totalDocumentPrice.toFixed(3)} د.ك`;
+                
+                priceStatus.textContent = breakdown;
                 priceStatus.className = 'text-success mt-1';
                 calculateRemaining();
             } else {
@@ -964,19 +1047,34 @@
         
         if (packagingCheckbox) {
             packagingCheckbox.addEventListener('change', function() {
-                calculateZoneBasedPrice();
+                const packageType = document.getElementById('package_type').value;
+                if (packageType === 'document') {
+                    updateDocumentPrice();
+                } else {
+                    calculateZoneBasedPrice();
+                }
             });
         }
         
         if (policyCheckbox) {
             policyCheckbox.addEventListener('change', function() {
-                calculateZoneBasedPrice();
+                const packageType = document.getElementById('package_type').value;
+                if (packageType === 'document') {
+                    updateDocumentPrice();
+                } else {
+                    calculateZoneBasedPrice();
+                }
             });
         }
         
         if (commentCheckbox) {
             commentCheckbox.addEventListener('change', function() {
-                calculateZoneBasedPrice();
+                const packageType = document.getElementById('package_type').value;
+                if (packageType === 'document') {
+                    updateDocumentPrice();
+                } else {
+                    calculateZoneBasedPrice();
+                }
             });
         }
     });
@@ -993,7 +1091,30 @@
             waybillPriceContainer.style.display = 'none';
             waybillPriceInput.value = '';
         }
+        
+        // Recalculate price after toggling
+        const packageType = document.getElementById('package_type').value;
+        if (packageType === 'document') {
+            updateDocumentPrice();
+        } else {
+            calculateZoneBasedPrice();
+        }
     }
+    
+    // Add event listener for waybill price input changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const waybillPriceInput = document.getElementById('waybill_price');
+        if (waybillPriceInput) {
+            waybillPriceInput.addEventListener('input', function() {
+                const packageType = document.getElementById('package_type').value;
+                if (packageType === 'document') {
+                    updateDocumentPrice();
+                } else {
+                    calculateZoneBasedPrice();
+                }
+            });
+        }
+    });
 
     // Form validation and user experience improvements
     document.getElementById('shipmentForm').addEventListener('submit', function(e) {
