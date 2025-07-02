@@ -217,6 +217,18 @@ class DocumentType(db.Model):
         return f'<DocumentType {self.name_ar}>'
 
 
+class ProcedureType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name_ar = db.Column(db.String(100), nullable=False)
+    name_en = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False, default=0.0)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ProcedureType {self.name_ar}>'
+
+
 class ZonePricing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     zone_name_ar = db.Column(db.String(100), nullable=False)
