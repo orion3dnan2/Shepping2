@@ -44,8 +44,12 @@
 
                         <!-- Shipment Types Section -->
                         <div class="types-container mb-5">
-                            <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h4 class="section-title">أنواع الشحنات</h4>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addShipmentTypeModal">
+                                    <i class="fas fa-plus me-2"></i>
+                                    إضافة نوع شحنة
+                                </button>
                             </div>
 
                             <div class="table-responsive">
@@ -53,26 +57,41 @@
                                     <thead class="table-header">
                                         <tr>
                                             <th>الاسم بالعربية</th>
+                                            <th>السعر (د.ك)</th>
                                             <th>الحالة</th>
+                                            <th>الإجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for shipment_type in shipment_types %}
                                         <tr>
                                             <td>
-                                                <span class="fw-medium">عامة</span>
+                                                <span class="fw-medium">{{ shipment_type.name_ar }}</span>
                                             </td>
                                             <td>
-                                                <span class="badge bg-success">نشط</span>
+                                                <span class="price-text">{{ "%.3f"|format(shipment_type.price) }}</span>
+                                            </td>
+                                            <td>
+                                                {% if shipment_type.is_active %}
+                                                    <span class="badge bg-success">نشط</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">غير نشط</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-2" 
+                                                        onclick="editShipmentType({{ shipment_type.id }}, '{{ shipment_type.name_ar }}', '{{ shipment_type.name_en }}', {{ shipment_type.price }}, {{ shipment_type.is_active|lower }})">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <form method="post" action="{{ url_for('delete_shipment_type', type_id=shipment_type.id) }}" style="display: inline;" 
+                                                      onsubmit="return confirm('هل أنت متأكد من حذف هذا النوع؟')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <span class="fw-medium">مستندات</span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-success">نشط</span>
-                                            </td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -1194,6 +1213,23 @@ function editShipmentType(id, nameAr, nameEn, price, isActive) {
     modal.show();
 }
 
+// Shipment Type Management Functions
+function editShipmentType(id, nameAr, nameEn, price, isActive) {
+    // Populate form fields
+    document.getElementById('edit_shipment_type_id').value = id;
+    document.getElementById('edit_shipment_name_ar').value = nameAr;
+    document.getElementById('edit_shipment_name_en').value = nameEn;
+    document.getElementById('edit_shipment_price').value = price;
+    document.getElementById('edit_shipment_is_active').checked = isActive;
+    
+    // Set form action
+    document.getElementById('editShipmentTypeForm').action = `/edit_shipment_type/${id}`;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editShipmentTypeModal'));
+    modal.show();
+}
+
 function editDocumentType(id, nameAr, nameEn, price, isActive) {
     document.getElementById('editDocumentTypeId').value = id;
     document.getElementById('editDocumentNameAr').value = nameAr;
@@ -1301,4 +1337,86 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Add Shipment Type Modal -->
+<div class="modal fade" id="addShipmentTypeModal" tabindex="-1" aria-labelledby="addShipmentTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addShipmentTypeModalLabel">إضافة نوع شحنة جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ url_for('add_shipment_type') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="shipment_name_ar" class="form-label">الاسم بالعربية</label>
+                        <input type="text" class="form-control" id="shipment_name_ar" name="name_ar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="shipment_name_en" class="form-label">الاسم بالإنجليزية</label>
+                        <input type="text" class="form-control" id="shipment_name_en" name="name_en" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="shipment_price" class="form-label">السعر (د.ك)</label>
+                        <input type="number" step="0.001" class="form-control" id="shipment_price" name="price" min="0" value="0.000">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="shipment_is_active" name="is_active" checked>
+                            <label class="form-check-label" for="shipment_is_active">
+                                نشط
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Shipment Type Modal -->
+<div class="modal fade" id="editShipmentTypeModal" tabindex="-1" aria-labelledby="editShipmentTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editShipmentTypeModalLabel">تعديل نوع الشحنة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="editShipmentTypeForm">
+                <div class="modal-body">
+                    <input type="hidden" id="edit_shipment_type_id" name="type_id">
+                    <div class="mb-3">
+                        <label for="edit_shipment_name_ar" class="form-label">الاسم بالعربية</label>
+                        <input type="text" class="form-control" id="edit_shipment_name_ar" name="name_ar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_shipment_name_en" class="form-label">الاسم بالإنجليزية</label>
+                        <input type="text" class="form-control" id="edit_shipment_name_en" name="name_en" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_shipment_price" class="form-label">السعر (د.ك)</label>
+                        <input type="number" step="0.001" class="form-control" id="edit_shipment_price" name="price" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="edit_shipment_is_active" name="is_active">
+                            <label class="form-check-label" for="edit_shipment_is_active">
+                                نشط
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

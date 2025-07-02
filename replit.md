@@ -956,6 +956,21 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Interface now shows only essential information: header title, three revenue rows, and grand total
   - Enhanced user experience with ultra-clean, minimal design focusing on summary data only
 - **June 30, 2025: Completely removed sidebar cards from all Financial Center tabs**
+- **July 2, 2025: Migration from Replit Agent to Replit environment completed successfully**
+  - Successfully migrated project from Replit Agent to standard Replit environment for better compatibility and security
+  - Set up PostgreSQL database with proper environment variables (DATABASE_URL, PGPORT, etc.)
+  - Fixed database configuration issues and ensured all tables are properly created
+  - Application now running successfully on port 5000 with Gunicorn
+  - Default admin user created (admin/admin123) for initial access
+  - All existing functionality preserved during migration
+- **July 2, 2025: Enhanced shipment types connection between Settings and Add Shipment pages**
+  - Connected shipment types table in Settings → Manage Types to display dynamic data from database
+  - Replaced hardcoded shipment types with live database integration showing Arabic names, prices, and status
+  - Added comprehensive management interface with Add/Edit/Delete modals for shipment types
+  - Enhanced Add New Shipment form to use shipment type prices from database when available
+  - Created fallback system using zone-based pricing when shipment types have no fixed prices
+  - Added sample shipment types: Electronics (5.000 KD), Clothes (3.500 KD), Books (2.000 KD), Medicine (8.000 KD), Food (4.500 KD)
+  - Real-time updates ensure changes in Settings immediately reflect in Add New Shipment dropdown
   - Removed "إجمالي الإيرادات المباشرة" sidebar panel with revenue breakdown
   - Deleted "الفاتورة التفاعلية" expense invoice panel from sidebar
 - **July 1, 2025: Enhanced logo design and comprehensive zone management**
