@@ -329,7 +329,7 @@
                             
                             <div class="col-md-6 mb-3">
                                 <label for="direction" class="form-label required-field">اتجاه الشحنة</label>
-                                <select class="form-select" id="direction" name="direction" required onchange="updateZonePricing()">
+                                <select class="form-select" id="direction" name="direction" required onchange="filterZonesByDirection(); updateZonePricing()">
                                     <option value="">اختر الاتجاه</option>
                                     <option value="kuwait_to_sudan">من الكويت إلى السودان</option>
                                     <option value="sudan_to_kuwait">من السودان إلى الكويت</option>
@@ -624,17 +624,7 @@
             zonePackagingRow.style.display = 'block';
             if (zoneSelect) zoneSelect.required = true;
             
-            // Filter zones by direction
-            const options = zoneSelect.querySelectorAll('option');
-            options.forEach(option => {
-                if (option.value === '') return; // Keep default option
-                const optionDirection = option.getAttribute('data-direction');
-                if (direction === '' || optionDirection === direction) {
-                    option.style.display = 'block';
-                } else {
-                    option.style.display = 'none';
-                }
-            });
+            filterZonesByDirection();
             
             // Reset zone selection when direction changes
             zoneSelect.value = '';
@@ -676,6 +666,41 @@
     window.refreshPricePerKg = function() {
         loadPricePerKg();
     };
+    
+    // Function to filter zones based on selected direction  
+    function filterZonesByDirection() {
+        const directionSelect = document.getElementById('direction');
+        const zoneSelect = document.getElementById('zone');
+        
+        if (!directionSelect || !zoneSelect) return;
+        
+        const direction = directionSelect.value;
+        
+        // Store current selection
+        const currentZone = zoneSelect.value;
+        
+        // Rebuild options based on direction
+        const firstOption = zoneSelect.querySelector('option[value=""]');  
+        zoneSelect.innerHTML = '';
+        zoneSelect.appendChild(firstOption);
+        
+        // Get all zones from server data
+        const allZones = {{ zone_pricings | tojsonfilter | safe }};
+        
+        allZones.forEach(zone => {
+            if (direction === '' || zone.direction === direction) {
+                const option = document.createElement('option');
+                option.value = zone.zone_name_ar;
+                option.textContent = zone.zone_name_ar;
+                option.setAttribute('data-price', zone.price_per_kg);
+                option.setAttribute('data-direction', zone.direction);
+                zoneSelect.appendChild(option);
+            }
+        });
+        
+        // Reset zone selection when filtering
+        zoneSelect.value = '';
+    }
     
     // Calculate price based on settings price per kg + packaging cost (for general shipments only)
     function calculateZoneBasedPrice() {
@@ -1197,6 +1222,8 @@
     // Load price per kg when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadPricePerKg();
+        // Initialize zone filtering based on current direction
+        filterZonesByDirection();
     });
 </script>
 {% endblock %}

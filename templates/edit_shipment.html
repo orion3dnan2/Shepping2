@@ -236,7 +236,7 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="direction" class="form-label">الاتجاه</label>
-                                <select class="form-select" id="direction" name="direction">
+                                <select class="form-select" id="direction" name="direction" onchange="filterZonesByDirection()">
                                     <option value="kuwait_to_sudan" {{ 'selected' if shipment.direction == 'kuwait_to_sudan' else '' }}>الكويت إلى السودان</option>
                                     <option value="sudan_to_kuwait" {{ 'selected' if shipment.direction == 'sudan_to_kuwait' else '' }}>السودان إلى الكويت</option>
                                 </select>
@@ -296,7 +296,9 @@
                                     <select class="form-select" id="zone" name="zone" onchange="updatePrice()">
                                         <option value="">اختر المنطقة</option>
                                         {% for zone in zone_pricings %}
-                                        <option value="{{ zone.zone_name_ar }}" data-price="{{ zone.price_per_kg }}" 
+                                        <option value="{{ zone.zone_name_ar }}" 
+                                                data-price="{{ zone.price_per_kg }}" 
+                                                data-direction="{{ zone.direction }}"
                                                 {{ 'selected' if shipment.zone == zone.zone_name_ar else '' }}>
                                             {{ zone.zone_name_ar }}
                                         </option>
@@ -652,6 +654,44 @@ function hidePriceBreakdown() {
     priceBreakdown.style.display = 'none';
 }
 
+// Function to filter zones based on selected direction
+function filterZonesByDirection() {
+    const directionSelect = document.getElementById('direction');
+    const zoneSelect = document.getElementById('zone');
+    const direction = directionSelect.value;
+    
+    if (!zoneSelect) return;
+    
+    // Store current selection
+    const currentZone = zoneSelect.value;
+    
+    // Rebuild options based on direction
+    const firstOption = zoneSelect.querySelector('option[value=""]');
+    zoneSelect.innerHTML = '';
+    zoneSelect.appendChild(firstOption);
+    
+    // Get all zones from server data
+    const allZones = {{ zone_pricings | tojsonfilter | safe }};
+    
+    allZones.forEach(zone => {
+        if (direction === '' || zone.direction === direction) {
+            const option = document.createElement('option');
+            option.value = zone.zone_name_ar;
+            option.textContent = zone.zone_name_ar;
+            option.setAttribute('data-price', zone.price_per_kg);
+            option.setAttribute('data-direction', zone.direction);
+            // Keep current selection if it matches the filtered zones
+            if (zone.zone_name_ar === currentZone) {
+                option.selected = true;
+            }
+            zoneSelect.appendChild(option);
+        }
+    });
+    
+    // Update price after filtering
+    updatePrice();
+}
+
 // Function to update price based on selected procedure (only for document shipments)
 function updateProcedurePrice() {
     const packageType = document.getElementById('package_type').value;
@@ -680,6 +720,7 @@ function updateProcedurePrice() {
 
 // Initialize form on page load
 document.addEventListener('DOMContentLoaded', function() {
+    filterZonesByDirection(); // Initialize zone filtering
     toggleShipmentFields();
     toggleWaybillPrice();
     
