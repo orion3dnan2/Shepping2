@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import JSONB
 import os
 import json
+import logging
 
 class Admin(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -124,6 +125,77 @@ class Shipment(db.Model):
         revenue = float(self.price)  # Customer price
         expenses = self.calculate_total_expenses()
         return revenue - expenses
+
+    def calculate_category_distributed_expenses(self):
+        """Calculate distributed category expenses per shipment based on shipment type"""
+        try:
+            if self.package_type == 'document':
+                # Get total document expenses and count of document shipments
+                total_expenses = self.get_total_document_category_expenses()
+                document_count = Shipment.query.filter_by(package_type='document').count()
+                return total_expenses / document_count if document_count > 0 else 0.0
+            else:
+                # Get total general expenses and count of general shipments
+                total_expenses = self.get_total_general_category_expenses()
+                general_count = Shipment.query.filter(Shipment.package_type != 'document').count()
+                return total_expenses / general_count if general_count > 0 else 0.0
+        except Exception as e:
+            logging.error(f'Error calculating distributed category expenses for shipment {self.id}: {str(e)}')
+            return 0.0
+
+    @staticmethod
+    def get_total_document_category_expenses():
+        """Get total expenses for all document shipments category"""
+        try:
+            # Get all document expenses from FinancialTransaction
+            financial_expenses = FinancialTransaction.query.filter_by(
+                transaction_type='expense',
+                shipping_type='مستندات'
+            ).all()
+            
+            # Get all document expenses from ExpenseDocuments
+            document_expenses = ExpenseDocuments.query.all()
+            
+            total = 0.0
+            for expense in financial_expenses:
+                total += float(expense.amount) if expense.amount else 0.0
+            for expense in document_expenses:
+                total += float(expense.amount) if expense.amount else 0.0
+                
+            return total
+        except Exception as e:
+            logging.error(f'Error calculating total document category expenses: {str(e)}')
+            return 0.0
+
+    @staticmethod
+    def get_total_general_category_expenses():
+        """Get total expenses for all general shipments category"""
+        try:
+            # Get all general expenses from FinancialTransaction
+            financial_expenses = FinancialTransaction.query.filter_by(
+                transaction_type='expense',
+                shipping_type='شحنات عامة'
+            ).all()
+            
+            # Get all general expenses from ExpenseGeneral
+            general_expenses = ExpenseGeneral.query.all()
+            
+            total = 0.0
+            for expense in financial_expenses:
+                total += float(expense.amount) if expense.amount else 0.0
+            for expense in general_expenses:
+                total += float(expense.amount) if expense.amount else 0.0
+                
+            return total
+        except Exception as e:
+            logging.error(f'Error calculating total general category expenses: {str(e)}')
+            return 0.0
+
+    def calculate_net_profit_with_category_expenses(self):
+        """Calculate net profit using distributed category expenses"""
+        revenue = float(self.price) if self.price else 0.0
+        category_expenses = self.calculate_category_distributed_expenses()
+        return revenue - category_expenses
     
     def update_linked_expenses(self):
         """Update the linked_expenses field with calculated total"""

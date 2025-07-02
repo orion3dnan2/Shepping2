@@ -978,6 +978,17 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Removed delivery status requirement from revenue calculations per user request
   - Revenue now displays immediately when shipments are created (any status)
   - Air shipping revenue: from general shipments with shipping_method='جوي' (all statuses)
+- **July 2, 2025: Implemented comprehensive distributed expense categorization system**
+  - Modified expense linking to automatically distribute expenses across shipment categories
+  - Document expenses are now distributed across all document shipments equally
+  - General expenses are distributed across all general shipments equally
+  - Added new calculation methods: calculate_category_distributed_expenses(), get_total_document_category_expenses(), get_total_general_category_expenses()
+  - Updated shipment reports to show both direct expenses and distributed category expenses
+  - Enhanced Financial Center with visual summary cards showing total distributed expenses per category
+  - Created new API endpoints for real-time category expense calculation
+  - Modified profit/loss calculations to use distributed expenses for accurate per-shipment analysis
+  - Updated shipment reports table with separate columns for category expenses vs direct expenses
+  - System now automatically calculates profit/loss using: Revenue - (Distributed Category Expenses + Direct Expenses)
   - Land shipping revenue: from general shipments with shipping_method='بري' (all statuses)
   - Document revenue: from document shipments with package_type='document' (all statuses)
   - Revenue appears instantly in Financial Center when new shipments are added to system

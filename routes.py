@@ -3537,28 +3537,33 @@ def api_shipment_reports():
         total_expenses = 0.0
         
         for shipment in shipments:
-            # Calculate expenses for this shipment
-            expenses = shipment.calculate_total_expenses()
-            net_profit = shipment.calculate_net_profit()
+            # Calculate distributed category expenses for this shipment
+            category_expenses = shipment.calculate_category_distributed_expenses()
+            direct_expenses = shipment.calculate_total_expenses()
+            net_profit_with_category = shipment.calculate_net_profit_with_category_expenses()
             
-            # Update shipment's linked_expenses field
-            shipment.linked_expenses = expenses
+            # Update shipment's linked_expenses field with category expenses
+            shipment.linked_expenses = category_expenses
+            
+            shipment_type_ar = 'مستندات' if shipment.package_type == 'document' else 'شحنات عامة'
             
             shipments_data.append({
                 'id': shipment.id,
                 'tracking_number': shipment.tracking_number,
                 'package_type': shipment.package_type,
+                'package_type_ar': shipment_type_ar,
                 'sender_name': shipment.sender_name,
                 'receiver_name': shipment.receiver_name,
                 'price': float(shipment.price),
-                'total_expenses': expenses,
-                'net_profit': net_profit,
+                'direct_expenses': direct_expenses,
+                'category_expenses': category_expenses,
+                'net_profit': net_profit_with_category,
                 'status': shipment.status,
                 'created_at': shipment.created_at.strftime('%Y-%m-%d')
             })
             
             total_revenue += float(shipment.price)
-            total_expenses += expenses
+            total_expenses += category_expenses
         
         # Commit the linked_expenses updates
         db.session.commit()
@@ -3632,8 +3637,9 @@ def api_shipment_details(shipment_id):
             'receiver_name': shipment.receiver_name,
             'package_type': shipment.package_type,
             'price': float(shipment.price),
-            'total_expenses': shipment.calculate_total_expenses(),
-            'net_profit': shipment.calculate_net_profit(),
+            'direct_expenses': shipment.calculate_total_expenses(),
+            'category_expenses': shipment.calculate_category_distributed_expenses(),
+            'net_profit': shipment.calculate_net_profit_with_category_expenses(),
             'created_at': shipment.created_at.strftime('%Y-%m-%d %H:%M'),
             'expenses': expenses
         }
@@ -3688,6 +3694,32 @@ def api_shipments_for_linking():
     except Exception as e:
         logging.error(f'Error getting shipments for linking: {str(e)}')
         return jsonify({'error': 'Failed to get shipments list'})
+
+
+@app.route('/api/general_category_expenses')
+@login_required
+@permission_required('expenses')
+def api_general_category_expenses():
+    """API endpoint to get total general category expenses"""
+    try:
+        total = Shipment.get_total_general_category_expenses()
+        return jsonify({'total': total})
+    except Exception as e:
+        logging.error(f'Error getting general category expenses: {str(e)}')
+        return jsonify({'total': 0.0})
+
+
+@app.route('/api/document_category_expenses')
+@login_required
+@permission_required('expenses')
+def api_document_category_expenses():
+    """API endpoint to get total document category expenses"""
+    try:
+        total = Shipment.get_total_document_category_expenses()
+        return jsonify({'total': total})
+    except Exception as e:
+        logging.error(f'Error getting document category expenses: {str(e)}')
+        return jsonify({'total': 0.0})
     try:
         shipments = Shipment.query.order_by(Shipment.created_at.desc()).limit(50).all()
         

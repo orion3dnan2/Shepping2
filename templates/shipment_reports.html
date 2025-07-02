@@ -81,15 +81,16 @@
                         <table class="table table-hover" id="shipmentsTable">
                             <thead style="background: linear-gradient(135deg, #667eea, #764ba2);" class="text-white">
                                 <tr>
-                                    <th style="width: 15%">رقم التتبع</th>
-                                    <th style="width: 12%">النوع</th>
-                                    <th style="width: 15%">المرسل</th>
-                                    <th style="width: 15%">المستلم</th>
-                                    <th style="width: 10%">الإيراد</th>
-                                    <th style="width: 10%">المصروفات</th>
+                                    <th style="width: 12%">رقم التتبع</th>
+                                    <th style="width: 10%">النوع</th>
+                                    <th style="width: 12%">المرسل</th>
+                                    <th style="width: 12%">المستلم</th>
+                                    <th style="width: 8%">الإيراد</th>
+                                    <th style="width: 10%">مصروفات الفئة</th>
+                                    <th style="width: 8%">مصروفات مباشرة</th>
                                     <th style="width: 10%">صافي الربح</th>
                                     <th style="width: 8%">الحالة</th>
-                                    <th style="width: 5%">الإجراءات</th>
+                                    <th style="width: 10%">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="shipmentsTableBody">
@@ -250,12 +251,13 @@ function updateShipmentsTable(shipments) {
                 </span>
             </td>
             <td>
-                <span class="badge bg-secondary">${shipment.package_type}</span>
+                <span class="badge bg-info">${shipment.package_type_ar || shipment.package_type}</span>
             </td>
             <td class="fw-bold">${shipment.sender_name}</td>
             <td class="fw-bold">${shipment.receiver_name}</td>
             <td class="text-primary fw-bold">${shipment.price.toFixed(3)} د.ك</td>
-            <td class="text-danger fw-bold">${shipment.total_expenses.toFixed(3)} د.ك</td>
+            <td class="text-warning fw-bold">${shipment.category_expenses.toFixed(3)} د.ك</td>
+            <td class="text-danger fw-bold">${shipment.direct_expenses.toFixed(3)} د.ك</td>
             <td class="${profitClass} fw-bold">${shipment.net_profit.toFixed(3)} د.ك</td>
             <td>${statusBadge}</td>
             <td>
@@ -328,7 +330,8 @@ function generateShipmentDetailsHTML(shipment) {
                 <h6 class="fw-bold mb-3">الحساب المالي</h6>
                 <table class="table table-borderless table-sm">
                     <tr><td class="fw-bold">سعر الشحنة:</td><td class="text-primary">${shipment.price.toFixed(3)} د.ك</td></tr>
-                    <tr><td class="fw-bold">إجمالي المصروفات:</td><td class="text-danger">${shipment.total_expenses.toFixed(3)} د.ك</td></tr>
+                    <tr><td class="fw-bold">مصروفات الفئة (موزعة):</td><td class="text-warning">${shipment.category_expenses ? shipment.category_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
+                    <tr><td class="fw-bold">مصروفات مباشرة:</td><td class="text-danger">${shipment.direct_expenses ? shipment.direct_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
                     <tr><td class="fw-bold">صافي الربح:</td><td class="fw-bold ${shipment.net_profit > 0 ? 'text-success' : shipment.net_profit < 0 ? 'text-danger' : 'text-warning'}">${shipment.net_profit.toFixed(3)} د.ك</td></tr>
                 </table>
             </div>

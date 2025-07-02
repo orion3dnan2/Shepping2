@@ -107,11 +107,43 @@
                         </div>
                     </div>
                     
+                    <!-- Category Expenses Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #6f42c1, #e83e8c);">
+                                    <h6 class="mb-0 text-center">
+                                        <i class="fas fa-chart-pie me-2"></i>
+                                        مصروفات الشحنات العامة (موزعة)
+                                    </h6>
+                                </div>
+                                <div class="card-body text-center p-3">
+                                    <h5 class="text-primary mb-1" id="generalCategoryExpenses">0.000 د.ك</h5>
+                                    <small class="text-muted">إجمالي موزع على كل شحنة عامة</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #20c997, #28a745);">
+                                    <h6 class="mb-0 text-center">
+                                        <i class="fas fa-file-alt me-2"></i>
+                                        مصروفات المستندات (موزعة)
+                                    </h6>
+                                </div>
+                                <div class="card-body text-center p-3">
+                                    <h5 class="text-success mb-1" id="documentCategoryExpenses">0.000 د.ك</h5>
+                                    <small class="text-muted">إجمالي موزع على كل شحنة مستندات</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Alert Message -->
                     <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(90deg, #17a2b8, #20c997);">
                         <div class="d-flex align-items-center text-white">
                             <i class="fas fa-info-circle me-3 fa-lg"></i>
-                            <span class="fw-bold">يمكنك إدارة المصروفات</span>
+                            <span class="fw-bold">المصروفات توزع تلقائياً على الشحنات حسب النوع لحساب الربح والخسارة</span>
                         </div>
                     </div>
                     
@@ -1309,9 +1341,29 @@ function populateShipmentSelect(selectId, shipments) {
     }
 }
 
-// Call on page load to load shipments
+// Load category expenses data
+function loadCategoryExpenses() {
+    // Load general category expenses
+    fetch('/api/general_category_expenses')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('generalCategoryExpenses').textContent = data.total.toFixed(3) + ' د.ك';
+        })
+        .catch(error => console.error('Error loading general category expenses:', error));
+    
+    // Load document category expenses  
+    fetch('/api/document_category_expenses')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('documentCategoryExpenses').textContent = data.total.toFixed(3) + ' د.ك';
+        })
+        .catch(error => console.error('Error loading document category expenses:', error));
+}
+
+// Call on page load to load shipments and category expenses
 document.addEventListener('DOMContentLoaded', function() {
     loadShipmentsForLinking();
+    loadCategoryExpenses();
 });
 </script>
 {% endblock %}
