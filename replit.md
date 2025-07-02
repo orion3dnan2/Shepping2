@@ -946,6 +946,8 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Added "عامة" (General) option to shipment type dropdown in Add New Shipment form
   - Removed "تعليق" (Comment) checkbox option from shipment details form
   - Hidden shipment types table in Settings → Manage Types page (document types table remains visible)
+  - Removed duplicate "عامة" entry from shipment type dropdown in Add New Shipment form
+  - Implemented dynamic region selection based on shipment direction (Sudan regions for Kuwait→Sudan, Kuwait regions for Sudan→Kuwait)
 - **June 30, 2025: Completed comprehensive PostgreSQL optimization and production setup**
   - Added Flask-Migrate>=4.0.0 dependency for professional database migration management
   - Created complete migrations system with initial migration and JSONB optimization

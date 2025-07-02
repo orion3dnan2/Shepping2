@@ -322,9 +322,6 @@
                                     <option value="">اختر نوع الشحنة</option>
                                     <option value="general">عامة</option>
                                     <option value="document">مستندات</option>
-                                    {% for shipment_type in shipment_types %}
-                                    <option value="{{ shipment_type.name_en }}">{{ shipment_type.name_ar }}</option>
-                                    {% endfor %}
                                 </select>
                             </div>
                             
@@ -356,13 +353,6 @@
                                 <label for="zone" class="form-label required-field">المنطقة</label>
                                 <select class="form-select" id="zone" name="zone" onchange="calculateZoneBasedPrice()">
                                     <option value="">اختر المنطقة</option>
-                                    {% for zone in zone_pricings %}
-                                    <option value="{{ zone.zone_name_ar }}" 
-                                            data-price="{{ zone.price_per_kg }}" 
-                                            data-direction="{{ zone.direction }}">
-                                        {{ zone.zone_name_ar }}
-                                    </option>
-                                    {% endfor %}
                                 </select>
                             </div>
                             
@@ -627,17 +617,8 @@
             zonePackagingRow.style.display = 'block';
             if (zoneSelect) zoneSelect.required = true;
             
-            // Filter zones by direction
-            const options = zoneSelect.querySelectorAll('option');
-            options.forEach(option => {
-                if (option.value === '') return; // Keep default option
-                const optionDirection = option.getAttribute('data-direction');
-                if (direction === '' || optionDirection === direction) {
-                    option.style.display = 'block';
-                } else {
-                    option.style.display = 'none';
-                }
-            });
+            // Update zone options based on direction
+            updateZoneOptions(direction);
             
             // Reset zone selection when direction changes
             zoneSelect.value = '';
@@ -653,6 +634,56 @@
             priceStatus.className = 'text-muted mt-1';
             calculateRemaining();
         }
+    }
+    
+    // Update zone options based on shipment direction
+    function updateZoneOptions(direction) {
+        const zoneSelect = document.getElementById('zone');
+        
+        // Clear existing options except the default
+        zoneSelect.innerHTML = '<option value="">اختر المنطقة</option>';
+        
+        let zones = [];
+        
+        if (direction === 'kuwait_to_sudan') {
+            // Sudan regions when shipping from Kuwait to Sudan
+            zones = [
+                'الخرطوم',
+                'أم درمان', 
+                'بحري',
+                'الجزيرة',
+                'كسلا',
+                'القضارف',
+                'بورتسودان',
+                'عطبرة',
+                'الأبيض',
+                'نيالا',
+                'الفاشر',
+                'الجنينة',
+                'كادقلي',
+                'ملكال',
+                'واو'
+            ];
+        } else if (direction === 'sudan_to_kuwait') {
+            // Kuwait regions when shipping from Sudan to Kuwait
+            zones = [
+                'الكويت العاصمة',
+                'حولي',
+                'الأحمدي',
+                'الجهراء',
+                'الفروانية',
+                'مبارك الكبير'
+            ];
+        }
+        
+        // Add zone options
+        zones.forEach(zone => {
+            const option = document.createElement('option');
+            option.value = zone;
+            option.textContent = zone;
+            option.setAttribute('data-price', '1.500'); // Default price per kg
+            zoneSelect.appendChild(option);
+        });
     }
     
     // Global variable to store price per kg from settings
