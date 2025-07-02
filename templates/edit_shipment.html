@@ -275,8 +275,15 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="action_required" class="form-label">الإجراء المطلوب</label>
-                                    <input type="text" class="form-control" id="action_required" name="action_required" 
-                                           value="{{ shipment.package_contents or '' }}" placeholder="الإجراء المطلوب">
+                                    <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
+                                        <option value="">اختر نوع الإجراء</option>
+                                        {% for document_type in document_types %}
+                                        <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}" 
+                                                {{ 'selected' if document_type.name_ar == shipment.package_contents else '' }}>
+                                            {{ document_type.name_ar }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -598,6 +605,26 @@ function showPriceBreakdown(details) {
 function hidePriceBreakdown() {
     const priceBreakdown = document.getElementById('price_breakdown');
     priceBreakdown.style.display = 'none';
+}
+
+// Function to update price based on selected procedure
+function updateProcedurePrice() {
+    const actionSelect = document.getElementById('action_required');
+    const totalPriceField = document.getElementById('total_price');
+    
+    if (!actionSelect.value) {
+        return;
+    }
+    
+    // Get price from data attribute
+    const selectedOption = actionSelect.options[actionSelect.selectedIndex];
+    const price = selectedOption.getAttribute('data-price');
+    
+    if (price && price !== 'null' && price !== '0') {
+        totalPriceField.value = parseFloat(price).toFixed(3);
+        showPriceBreakdown(`سعر ${selectedOption.text}: ${parseFloat(price).toFixed(3)} د.ك`);
+        updateRemainingAmount();
+    }
 }
 
 // Initialize form on page load
