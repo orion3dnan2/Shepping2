@@ -254,16 +254,15 @@
 
                         </div>
 
-                        <!-- Document Types Pricing -->
+                        <!-- Document Types Section -->
                         <div class="pricing-section">
-                            <h4 class="section-title mb-3">أسعار الإجراءات للوثائق</h4>
+                            <h4 class="section-title mb-3">أنواع الإجراءات للوثائق</h4>
                             <div class="table-responsive">
                                 <table class="table table-hover pricing-table">
                                     <thead class="table-header">
                                         <tr>
                                             <th>نوع الإجراء</th>
-                                            <th>السعر (د.ك)</th>
-                                            <th>الإجراءات</th>
+                                            <th>الحالة</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -273,20 +272,11 @@
                                                 <span class="fw-medium">{{ document_type.name_ar }}</span>
                                             </td>
                                             <td>
-                                                <span class="price-display">{{ "%.3f"|format(document_type.price) }} د.ك</span>
-                                            </td>
-                                            <td>
-                                                <form method="post" action="{{ url_for('update_document_price', type_id=document_type.id) }}" class="d-flex gap-2" style="align-items: center;">
-                                                    <div class="input-group" style="max-width: 150px;">
-                                                        <input type="number" step="0.001" class="form-control form-control-sm" name="price" 
-                                                               value="{{ document_type.price }}" min="0" required placeholder="السعر">
-                                                        <span class="input-group-text input-group-text-sm">د.ك</span>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-success btn-sm">
-                                                        <i class="fas fa-save"></i>
-                                                        حفظ
-                                                    </button>
-                                                </form>
+                                                {% if document_type.is_active %}
+                                                    <span class="badge bg-success">نشط</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">غير نشط</span>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endfor %}
