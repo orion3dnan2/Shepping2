@@ -623,14 +623,14 @@
             // Reset zone selection when direction changes
             zoneSelect.value = '';
             totalPriceField.value = '';
-            priceStatus.textContent = 'اختر المنطقة والوزن لحساب السعر الإجمالي';
+            priceStatus.textContent = 'أدخل الوزن لحساب السعر الإجمالي';
             priceStatus.className = 'text-muted mt-1';
             calculateRemaining();
         } else {
             zonePackagingRow.style.display = 'none';
             if (zoneSelect) zoneSelect.required = false;
             totalPriceField.value = '';
-            priceStatus.textContent = 'يتم تحديده تلقائياً حسب النوع والمنطقة والوزن';
+            priceStatus.textContent = 'يتم تحديده تلقائياً حسب الوزن';
             priceStatus.className = 'text-muted mt-1';
             calculateRemaining();
         }
@@ -711,7 +711,7 @@
         loadPricePerKg();
     };
     
-    // Calculate price based on settings price per kg + packaging cost
+    // Calculate price based only on weight × price per kg (simplified version)
     function calculateZoneBasedPrice() {
         const packageType = document.getElementById('package_type').value;
         const weightInput = document.getElementById('weight');
@@ -733,69 +733,21 @@
             return;
         }
         
-        // Use price per kg from settings or zone pricing as fallback
+        // Use fixed price per kg from settings
         let pricePerKg = globalPricePerKg;
         
-        // If global price is not set, try to get zone price
+        // Default price per kg if not set in settings
         if (pricePerKg <= 0) {
-            const zoneSelect = document.getElementById('zone');
-            if (zoneSelect && zoneSelect.value) {
-                const selectedZoneOption = zoneSelect.options[zoneSelect.selectedIndex];
-                pricePerKg = parseFloat(selectedZoneOption.getAttribute('data-price')) || 0;
-            }
+            pricePerKg = 1.500; // Default price per kg
         }
         
-        if (pricePerKg <= 0) {
-            totalPriceField.value = '';
-            priceStatus.textContent = 'اختر المنطقة أو حدد سعر الكيلو في الإعدادات';
-            priceStatus.className = 'text-warning mt-1';
-            calculateRemaining();
-            return;
-        }
-        
-        // Get packaging cost from simple checkbox
-        let packagingCost = 0;
-        const packagingCheckbox = document.getElementById('has_packaging');
-        if (packagingCheckbox && packagingCheckbox.checked) {
-            packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
-        }
-        
-        // Get additional costs from checkboxes
-        const hasPolicy = document.getElementById('has_policy').checked;
-        const hasComment = document.getElementById('has_comment').checked;
-        
-        // Calculate additional costs
-        let policyPrice = 0;
-        let commentPrice = 0;
-        
-        // Get manual waybill price if policy is checked
-        if (hasPolicy) {
-            const waybillPriceInput = document.getElementById('waybill_price');
-            policyPrice = parseFloat(waybillPriceInput.value) || 0;
-        }
-        if (hasComment) {
-            commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
-        }
-        
-        // Calculate total price: (weight × price per kg) + packaging cost + policy + comment
-        const weightCost = weight * pricePerKg;
-        const totalPrice = weightCost + packagingCost + policyPrice + commentPrice;
+        // Simple calculation: total price = weight × price per kg only
+        const totalPrice = weight * pricePerKg;
         
         totalPriceField.value = totalPrice.toFixed(3);
         
-        // Build detailed price breakdown message
-        const priceSource = globalPricePerKg > 0 ? '(من الإعدادات)' : '(من المنطقة)';
-        let breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك ${priceSource} = ${weightCost.toFixed(3)} د.ك`;
-        if (packagingCost > 0) {
-            breakdown += ` + ${packagingCost.toFixed(3)} د.ك (تغليف)`;
-        }
-        if (policyPrice > 0) {
-            breakdown += ` + ${policyPrice.toFixed(3)} د.ك (بوليصة)`;
-        }
-        if (commentPrice > 0) {
-            breakdown += ` + ${commentPrice.toFixed(3)} د.ك (تعليق)`;
-        }
-        breakdown += ` = ${totalPrice.toFixed(3)} د.ك`;
+        // Simple price breakdown message
+        const breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك = ${totalPrice.toFixed(3)} د.ك`;
         
         priceStatus.textContent = breakdown;
         priceStatus.className = 'text-success mt-1';
