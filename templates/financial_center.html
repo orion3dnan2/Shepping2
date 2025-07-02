@@ -627,7 +627,6 @@ document.getElementById('generalExpenseForm').addEventListener('submit', functio
     
     fetch('/add_expense_general', {
         method: 'POST',
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.json())
@@ -699,7 +698,6 @@ function deleteGeneralExpense(expenseId) {
     if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
         fetch(`/delete_expense_general/${expenseId}`, {
             method: 'POST'
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         })
         .then(response => response.json())
         .then(data => {
@@ -740,7 +738,6 @@ document.getElementById('documentExpenseForm').addEventListener('submit', functi
     
     fetch('/add_expense_documents', {
         method: 'POST',
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         body: formData
     })
     .then(response => response.json())
@@ -811,7 +808,6 @@ function deleteDocumentExpense(expenseId) {
     if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
         fetch(`/delete_expense_documents/${expenseId}`, {
             method: 'POST'
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         })
         .then(response => response.json())
         .then(data => {

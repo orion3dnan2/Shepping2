@@ -1144,7 +1144,6 @@ function confirmDelete(shipmentId, trackingNumber) {
 function deleteShipment(shipmentId) {
     fetch(`/delete_shipment/${shipmentId}`, {
         method: 'POST',
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'

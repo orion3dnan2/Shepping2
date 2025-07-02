@@ -110,7 +110,6 @@
             <!-- Add Shipment Type Form -->
             <div id="shipmentForm" class="form-section" style="display: none;">
                 <form method="POST" action="{{ url_for('add_shipment_type') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="shipment_name_ar" class="form-label">الاسم بالعربية</label>
@@ -158,7 +157,6 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <form method="POST" action="{{ url_for('delete_shipment_type', type_id=shipment_type.id) }}" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف هذا النوع؟')">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <button type="submit" class="btn-action btn-delete" title="حذف">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -196,7 +194,6 @@
             <!-- Add Document Type Form -->
             <div id="documentForm" class="form-section" style="display: none;">
                 <form method="POST" action="{{ url_for('add_document_type') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="document_name_ar" class="form-label">الاسم بالعربية</label>
@@ -244,7 +241,6 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <form method="POST" action="{{ url_for('delete_document_type', type_id=document_type.id) }}" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف هذا النوع؟')">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <button type="submit" class="btn-action btn-delete" title="حذف">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -270,7 +266,6 @@
 <div id="editShipmentForm" class="edit-form">
     <h5>تعديل نوع الشحنة</h5>
     <form method="POST" id="shipmentEditForm">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="edit_shipment_name_ar" class="form-label">الاسم بالعربية</label>
@@ -296,7 +291,6 @@
 <div id="editDocumentForm" class="edit-form">
     <h5>تعديل نوع الوثيقة</h5>
     <form method="POST" id="documentEditForm">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="edit_document_name_ar" class="form-label">الاسم بالعربية</label>

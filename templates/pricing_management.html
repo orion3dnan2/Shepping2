@@ -403,7 +403,6 @@
                     </td>
                     <td>
                         <form method="POST" action="{{ url_for('update_shipment_price', type_id=shipment_type.id) }}" style="display: inline-block;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="number" 
                                    step="0.01" 
                                    min="0" 
@@ -490,7 +489,6 @@
                     </td>
                     <td>
                         <form method="POST" action="{{ url_for('update_document_price', type_id=document_type.id) }}" style="display: inline-block;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="number" 
                                    step="0.01" 
                                    min="0" 
@@ -643,7 +641,6 @@ function deleteDocumentType(id, name) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <form method="POST" action="{{ url_for('add_shipment_type') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <div class="modal-form-grid">
                         <div class="form-group">
@@ -684,7 +681,6 @@ function deleteDocumentType(id, name) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <form method="POST" action="{{ url_for('edit_shipment_type', type_id=0) }}" id="editShipmentTypeForm">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <input type="hidden" id="editShipmentTypeId" name="type_id">
                     <div class="modal-form-grid">
@@ -726,7 +722,6 @@ function deleteDocumentType(id, name) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <form method="POST" action="{{ url_for('add_document_type') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <div class="modal-form-grid">
                         <div class="form-group">
@@ -767,7 +762,6 @@ function deleteDocumentType(id, name) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <form method="POST" action="{{ url_for('edit_document_type', type_id=0) }}" id="editDocumentTypeForm">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <input type="hidden" id="editDocumentTypeId" name="type_id">
                     <div class="modal-form-grid">

@@ -916,7 +916,6 @@ function deleteUser(userId, username) {
     if (confirm(`هل أنت متأكد من حذف المستخدم "${username}"؟\nلا يمكن التراجع عن هذا الإجراء.`)) {
         fetch(`/delete_user/${userId}`, {
             method: 'POST',
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             headers: {
                 'Content-Type': 'application/json',
             }

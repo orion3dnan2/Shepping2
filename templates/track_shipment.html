@@ -872,7 +872,6 @@
                 <!-- Admin Control -->
                 {% if current_user.is_authenticated and not is_current %}
                     <form method="POST" action="{{ url_for('update_status', shipment_id=shipment.id) }}" style="margin-top: 10px;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="new_status" value="{{ status }}">
                         <button type="submit" class="step-control-btn">
                             تعيين كالحالة الحالية
@@ -1016,7 +1015,6 @@
         </div>
         <div class="card-body">
             <form method="POST" action="{{ url_for('update_status', shipment_id=shipment.id) }}" id="statusUpdateForm">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="row align-items-end">
                     <div class="col-md-6 mb-3">
                         <label for="status" class="form-label">الحالة الجديدة</label>
