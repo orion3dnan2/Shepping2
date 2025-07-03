@@ -1,68 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تفاصيل الشحنة</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-6 font-sans">
-
-  <div class="flex flex-wrap gap-4 justify-center">
-    <!-- بطاقة بيانات المرسل -->
-    <div class="bg-white rounded-xl shadow-lg w-[350px]">
-      <div class="bg-gradient-to-l from-purple-500 to-blue-400 text-white px-4 py-2 rounded-t-xl flex items-center justify-between">
-        <h2 class="font-bold text-lg">بيانات المرسل</h2>
-        <span class="text-xl">👤</span>
-      </div>
-      <div class="p-4 text-right">
-        <p><span class="font-bold">الاسم:</span> محمد</p>
-        <p><span class="font-bold">الهاتف:</span> 556656535</p>
-        <p><span class="font-bold">العنوان في الكويت:</span> الجهراء</p>
-        <p><span class="font-bold">البريد الإلكتروني:</span> morsalexpress@gmail.com</p>
-      </div>
-    </div>
-
-    <!-- بطاقة بيانات المستلم -->
-    <div class="bg-white rounded-xl shadow-lg w-[350px]">
-      <div class="bg-gradient-to-l from-purple-500 to-blue-400 text-white px-4 py-2 rounded-t-xl flex items-center justify-between">
-        <h2 class="font-bold text-lg">بيانات المستلم</h2>
-        <span class="text-xl">👥</span>
-      </div>
-      <div class="p-4 text-right">
-        <p><span class="font-bold">الاسم:</span> منتصر</p>
-        <p><span class="font-bold">الهاتف:</span> 09754646566</p>
-        <p><span class="font-bold">العنوان في السودان:</span> بورتسودان</p>
-        <p><span class="font-bold">البريد الإلكتروني:</span> morsalexpress@gmail.com</p>
-      </div>
-    </div>
-
-    <!-- بطاقة تفاصيل الشحنة -->
-    <div class="bg-white rounded-xl shadow-lg w-[350px]">
-      <div class="bg-gradient-to-l from-purple-500 to-blue-400 text-white px-4 py-2 rounded-t-xl flex items-center justify-between">
-        <h2 class="font-bold text-lg">تفاصيل الشحنة</h2>
-        <span class="text-xl">📦</span>
-      </div>
-      <div class="p-4 text-right">
-        <p><span class="font-bold">الوزن:</span> 50.00 كج</p>
-        <p><span class="font-bold">التكلفة:</span> 0.00 د.ك</p>
-        <p><span class="font-bold">المحتويات:</span> أغراض شخصية</p>
-      </div>
-    </div>
-
-    <!-- بطاقة الحالة -->
-    <div class="bg-white rounded-xl shadow-lg w-[720px]">
-      <div class="bg-gradient-to-l from-purple-500 to-blue-400 text-white px-4 py-2 rounded-t-xl flex items-center justify-between">
-        <h2 class="font-bold text-lg">معلومات إضافية</h2>
-        <span class="text-xl">📄</span>
-      </div>
-      <div class="p-4 text-right grid grid-cols-2 gap-4">
-        <p><span class="font-bold">الحالة:</span> <span class="bg-green-500 text-white px-2 py-1 rounded">تم التسليم</span></p>
-        <p><span class="font-bold">تاريخ الإنشاء:</span> 2025-06-22</p>
-        <p><span class="font-bold">ملاحظات:</span> عدد 3 طرود</p>
-      </div>
-    </div>
-  </div>
-
-</body>
-</html>

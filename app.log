@@ -1,9 +1,0 @@
-2025-07-02 04:47:56,134 WARNING root Using default secret key for development. Set SESSION_SECRET environment variable for production.
-2025-07-02 04:49:19,812 WARNING root Using default secret key for development. Set SESSION_SECRET environment variable for production.
-2025-07-02 04:49:26,024 WARNING root Using default secret key for development. Set SESSION_SECRET environment variable for production.
-2025-07-02 04:49:31,297 INFO flask_wtf.csrf The CSRF token is missing.
-2025-07-02 04:49:31,297 WARNING security Security Event: {'event_type': 'BAD_REQUEST', 'description': '400 Bad Request: The CSRF token is missing.', 'ip_address': '10.82.4.25', 'user_id': None}
-2025-07-02 04:51:23,349 WARNING root Using default secret key for development. Set SESSION_SECRET environment variable for production.
-2025-07-02 04:51:48,241 WARNING root Using default secret key for development. Set SESSION_SECRET environment variable for production.
-2025-07-02 04:53:19,902 WARNING root Using default secret key for development. Set SESSION_SECRET environment variable for production.
-2025-07-02 04:53:37,091 WARNING security Security Event: {'event_type': 'SUCCESSFUL_LOGIN', 'description': 'User admin logged in successfully', 'ip_address': '10.82.4.25', 'user_id': 1}

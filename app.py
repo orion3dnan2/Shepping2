@@ -25,71 +25,15 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 # Additional Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# configure the database - MySQL configuration for cPanel hosting
-database_url = os.environ.get("DATABASE_URL")
-
-# Multi-database configuration (PostgreSQL for Replit, MySQL for cPanel)
-if database_url:
-    # Handle PostgreSQL (current Replit environment)
-    if database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 300,
-            "pool_pre_ping": True,
-            "pool_size": 5,
-            "max_overflow": 10,
-            "echo": False,
-        }
-    # Handle MySQL (cPanel hosting)
-    elif database_url.startswith("mysql://"):
-        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 3600,
-            "pool_pre_ping": True,
-            "pool_size": 3,
-            "max_overflow": 2,
-            "echo": False,
-            "connect_args": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
-        }
-    elif database_url.startswith("mysql+pymysql://"):
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 3600,
-            "pool_pre_ping": True,
-            "pool_size": 3,
-            "max_overflow": 2,
-            "echo": False,
-            "connect_args": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
-        }
-    else:
-        # Default configuration
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 300,
-            "pool_pre_ping": True,
-            "pool_size": 5,
-            "max_overflow": 10,
-            "echo": False,
-        }
-else:
-    # Default cPanel MySQL connection format for documentation
-    database_url = "mysql+pymysql://username:password@localhost/database_name"
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 3600,
-        "pool_pre_ping": True,
-        "pool_size": 3,
-        "max_overflow": 2,
-        "echo": False,
-        "connect_args": {
-            "charset": "utf8mb4",
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
-    }
+# SQLite Database Configuration (Clean Setup)
+database_url = "sqlite:///shipping.db"
+print("INFO: Using SQLite database for clean setup")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "echo": False,
+}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # initialize the app with the extension, flask-sqlalchemy >= 3.0.x
