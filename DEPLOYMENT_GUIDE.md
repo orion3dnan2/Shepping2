@@ -18,11 +18,12 @@ git push -u origin main
 - اربط حسابك بـ GitHub
 
 ### 3. إنشاء قاعدة البيانات
-- في لوحة التحكم، اضغط على "New PostgreSQL"
+- في لوحة التحكم، اضغط على "New MySQL"
 - أدخل الاسم: `shipping-database`
 - اختر الخطة المجانية
 - اضغط "Create Database"
 - احفظ رابط قاعدة البيانات (DATABASE_URL)
+- تأكد أن الرابط يبدأ بـ `mysql://`
 
 ### 4. إنشاء الخدمة الرئيسية
 - اضغط على "New Web Service"

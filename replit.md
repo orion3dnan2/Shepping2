@@ -948,15 +948,17 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Hidden shipment types table in Settings → Manage Types page (document types table remains visible)
   - Removed duplicate "عامة" entry from shipment type dropdown in Add New Shipment form
   - Implemented dynamic region selection based on shipment direction (Sudan regions for Kuwait→Sudan, Kuwait regions for Sudan→Kuwait)
-- **July 3, 2025: Prepared production deployment configuration for Render hosting**
-  - Created comprehensive deployment guide (DEPLOYMENT_GUIDE.md) with step-by-step instructions in Arabic
-  - Added Procfile for Gunicorn web server configuration
-  - Created render.yaml for automated deployment setup
-  - Added .flaskenv for Flask environment configuration
-  - Specified runtime.txt for Python 3.11.10 version
-  - Fixed PostgreSQL configuration issues and JSONB import errors
-  - Updated database initialization and admin user creation process
-  - Application now ready for production deployment on Render platform
+- **July 3, 2025: Converted database configuration from PostgreSQL to MySQL for Render deployment**
+  - Updated app.py database configuration to use MySQL with PyMySQL driver
+  - Converted JSONB fields to standard JSON for MySQL compatibility
+  - Added PyMySQL package dependency for MySQL connection
+  - Updated render.yaml to use MySQL database instead of PostgreSQL
+  - Modified deployment guide to include MySQL-specific instructions
+  - Fixed all JSONB import errors and database compatibility issues
+  - Application now configured for MySQL production deployment on Render platform
+  - Created comprehensive deployment guide (DEPLOYMENT_GUIDE.md) with MySQL setup instructions in Arabic
+  - Added Procfile, .flaskenv, and runtime.txt for production deployment
+  - Application successfully running with MySQL-compatible configuration
 - **June 30, 2025: Completed comprehensive PostgreSQL optimization and production setup**
   - Added Flask-Migrate>=4.0.0 dependency for professional database migration management
   - Created complete migrations system with initial migration and JSONB optimization
