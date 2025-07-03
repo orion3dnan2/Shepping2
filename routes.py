@@ -3721,6 +3721,136 @@ def api_document_category_expenses():
     except Exception as e:
         logging.error(f'Error getting document category expenses: {str(e)}')
         return jsonify({'total': 0.0})
+
+
+@app.route('/api/general_shipments_profit_report')
+@login_required
+@permission_required('expenses')
+def api_general_shipments_profit_report():
+    """API endpoint for general shipments profit/loss report"""
+    try:
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+        
+        # Parse dates
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
+        
+        if end_date:
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+        
+        # Query general shipments (not documents)
+        query = Shipment.query.filter(Shipment.package_type != 'document')
+        
+        if start_date and end_date:
+            query = query.filter(
+                Shipment.created_at >= start_date,
+                Shipment.created_at <= end_date
+            )
+        
+        shipments = query.order_by(Shipment.created_at.desc()).all()
+        
+        shipments_data = []
+        for shipment in shipments:
+            # Calculate category expenses for this shipment
+            category_expenses = shipment.calculate_category_distributed_expenses()
+            
+            shipments_data.append({
+                'id': shipment.id,
+                'tracking_number': shipment.tracking_number,
+                'shipping_method': shipment.shipping_method or 'غير محدد',
+                'price': float(shipment.price or 0),
+                'category_expenses': category_expenses,
+                'net_profit': float(shipment.price or 0) - category_expenses,
+                'created_at': shipment.created_at.strftime('%Y-%m-%d')
+            })
+        
+        return jsonify({
+            'success': True,
+            'shipments': shipments_data
+        })
+        
+    except Exception as e:
+        logging.error(f'Error generating general shipments profit report: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في تحميل تقرير الشحنات العامة: {str(e)}'})
+
+
+@app.route('/api/document_shipments_profit_report')
+@login_required
+@permission_required('expenses')
+def api_document_shipments_profit_report():
+    """API endpoint for document shipments profit/loss report"""
+    try:
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+        
+        # Parse dates
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
+        
+        if end_date:
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+        
+        # Query document shipments only
+        query = Shipment.query.filter(Shipment.package_type == 'document')
+        
+        if start_date and end_date:
+            query = query.filter(
+                Shipment.created_at >= start_date,
+                Shipment.created_at <= end_date
+            )
+        
+        shipments = query.order_by(Shipment.created_at.desc()).all()
+        
+        shipments_data = []
+        for shipment in shipments:
+            # Calculate category expenses for this shipment
+            category_expenses = shipment.calculate_category_distributed_expenses()
+            
+            # Get document type in Arabic
+            document_type = get_document_type_arabic(shipment.document_type) if shipment.document_type else 'مستندات'
+            
+            shipments_data.append({
+                'id': shipment.id,
+                'tracking_number': shipment.tracking_number,
+                'document_type': document_type,
+                'price': float(shipment.price or 0),
+                'category_expenses': category_expenses,
+                'net_profit': float(shipment.price or 0) - category_expenses,
+                'created_at': shipment.created_at.strftime('%Y-%m-%d')
+            })
+        
+        return jsonify({
+            'success': True,
+            'shipments': shipments_data
+        })
+        
+    except Exception as e:
+        logging.error(f'Error generating document shipments profit report: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في تحميل تقرير شحنات المستندات: {str(e)}'})
+
+
+@app.route('/api/delete_shipment/<int:shipment_id>', methods=['POST'])
+@login_required
+@permission_required('home')
+def api_delete_shipment(shipment_id):
+    """API endpoint for deleting a shipment"""
+    try:
+        shipment = Shipment.query.get(shipment_id)
+        if not shipment:
+            return jsonify({'success': False, 'message': 'الشحنة غير موجودة أو تم حذفها مسبقاً'})
+        
+        tracking_number = shipment.tracking_number
+        db.session.delete(shipment)
+        db.session.commit()
+        
+        logging.info(f'Shipment deleted: {tracking_number} by user {current_user.username}')
+        return jsonify({'success': True, 'message': f'تم حذف الشحنة {tracking_number} بنجاح'})
+        
+    except Exception as e:
+        logging.error(f'Error deleting shipment {shipment_id}: {str(e)}')
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'حدث خطأ في الخادم، يرجى المحاولة مرة أخرى'})
     try:
         shipments = Shipment.query.order_by(Shipment.created_at.desc()).limit(50).all()
         

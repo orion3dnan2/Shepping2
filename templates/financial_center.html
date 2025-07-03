@@ -448,38 +448,109 @@
                         </div>
                     </div>
 
-                    <!-- Profit & Loss Report Table -->
+                    <!-- Separate Profit & Loss Reports -->
                     <div class="row">
-                        <div class="col-12">
+                        <!-- General Shipments Report -->
+                        <div class="col-md-6 mb-4">
                             <div class="card border-0 shadow-sm">
-                                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
                                     <h5 class="mb-0">
-                                        <i class="fas fa-balance-scale me-2"></i>
-                                        تقرير الربح والخسارة للشحنات
+                                        <i class="fas fa-box me-2"></i>
+                                        تقرير الربح والخسارة - الشحنات العامة
                                     </h5>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-hover mb-0" id="profitLossTable">
+                                        <table class="table table-hover mb-0" id="generalProfitLossTable">
                                             <thead style="background: linear-gradient(135deg, #1e1e2f, #2d2d4a); color: white;">
                                                 <tr>
                                                     <th class="text-center">رقم التتبع</th>
-                                                    <th class="text-center">نوع الشحنة</th>
+                                                    <th class="text-center">طريق الشحن</th>
                                                     <th class="text-center">الإيراد (د.ك)</th>
-                                                    <th class="text-center">مصروفات الفئة (د.ك)</th>
+                                                    <th class="text-center">المصروفات (د.ك)</th>
                                                     <th class="text-center">صافي الربح (د.ك)</th>
-                                                    <th class="text-center">نسبة الربح (%)</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="profitLossTableBody">
+                                            <tbody id="generalProfitLossTableBody">
                                                 <tr>
-                                                    <td colspan="6" class="text-center text-muted py-4">
+                                                    <td colspan="5" class="text-center text-muted py-4">
                                                         <i class="fas fa-chart-line fa-2x mb-2"></i>
                                                         <br>اختر التواريخ وانقر "عرض التقرير" لإظهار البيانات
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                </div>
+                                
+                                <!-- General Shipments Summary -->
+                                <div class="card-footer bg-light" id="generalSummary" style="display: none;">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="fw-bold text-success">إجمالي الإيرادات</div>
+                                            <div id="generalTotalRevenue" class="h6 text-success">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-danger">إجمالي المصروفات</div>
+                                            <div id="generalTotalExpenses" class="h6 text-danger">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-primary">صافي الربح</div>
+                                            <div id="generalNetProfit" class="h6 text-primary">0.000 د.ك</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Shipments Report -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); color: white;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-file-alt me-2"></i>
+                                        تقرير الربح والخسارة - شحنات المستندات
+                                    </h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0" id="documentProfitLossTable">
+                                            <thead style="background: linear-gradient(135deg, #1e1e2f, #2d2d4a); color: white;">
+                                                <tr>
+                                                    <th class="text-center">رقم التتبع</th>
+                                                    <th class="text-center">نوع المستند</th>
+                                                    <th class="text-center">الإيراد (د.ك)</th>
+                                                    <th class="text-center">المصروفات (د.ك)</th>
+                                                    <th class="text-center">صافي الربح (د.ك)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="documentProfitLossTableBody">
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-4">
+                                                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                                        <br>اختر التواريخ وانقر "عرض التقرير" لإظهار البيانات
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <!-- Document Shipments Summary -->
+                                <div class="card-footer bg-light" id="documentSummary" style="display: none;">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="fw-bold text-success">إجمالي الإيرادات</div>
+                                            <div id="documentTotalRevenue" class="h6 text-success">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-danger">إجمالي المصروفات</div>
+                                            <div id="documentTotalExpenses" class="h6 text-danger">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-primary">صافي الربح</div>
+                                            <div id="documentNetProfit" class="h6 text-primary">0.000 د.ك</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1453,7 +1524,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('profitStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
 });
 
-// Profit & Loss Report Functions
+// Profit & Loss Report Functions for Separated Reports
 function loadProfitLossReport() {
     const startDate = document.getElementById('profitStartDate').value;
     const endDate = document.getElementById('profitEndDate').value;
@@ -1463,125 +1534,188 @@ function loadProfitLossReport() {
         return;
     }
     
-    const tableBody = document.getElementById('profitLossTableBody');
+    // Load both general and document reports
+    loadGeneralShipmentsProfitReport(startDate, endDate);
+    loadDocumentShipmentsProfitReport(startDate, endDate);
+}
+
+// Load General Shipments Profit/Loss Report
+function loadGeneralShipmentsProfitReport(startDate, endDate) {
+    const tableBody = document.getElementById('generalProfitLossTableBody');
     tableBody.innerHTML = `
         <tr>
-            <td colspan="6" class="text-center text-muted py-4">
+            <td colspan="5" class="text-center text-muted py-4">
                 <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
                 <br>جاري تحميل البيانات...
             </td>
         </tr>
     `;
     
-    // Fetch profit/loss data from shipment reports API
-    fetch(`/api/shipment_reports?start_date=${startDate}&end_date=${endDate}`)
+    // Fetch general shipments profit/loss data
+    fetch(`/api/general_shipments_profit_report?start_date=${startDate}&end_date=${endDate}`)
     .then(response => response.json())
     .then(data => {
-        if (data.success && data.shipments.length > 0) {
-            displayProfitLossData(data.shipments);
-            calculateSummaryTotals(data.shipments);
-            document.getElementById('profitLossSummary').style.display = 'block';
-        } else {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
-                        <i class="fas fa-inbox fa-2x mb-2"></i>
-                        <br>لا توجد شحنات في الفترة المحددة
-                    </td>
-                </tr>
-            `;
-            document.getElementById('profitLossSummary').style.display = 'none';
+        if (data.success) {
+            let tableHTML = '';
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+            
+            if (data.shipments && data.shipments.length > 0) {
+                data.shipments.forEach(shipment => {
+                    const revenue = parseFloat(shipment.price || 0);
+                    const expenses = parseFloat(shipment.category_expenses || 0);
+                    const netProfit = revenue - expenses;
+                    
+                    totalRevenue += revenue;
+                    totalExpenses += expenses;
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="text-center">${shipment.tracking_number}</td>
+                            <td class="text-center">
+                                <span class="badge ${getShippingMethodBadgeClass(shipment.shipping_method)}">
+                                    ${getShippingMethodIcon(shipment.shipping_method)} ${shipment.shipping_method || 'غير محدد'}
+                                </span>
+                            </td>
+                            <td class="text-center text-success fw-bold">${revenue.toFixed(3)}</td>
+                            <td class="text-center text-danger">${expenses.toFixed(3)}</td>
+                            <td class="text-center ${netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">
+                                ${netProfit.toFixed(3)}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle fa-2x mb-2"></i>
+                            <br>لا توجد شحنات عامة في الفترة المحددة
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tableBody.innerHTML = tableHTML;
+            
+            // Update summary
+            const netProfit = totalRevenue - totalExpenses;
+            document.getElementById('generalTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
+            document.getElementById('generalTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
+            document.getElementById('generalNetProfit').textContent = netProfit.toFixed(3) + ' د.ك';
+            document.getElementById('generalNetProfit').className = `h6 ${netProfit >= 0 ? 'text-success' : 'text-danger'}`;
+            
+            // Show summary
+            document.getElementById('generalSummary').style.display = 'block';
         }
     })
     .catch(error => {
-        console.error('Error loading profit/loss data:', error);
+        console.error('Error loading general shipments profit report:', error);
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center text-danger py-4">
+                <td colspan="5" class="text-center text-danger py-4">
                     <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
                     <br>حدث خطأ في تحميل البيانات
                 </td>
             </tr>
         `;
-        showNotification('حدث خطأ في تحميل تقرير الربح والخسارة', 'error');
     });
 }
 
-function displayProfitLossData(shipments) {
-    const tableBody = document.getElementById('profitLossTableBody');
-    tableBody.innerHTML = '';
+// Load Document Shipments Profit/Loss Report
+function loadDocumentShipmentsProfitReport(startDate, endDate) {
+    const tableBody = document.getElementById('documentProfitLossTableBody');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="5" class="text-center text-muted py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                <br>جاري تحميل البيانات...
+            </td>
+        </tr>
+    `;
     
-    shipments.forEach(shipment => {
-        const revenue = parseFloat(shipment.price) || 0;
-        const categoryExpenses = parseFloat(shipment.category_expenses) || 0;
-        const netProfit = revenue - categoryExpenses;
-        const profitMargin = revenue > 0 ? ((netProfit / revenue) * 100) : 0;
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="text-center fw-bold">${shipment.tracking_number}</td>
-            <td class="text-center">
-                <span class="badge ${getShipmentTypeBadgeClass(shipment.package_type)}">
-                    ${getShipmentTypeDisplay(shipment.package_type)}
-                </span>
-            </td>
-            <td class="text-center text-success fw-bold">${revenue.toFixed(3)}</td>
-            <td class="text-center text-danger">${categoryExpenses.toFixed(3)}</td>
-            <td class="text-center ${netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">
-                ${netProfit.toFixed(3)}
-            </td>
-            <td class="text-center ${profitMargin >= 0 ? 'text-success' : 'text-danger'}">
-                ${profitMargin.toFixed(1)}%
-            </td>
+    // Fetch document shipments profit/loss data
+    fetch(`/api/document_shipments_profit_report?start_date=${startDate}&end_date=${endDate}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let tableHTML = '';
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+            
+            if (data.shipments && data.shipments.length > 0) {
+                data.shipments.forEach(shipment => {
+                    const revenue = parseFloat(shipment.price || 0);
+                    const expenses = parseFloat(shipment.category_expenses || 0);
+                    const netProfit = revenue - expenses;
+                    
+                    totalRevenue += revenue;
+                    totalExpenses += expenses;
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="text-center">${shipment.tracking_number}</td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-file-alt me-1"></i>${shipment.document_type || 'مستندات'}
+                                </span>
+                            </td>
+                            <td class="text-center text-success fw-bold">${revenue.toFixed(3)}</td>
+                            <td class="text-center text-danger">${expenses.toFixed(3)}</td>
+                            <td class="text-center ${netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">
+                                ${netProfit.toFixed(3)}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle fa-2x mb-2"></i>
+                            <br>لا توجد شحنات مستندات في الفترة المحددة
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tableBody.innerHTML = tableHTML;
+            
+            // Update summary
+            const netProfit = totalRevenue - totalExpenses;
+            document.getElementById('documentTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
+            document.getElementById('documentTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
+            document.getElementById('documentNetProfit').textContent = netProfit.toFixed(3) + ' د.ك';
+            document.getElementById('documentNetProfit').className = `h6 ${netProfit >= 0 ? 'text-success' : 'text-danger'}`;
+            
+            // Show summary
+            document.getElementById('documentSummary').style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading document shipments profit report:', error);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <br>حدث خطأ في تحميل البيانات
+                </td>
+            </tr>
         `;
-        tableBody.appendChild(row);
     });
 }
 
-function calculateSummaryTotals(shipments) {
-    let totalRevenue = 0;
-    let totalExpenses = 0;
-    
-    shipments.forEach(shipment => {
-        totalRevenue += parseFloat(shipment.price) || 0;
-        totalExpenses += parseFloat(shipment.category_expenses) || 0;
-    });
-    
-    const netProfit = totalRevenue - totalExpenses;
-    const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100) : 0;
-    
-    document.getElementById('totalRevenueProfit').textContent = totalRevenue.toFixed(3) + ' د.ك';
-    document.getElementById('totalExpensesProfit').textContent = totalExpenses.toFixed(3) + ' د.ك';
-    document.getElementById('netProfitProfit').textContent = netProfit.toFixed(3) + ' د.ك';
-    document.getElementById('profitMarginProfit').textContent = profitMargin.toFixed(1) + '%';
-    
-    // Update colors based on profit/loss
-    const netProfitElement = document.getElementById('netProfitProfit');
-    const profitMarginElement = document.getElementById('profitMarginProfit');
-    
-    if (netProfit >= 0) {
-        netProfitElement.className = 'text-success';
-        profitMarginElement.className = 'text-success';
-    } else {
-        netProfitElement.className = 'text-danger';
-        profitMarginElement.className = 'text-danger';
-    }
+// Helper functions for shipping method badges
+function getShippingMethodBadgeClass(method) {
+    if (method === 'جوي') return 'bg-primary';
+    if (method === 'بري') return 'bg-success';
+    return 'bg-secondary';
 }
 
-function getShipmentTypeBadgeClass(packageType) {
-    switch(packageType) {
-        case 'document': return 'bg-info text-dark';
-        case 'general': return 'bg-primary';
-        default: return 'bg-secondary';
-    }
-}
-
-function getShipmentTypeDisplay(packageType) {
-    switch(packageType) {
-        case 'document': return 'مستندات';
-        case 'general': return 'عامة';
-        default: return 'غير محدد';
-    }
+function getShippingMethodIcon(method) {
+    if (method === 'جوي') return '<i class="fas fa-plane me-1"></i>';
+    if (method === 'بري') return '<i class="fas fa-truck me-1"></i>';
+    return '<i class="fas fa-box me-1"></i>';
 }
 </script>
 {% endblock %}
