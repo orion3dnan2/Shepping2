@@ -33,24 +33,17 @@ if database_url and database_url.startswith("postgres://"):
 # Add SSL parameters to database URL if not present
 if database_url and "sslmode" not in database_url:
     if "?" in database_url:
-        database_url += "&sslmode=require"
+        database_url += "&sslmode=prefer"
     else:
-        database_url += "?sslmode=require"
+        database_url += "?sslmode=prefer"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 280,
+    "pool_recycle": 300,
     "pool_pre_ping": True,
-    "pool_size": 3,
-    "max_overflow": 5,
-    "pool_timeout": 20,
-    "pool_reset_on_return": "commit",
-    "echo": False,
-    "connect_args": {
-        "sslmode": "require",
-        "connect_timeout": 10,
-        "options": "-c timezone=utc"
-    }
+    "pool_size": 10,
+    "max_overflow": 20,
+    "echo": False
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
