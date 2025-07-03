@@ -30,6 +30,13 @@ database_url = os.environ.get("DATABASE_URL")
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
+# Add SSL parameters to database URL if not present
+if database_url and "sslmode" not in database_url:
+    if "?" in database_url:
+        database_url += "&sslmode=require"
+    else:
+        database_url += "?sslmode=require"
+
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 280,
@@ -38,7 +45,12 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "max_overflow": 5,
     "pool_timeout": 20,
     "pool_reset_on_return": "commit",
-    "echo": False
+    "echo": False,
+    "connect_args": {
+        "sslmode": "require",
+        "connect_timeout": 10,
+        "options": "-c timezone=utc"
+    }
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
