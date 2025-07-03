@@ -186,6 +186,12 @@
                                     
                                     <!-- General Expenses Display -->
                                     <div id="generalExpensesContainer">
+                                        <!-- Print Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-success btn-sm" onclick="printGeneralExpenses()">
+                                                <i class="fas fa-print me-1"></i>طباعة
+                                            </button>
+                                        </div>
                                         <div class="row" id="generalExpensesCards">
                                             <div class="col-12 text-center text-muted py-4">
                                                 <i class="fas fa-inbox me-2 fa-lg"></i>
@@ -230,6 +236,12 @@
                                     
                                     <!-- General Shipments Expenses Display -->
                                     <div id="generalShipmentsExpensesContainer">
+                                        <!-- Print Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="printGeneralShipmentsExpenses()">
+                                                <i class="fas fa-print me-1"></i>طباعة
+                                            </button>
+                                        </div>
                                         <div class="table-responsive">
                                             <table class="table table-hover" id="generalShipmentsExpensesTable">
                                                 <thead class="table-primary">
@@ -284,6 +296,12 @@
                                     
                                     <!-- Document Expenses Display -->
                                     <div id="documentExpensesContainer">
+                                        <!-- Print Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="printDocumentExpenses()">
+                                                <i class="fas fa-print me-1"></i>طباعة
+                                            </button>
+                                        </div>
                                         <div class="row" id="documentExpensesCards">
                                             <div class="col-12 text-center text-muted py-4">
                                                 <i class="fas fa-inbox me-2 fa-lg"></i>
@@ -454,10 +472,15 @@
                         <div class="col-md-6 mb-4">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
-                                    <h5 class="mb-0">
-                                        <i class="fas fa-box me-2"></i>
-                                        تقرير الربح والخسارة - الشحنات العامة
-                                    </h5>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-box me-2"></i>
+                                            تقرير الربح والخسارة - الشحنات العامة
+                                        </h5>
+                                        <button type="button" class="btn btn-light btn-sm" onclick="printGeneralProfitLossTable()">
+                                            <i class="fas fa-print me-1"></i>طباعة
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
@@ -507,10 +530,15 @@
                         <div class="col-md-6 mb-4">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-header" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); color: white;">
-                                    <h5 class="mb-0">
-                                        <i class="fas fa-file-alt me-2"></i>
-                                        تقرير الربح والخسارة - شحنات المستندات
-                                    </h5>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            تقرير الربح والخسارة - شحنات المستندات
+                                        </h5>
+                                        <button type="button" class="btn btn-light btn-sm" onclick="printDocumentProfitLossTable()">
+                                            <i class="fas fa-print me-1"></i>طباعة
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
@@ -1716,6 +1744,216 @@ function getShippingMethodIcon(method) {
     if (method === 'جوي') return '<i class="fas fa-plane me-1"></i>';
     if (method === 'بري') return '<i class="fas fa-truck me-1"></i>';
     return '<i class="fas fa-box me-1"></i>';
+}
+
+// Print functions
+function printGeneralShipmentsExpenses() {
+    const tableContent = document.getElementById('generalShipmentsExpensesTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>مصروفات الشحنات العامة</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #f8f9fa; font-weight: bold; }
+                .table-primary th { background-color: #0d6efd; color: white; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">مصروفات الشحنات العامة</h2>
+            ${tableContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printGeneralProfitLossTable() {
+    const tableContent = document.getElementById('generalProfitLossTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>تقرير الربح والخسارة - الشحنات العامة</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #1e1e2f; color: white; font-weight: bold; }
+                .text-success { color: #28a745; }
+                .text-danger { color: #dc3545; }
+                .text-primary { color: #0d6efd; }
+                .fw-bold { font-weight: bold; }
+                .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8em; }
+                .bg-primary { background-color: #0d6efd; color: white; }
+                .bg-success { background-color: #28a745; color: white; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">تقرير الربح والخسارة - الشحنات العامة</h2>
+            ${tableContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printDocumentProfitLossTable() {
+    const tableContent = document.getElementById('documentProfitLossTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>تقرير الربح والخسارة - شحنات المستندات</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #1e1e2f; color: white; font-weight: bold; }
+                .text-success { color: #28a745; }
+                .text-danger { color: #dc3545; }
+                .text-primary { color: #0d6efd; }
+                .fw-bold { font-weight: bold; }
+                .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8em; }
+                .bg-info { background-color: #0dcaf0; color: black; }
+                .bg-secondary { background-color: #6c757d; color: white; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">تقرير الربح والخسارة - شحنات المستندات</h2>
+            ${tableContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printGeneralExpenses() {
+    const cardsContainer = document.getElementById('generalExpensesCards');
+    const cards = cardsContainer.querySelectorAll('.card');
+    
+    if (cards.length === 0 || cardsContainer.innerHTML.includes('لا توجد مصروفات عامة')) {
+        alert('لا توجد مصروفات عامة للطباعة');
+        return;
+    }
+
+    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+    
+    cards.forEach(card => {
+        const nameElement = card.querySelector('.fw-bold');
+        const amountElement = card.querySelector('.text-success');
+        const dateElement = card.querySelector('.text-muted small');
+        const notesElement = card.querySelector('.text-secondary');
+        
+        if (nameElement && amountElement) {
+            const name = nameElement.textContent.trim();
+            const amount = amountElement.textContent.trim();
+            const date = dateElement ? dateElement.textContent.trim() : '';
+            const notes = notesElement ? notesElement.textContent.trim() : '';
+            
+            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${date}</td><td>${notes}</td></tr>`;
+        }
+    });
+    
+    expensesHTML += '</tbody></table>';
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>مصروفات المكتب</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #28a745; color: white; font-weight: bold; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">مصروفات المكتب</h2>
+            ${expensesHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printDocumentExpenses() {
+    const cardsContainer = document.getElementById('documentExpensesCards');
+    const cards = cardsContainer.querySelectorAll('.card');
+    
+    if (cards.length === 0 || cardsContainer.innerHTML.includes('لا توجد مصروفات مستندات')) {
+        alert('لا توجد مصروفات مستندات للطباعة');
+        return;
+    }
+
+    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+    
+    cards.forEach(card => {
+        const nameElement = card.querySelector('.fw-bold');
+        const amountElement = card.querySelector('.text-success');
+        const dateElement = card.querySelector('.text-muted small');
+        const notesElement = card.querySelector('.text-secondary');
+        
+        if (nameElement && amountElement) {
+            const name = nameElement.textContent.trim();
+            const amount = amountElement.textContent.trim();
+            const date = dateElement ? dateElement.textContent.trim() : '';
+            const notes = notesElement ? notesElement.textContent.trim() : '';
+            
+            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${date}</td><td>${notes}</td></tr>`;
+        }
+    });
+    
+    expensesHTML += '</tbody></table>';
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>مصروفات شحن المستندات</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #6f42c1; color: white; font-weight: bold; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">مصروفات شحن المستندات</h2>
+            ${expensesHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
 }
 </script>
 {% endblock %}
