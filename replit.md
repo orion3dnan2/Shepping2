@@ -1014,6 +1014,8 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Optimized shipping sticker size to quarter A4 page (10.5cm × 14.8cm) with enhanced typography and spacing
   - Added direction information to shipping sticker with abbreviated format (KW → SU, SU → KW)
   - Improved font sizes and margins to effectively utilize the increased sticker space
+  - **Cleaned requirements.txt for MySQL compatibility**: Removed all PostgreSQL dependencies (psycopg2-binary), kept only PyMySQL 1.1.1 for database connectivity
+  - Created requirements_render.txt as clean MySQL-only dependencies file for Render deployment
 - **July 1, 2025: Enhanced logo design and comprehensive zone management**
   - Added professional Morsal logo design to sidebar navigation with responsive mobile support
   - Redesigned professional invoice layout with logo positioned above "فاتورة شحن" title for enhanced aesthetics
