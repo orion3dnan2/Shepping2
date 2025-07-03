@@ -1,0 +1,48 @@
+# cPanel Flask Application Configuration
+# This file configures Apache to serve the Flask application properly
+
+# Enable Passenger for Python
+PassengerEnabled on
+PassengerAppRoot /home/username/public_html/
+PassengerPython /home/username/virtualenv/public_html/3.11/bin/python
+
+# Set the startup file
+PassengerStartupFile passenger_wsgi.py
+
+# Force HTTPS (optional, recommended for production)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Set environment variables
+SetEnv SESSION_SECRET "your-secret-key-change-this"
+SetEnv FLASK_ENV "production"
+SetEnv DATABASE_URL "mysql+pymysql://username:password@localhost/database_name"
+
+# Handle Flask static files
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+</FilesMatch>
+
+# Prevent access to Python files directly
+<Files "*.py">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent access to sensitive files
+<Files "*.pyc">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "requirements.txt">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>

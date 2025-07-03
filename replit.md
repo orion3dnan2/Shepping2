@@ -1016,6 +1016,16 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Improved font sizes and margins to effectively utilize the increased sticker space
   - **Cleaned requirements.txt for MySQL compatibility**: Removed all PostgreSQL dependencies (psycopg2-binary), kept only PyMySQL 1.1.1 for database connectivity
   - Created requirements_render.txt as clean MySQL-only dependencies file for Render deployment
+- **July 3, 2025: Converted application for cPanel hosting compatibility**
+  - Created passenger_wsgi.py as WSGI entry point for cPanel Passenger
+  - Generated .htaccess configuration file with proper Apache directives and environment variables
+  - Modified app.py database configuration for cPanel MySQL hosting with optimized connection pooling
+  - Created requirements_cpanel.txt with hosting-specific package versions
+  - Built comprehensive CPANEL_DEPLOYMENT.md guide with step-by-step installation instructions
+  - Added app_start.py for database initialization and admin user creation
+  - Created cpanel_config.py helper script for deployment configuration validation
+  - Updated main.py with cPanel compatibility and environment variable defaults
+  - Configured smaller connection pool sizes suitable for shared hosting limitations
 - **July 1, 2025: Enhanced logo design and comprehensive zone management**
   - Added professional Morsal logo design to sidebar navigation with responsive mobile support
   - Redesigned professional invoice layout with logo positioned above "فاتورة شحن" title for enhanced aesthetics

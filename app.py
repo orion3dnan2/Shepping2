@@ -25,44 +25,38 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 # Additional Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# configure the database - MySQL configuration for Render
+# configure the database - MySQL configuration for cPanel hosting
 database_url = os.environ.get("DATABASE_URL")
 
-# Handle MySQL URL format conversion
+# cPanel MySQL configuration
 if database_url:
+    # Handle different MySQL URL formats for cPanel
     if database_url.startswith("mysql://"):
         database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
-    elif database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
-        # Convert PostgreSQL URL to MySQL format if needed
-        print("⚠️ PostgreSQL URL detected, please use MySQL URL instead")
     elif not database_url.startswith("mysql+pymysql://"):
         # Add PyMySQL driver if not specified
         database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
+else:
+    # Default cPanel MySQL connection format
+    # Users will need to update these values in their cPanel environment
+    database_url = "mysql+pymysql://username:password@localhost/database_name"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
-# MySQL-specific configuration
-if database_url and "mysql" in database_url:
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 3600,
-        "pool_pre_ping": True,
-        "pool_size": 5,
-        "max_overflow": 10,
-        "echo": False,
-        "connect_args": {
-            "charset": "utf8mb4",
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
+# cPanel MySQL-specific configuration
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 3600,  # Recycle connections every hour
+    "pool_pre_ping": True,  # Validate connections before use
+    "pool_size": 3,  # Smaller pool size for shared hosting
+    "max_overflow": 2,  # Limited overflow for cPanel restrictions
+    "echo": False,  # Set to True for debugging
+    "connect_args": {
+        "charset": "utf8mb4",
+        "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        "autocommit": False,
+        "check_same_thread": False,
     }
-else:
-    # Keep PostgreSQL configuration as fallback
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 300,
-        "pool_pre_ping": True,
-        "pool_size": 5,
-        "max_overflow": 10,
-        "echo": False,
-    }
+}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # initialize the app with the extension, flask-sqlalchemy >= 3.0.x
