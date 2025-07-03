@@ -25,28 +25,43 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 # Additional Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# configure the database - PostgreSQL configuration for Render
+# configure the database - MySQL configuration for Render
 database_url = os.environ.get("DATABASE_URL")
-if database_url and database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-# Special handling for Render PostgreSQL SSL issues
-if database_url and "dpg-" in database_url and "render.com" in database_url:
-    # Render PostgreSQL requires SSL with minimal verification
-    if "sslmode" not in database_url:
-        if "?" in database_url:
-            database_url += "&sslmode=require&sslcert=&sslkey=&sslrootcert=&sslcheck=none"
-        else:
-            database_url += "?sslmode=require&sslcert=&sslkey=&sslrootcert=&sslcheck=none"
+# Handle MySQL URL format conversion
+if database_url:
+    if database_url.startswith("mysql://"):
+        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
+    elif database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
+        # Convert PostgreSQL URL to MySQL format if needed
+        print("⚠️ PostgreSQL URL detected, please use MySQL URL instead")
+    elif not database_url.startswith("mysql+pymysql://"):
+        # Add PyMySQL driver if not specified
+        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-    "pool_size": 5,
-    "max_overflow": 10,
-    "echo": False,
-}
+# MySQL-specific configuration
+if database_url and "mysql" in database_url:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+        "pool_size": 5,
+        "max_overflow": 10,
+        "echo": False,
+        "connect_args": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
+    }
+else:
+    # Keep PostgreSQL configuration as fallback
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+        "pool_size": 5,
+        "max_overflow": 10,
+        "echo": False,
+    }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # initialize the app with the extension, flask-sqlalchemy >= 3.0.x
