@@ -1007,6 +1007,7 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Deleted "الفاتورة التفاعلية" expense invoice panel from sidebar
 - **July 3, 2025: Enhanced invoice system and shipping sticker optimization**
   - Modified document shipment invoices to exclude weight and waybill fields while keeping them for general shipments
+  - Added document status display exclusively in document shipment invoices with comprehensive Arabic translations
   - Added comprehensive print functionality to all financial center tables and profit/loss reports
   - Optimized shipping sticker size to quarter A4 page (10.5cm × 14.8cm) with enhanced typography and spacing
   - Added direction information to shipping sticker with abbreviated format (KW → SU, SU → KW)

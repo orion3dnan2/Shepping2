@@ -507,6 +507,34 @@
                         <td class="detail-label">رقم التتبع</td>
                         <td class="detail-value">{{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</td>
                     </tr>
+                    {% if shipment and shipment.package_type == 'document' %}
+                    <tr>
+                        <td class="detail-label">حالة المستند</td>
+                        <td class="detail-value">
+                            {% if shipment.status == 'created' %}
+                                تم الإنشاء
+                            {% elif shipment.status == 'under_review' %}
+                                قيد المراجعة
+                            {% elif shipment.status == 'documents_received' %}
+                                تم استلام المستندات
+                            {% elif shipment.status == 'authentication_in_progress' %}
+                                التوثيق جاري
+                            {% elif shipment.status == 'authentication_completed' %}
+                                تم التوثيق
+                            {% elif shipment.status == 'sending_after_auth' %}
+                                الإرسال بعد التوثيق
+                            {% elif shipment.status == 'in_transit' %}
+                                في الطريق
+                            {% elif shipment.status == 'delivered' %}
+                                تم التسليم
+                            {% elif shipment.status == 'cancelled' %}
+                                ملغاة
+                            {% else %}
+                                {{ shipment.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
                     {% if not shipment or shipment.package_type != 'document' %}
                     <tr>
                         <td class="detail-label">الوزن</td>
