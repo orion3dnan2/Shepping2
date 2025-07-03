@@ -1,0 +1,1959 @@
+{% extends "base.html" %}
+
+{% block title %}المركز المالي{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-chart-line me-2" style="color: #6f42c1;"></i>
+                    المركز المالي
+                </h2>
+            </div>
+
+            <!-- Tab Navigation -->
+            <ul class="nav nav-pills mb-4" id="financial-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="revenues-tab" data-bs-toggle="pill" data-bs-target="#revenues" type="button" role="tab">
+                        <i class="fas fa-coins me-2"></i>الإيرادات
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="expenses-tab" data-bs-toggle="pill" data-bs-target="#expenses" type="button" role="tab">
+                        <i class="fas fa-minus-circle me-2"></i>المصروفات
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reports-tab" data-bs-toggle="pill" data-bs-target="#reports" type="button" role="tab">
+                        <i class="fas fa-chart-bar me-2"></i>التقارير المالية
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profit-loss-tab" data-bs-toggle="pill" data-bs-target="#profit-loss" type="button" role="tab">
+                        <i class="fas fa-balance-scale me-2"></i>تقارير الربح والخسارة
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="financial-content">
+                
+                <!-- Revenues Tab -->
+                <div class="tab-pane fade show active" id="revenues" role="tabpanel">
+                    <div class="row">
+                        <!-- Air Shipping Revenue -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-sm revenue-card">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-plane fa-3x text-primary"></i>
+                                    </div>
+                                    <h5 class="card-title text-dark mb-3">إيرادات الشحن الجوي</h5>
+                                    <h3 class="text-primary mb-0" id="airRevenueAmount">0.000 د.ك</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Land Shipping Revenue -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-sm revenue-card">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-truck fa-3x text-success"></i>
+                                    </div>
+                                    <h5 class="card-title text-dark mb-3">إيرادات الشحن البري</h5>
+                                    <h3 class="text-success mb-0" id="landRevenueAmount">0.000 د.ك</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Shipping Revenue -->
+                        <div class="col-lg-4 col-md-12 mb-4">
+                            <div class="card h-100 border-0 shadow-sm revenue-card">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-3">
+                                        <i class="fas fa-file-alt fa-3x text-warning"></i>
+                                    </div>
+                                    <h5 class="card-title text-dark mb-3">إيرادات شحن المستندات</h5>
+                                    <h3 class="text-warning mb-0" id="documentRevenueAmount">0.000 د.ك</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Revenue -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-lg total-revenue-card">
+                                <div class="card-body text-center p-4">
+                                    <h4 class="card-title text-white mb-3">إجمالي الإيرادات</h4>
+                                    <h2 class="text-white mb-0" id="totalRevenueAmount">0.000 د.ك</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                </div>
+
+                <!-- Expenses Tab -->
+                <div class="tab-pane fade" id="expenses" role="tabpanel">
+                    <!-- Total Expenses Card -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);">
+                                <div class="card-body text-center p-4">
+                                    <h4 class="card-title text-white mb-3">إجمالي المصروفات</h4>
+                                    <h2 class="text-white mb-0" id="totalExpensesAmount">0.000 د.ك</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category Expenses Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #6f42c1, #e83e8c);">
+                                    <h6 class="mb-0 text-center">
+                                        <i class="fas fa-chart-pie me-2"></i>
+                                        مصروفات الشحنات العامة (موزعة)
+                                    </h6>
+                                </div>
+                                <div class="card-body text-center p-3">
+                                    <h5 class="text-primary mb-1" id="generalCategoryExpenses">0.000 د.ك</h5>
+                                    <small class="text-muted">إجمالي موزع على كل شحنة عامة</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #20c997, #28a745);">
+                                    <h6 class="mb-0 text-center">
+                                        <i class="fas fa-file-alt me-2"></i>
+                                        مصروفات المستندات (موزعة)
+                                    </h6>
+                                </div>
+                                <div class="card-body text-center p-3">
+                                    <h5 class="text-success mb-1" id="documentCategoryExpenses">0.000 د.ك</h5>
+                                    <small class="text-muted">إجمالي موزع على كل شحنة مستندات</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alert Message -->
+                    <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(90deg, #17a2b8, #20c997);">
+                        <div class="d-flex align-items-center text-white">
+                            <i class="fas fa-info-circle me-3 fa-lg"></i>
+                            <span class="fw-bold">المصروفات توزع تلقائياً على الشحنات حسب النوع لحساب الربح والخسارة</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Office Expenses Section -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                    <h5 class="mb-0 text-center">
+                                        <i class="fas fa-box me-2"></i>
+                                        مصروفات المكتب
+                                    </h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <!-- General Expense Form -->
+                                    <form id="generalExpenseForm" class="mb-4">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">اسم المصروف</label>
+                                            <input type="text" class="form-control form-control-lg" name="name" placeholder="مثال: إيجار المكتب" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">المبلغ (د.ك)</label>
+                                            <input type="text" class="form-control form-control-lg" name="amount" 
+                                                   pattern="[0-9]+(\.[0-9]{1,3})?" placeholder="0.000" required
+                                                   inputmode="decimal">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">الملاحظات (اختياري)</label>
+                                            <textarea class="form-control" name="notes" rows="3" placeholder="تفاصيل إضافية حول المصروف"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-lg w-100" style="border-radius: 10px;">
+                                            <i class="fas fa-save me-2"></i>حفظ المصروف
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- General Expenses Display -->
+                                    <div id="generalExpensesContainer">
+                                        <!-- Print Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-success btn-sm" onclick="printGeneralExpenses()">
+                                                <i class="fas fa-print me-1"></i>طباعة
+                                            </button>
+                                        </div>
+                                        <div class="row" id="generalExpensesCards">
+                                            <div class="col-12 text-center text-muted py-4">
+                                                <i class="fas fa-inbox me-2 fa-lg"></i>
+                                                <br><small>لا توجد مصروفات عامة</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- General Shipments Expenses Section -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #007bff, #6610f2);">
+                                    <h5 class="mb-0 text-center">
+                                        <i class="fas fa-shipping-fast me-2"></i>
+                                        مصروفات شحنات عامة
+                                    </h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <!-- General Shipments Expense Form -->
+                                    <form id="generalShipmentsExpenseForm" class="mb-4">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">اسم المصروف</label>
+                                            <input type="text" class="form-control form-control-lg" name="name" placeholder="مثال: تكاليف النقل" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">المبلغ (د.ك)</label>
+                                            <input type="text" class="form-control form-control-lg" name="amount" 
+                                                   pattern="[0-9]+(\.[0-9]{1,3})?" placeholder="0.000" required
+                                                   inputmode="decimal">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">الملاحظات (اختياري)</label>
+                                            <textarea class="form-control" name="notes" rows="3" placeholder="تفاصيل إضافية حول المصروف"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-lg w-100" style="border-radius: 10px;">
+                                            <i class="fas fa-save me-2"></i>حفظ المصروف
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- General Shipments Expenses Display -->
+                                    <div id="generalShipmentsExpensesContainer">
+                                        <!-- Print Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="printGeneralShipmentsExpenses()">
+                                                <i class="fas fa-print me-1"></i>طباعة
+                                            </button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="generalShipmentsExpensesTable">
+                                                <thead class="table-primary">
+                                                    <tr>
+                                                        <th style="width: 60%">اسم المصروف</th>
+                                                        <th style="width: 25%">المبلغ</th>
+                                                        <th style="width: 15%">مسح</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                        <div class="text-center text-muted py-4" id="generalShipmentsNoExpenses">
+                                            <i class="fas fa-inbox me-2 fa-lg"></i>
+                                            <br><small>لا توجد مصروفات شحنات عامة</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Document Expenses Section -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header text-white" style="background: linear-gradient(135deg, #6f42c1, #e83e8c);">
+                                    <h5 class="mb-0 text-center">
+                                        <i class="fas fa-file-alt me-2"></i>
+                                        مصروفات شحن المستندات
+                                    </h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <!-- Document Expense Form -->
+                                    <form id="documentExpenseForm" class="mb-4">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">اسم المصروف</label>
+                                            <input type="text" class="form-control form-control-lg" name="name" placeholder="مثال: رسوم التوثيق" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">المبلغ (د.ك)</label>
+                                            <input type="text" class="form-control form-control-lg" name="amount" 
+                                                   pattern="[0-9]+(\.[0-9]{1,3})?" placeholder="0.000" required
+                                                   inputmode="decimal">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">الملاحظات (اختياري)</label>
+                                            <textarea class="form-control" name="notes" rows="3" placeholder="تفاصيل إضافية حول المصروف"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-lg w-100" style="background: linear-gradient(135deg, #6f42c1, #e83e8c); color: white; border: none; border-radius: 10px;">
+                                            <i class="fas fa-save me-2"></i>حفظ المصروف
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Document Expenses Display -->
+                                    <div id="documentExpensesContainer">
+                                        <!-- Print Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="printDocumentExpenses()">
+                                                <i class="fas fa-print me-1"></i>طباعة
+                                            </button>
+                                        </div>
+                                        <div class="row" id="documentExpensesCards">
+                                            <div class="col-12 text-center text-muted py-4">
+                                                <i class="fas fa-inbox me-2 fa-lg"></i>
+                                                <br><small>لا توجد مصروفات مستندات</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div class="tab-pane fade" id="reports" role="tabpanel">
+                    <!-- Financial Summary Cards -->
+                    <div class="row mb-4">
+                        <!-- Revenues Summary -->
+                        <div class="col-lg-6 mb-3">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-coins me-2"></i>
+                                        ملخص الإيرادات
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="p-3">
+                                                <i class="fas fa-plane text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                                <div class="fw-bold">الشحن الجوي</div>
+                                                <div id="reportAirRevenue" class="text-success fw-bold">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="p-3">
+                                                <i class="fas fa-truck text-success mb-2" style="font-size: 1.5rem;"></i>
+                                                <div class="fw-bold">الشحن البري</div>
+                                                <div id="reportLandRevenue" class="text-success fw-bold">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="p-3">
+                                                <i class="fas fa-file-alt text-warning mb-2" style="font-size: 1.5rem;"></i>
+                                                <div class="fw-bold">المستندات</div>
+                                                <div id="reportDocumentRevenue" class="text-success fw-bold">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="text-center">
+                                        <div class="fw-bold mb-1">إجمالي الإيرادات</div>
+                                        <div id="reportTotalRevenue" class="h4 text-success fw-bold mb-0">0.000 د.ك</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expenses Summary -->
+                        <div class="col-lg-6 mb-3">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #dc3545, #fd7e14); color: white;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-minus-circle me-2"></i>
+                                        ملخص المصروفات
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="p-3">
+                                                <i class="fas fa-shipping-fast text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                                <div class="fw-bold">شحنات عامة</div>
+                                                <div id="reportGeneralExpenses" class="text-danger fw-bold">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-3">
+                                                <i class="fas fa-file-invoice text-warning mb-2" style="font-size: 1.5rem;"></i>
+                                                <div class="fw-bold">مستندات</div>
+                                                <div id="reportDocumentExpenses" class="text-danger fw-bold">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="text-center">
+                                        <div class="fw-bold mb-1">إجمالي المصروفات</div>
+                                        <div id="reportTotalExpenses" class="h4 text-danger fw-bold mb-0">0.000 د.ك</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Net Profit Card -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #6f42c1, #e83e8c); color: white;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        التقرير المالي الإجمالي
+                                    </h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="p-4" style="background: linear-gradient(135deg, #e8f5e8, #d4edda); border-radius: 10px;">
+                                                <i class="fas fa-arrow-up text-success mb-2" style="font-size: 2rem;"></i>
+                                                <div class="fw-bold mb-1">إجمالي الإيرادات</div>
+                                                <div id="finalTotalRevenue" class="h3 text-success fw-bold mb-0">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="p-4" style="background: linear-gradient(135deg, #f8e8e8, #f5c6cb); border-radius: 10px;">
+                                                <i class="fas fa-arrow-down text-danger mb-2" style="font-size: 2rem;"></i>
+                                                <div class="fw-bold mb-1">إجمالي المصروفات</div>
+                                                <div id="finalTotalExpenses" class="h3 text-danger fw-bold mb-0">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="p-4" style="background: linear-gradient(135deg, #e8e8f8, #d1ecf1); border-radius: 10px;">
+                                                <i id="profitIcon" class="fas fa-equals mb-2" style="font-size: 2rem;"></i>
+                                                <div class="fw-bold mb-1">صافي الربح/الخسارة</div>
+                                                <div id="netProfit" class="h3 fw-bold mb-0">0.000 د.ك</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profit & Loss Reports Tab -->
+                <div class="tab-pane fade" id="profit-loss" role="tabpanel">
+                    <!-- Date Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        تصفية حسب التاريخ
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">من تاريخ</label>
+                                            <input type="date" class="form-control" id="profitStartDate">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">إلى تاريخ</label>
+                                            <input type="date" class="form-control" id="profitEndDate">
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="loadProfitLossReport()">
+                                        <i class="fas fa-search me-2"></i>عرض التقرير
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Separate Profit & Loss Reports -->
+                    <div class="row">
+                        <!-- General Shipments Report -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-box me-2"></i>
+                                            تقرير الربح والخسارة - الشحنات العامة
+                                        </h5>
+                                        <button type="button" class="btn btn-light btn-sm" onclick="printGeneralProfitLossTable()">
+                                            <i class="fas fa-print me-1"></i>طباعة
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0" id="generalProfitLossTable">
+                                            <thead style="background: linear-gradient(135deg, #1e1e2f, #2d2d4a); color: white;">
+                                                <tr>
+                                                    <th class="text-center">رقم التتبع</th>
+                                                    <th class="text-center">طريق الشحن</th>
+                                                    <th class="text-center">الإيراد (د.ك)</th>
+                                                    <th class="text-center">المصروفات (د.ك)</th>
+                                                    <th class="text-center">صافي الربح (د.ك)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="generalProfitLossTableBody">
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-4">
+                                                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                                        <br>اختر التواريخ وانقر "عرض التقرير" لإظهار البيانات
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <!-- General Shipments Summary -->
+                                <div class="card-footer bg-light" id="generalSummary" style="display: none;">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="fw-bold text-success">إجمالي الإيرادات</div>
+                                            <div id="generalTotalRevenue" class="h6 text-success">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-danger">إجمالي المصروفات</div>
+                                            <div id="generalTotalExpenses" class="h6 text-danger">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-primary">صافي الربح</div>
+                                            <div id="generalNetProfit" class="h6 text-primary">0.000 د.ك</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Shipments Report -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); color: white;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            تقرير الربح والخسارة - شحنات المستندات
+                                        </h5>
+                                        <button type="button" class="btn btn-light btn-sm" onclick="printDocumentProfitLossTable()">
+                                            <i class="fas fa-print me-1"></i>طباعة
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0" id="documentProfitLossTable">
+                                            <thead style="background: linear-gradient(135deg, #1e1e2f, #2d2d4a); color: white;">
+                                                <tr>
+                                                    <th class="text-center">رقم التتبع</th>
+                                                    <th class="text-center">نوع المستند</th>
+                                                    <th class="text-center">الإيراد (د.ك)</th>
+                                                    <th class="text-center">المصروفات (د.ك)</th>
+                                                    <th class="text-center">صافي الربح (د.ك)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="documentProfitLossTableBody">
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-4">
+                                                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                                        <br>اختر التواريخ وانقر "عرض التقرير" لإظهار البيانات
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <!-- Document Shipments Summary -->
+                                <div class="card-footer bg-light" id="documentSummary" style="display: none;">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="fw-bold text-success">إجمالي الإيرادات</div>
+                                            <div id="documentTotalRevenue" class="h6 text-success">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-danger">إجمالي المصروفات</div>
+                                            <div id="documentTotalExpenses" class="h6 text-danger">0.000 د.ك</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-primary">صافي الربح</div>
+                                            <div id="documentNetProfit" class="h6 text-primary">0.000 د.ك</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="row mt-4" id="profitLossSummary" style="display: none;">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-coins fa-2x text-success mb-2"></i>
+                                    <h6 class="card-title">إجمالي الإيرادات</h6>
+                                    <h4 class="text-success" id="totalRevenueProfit">0.000 د.ك</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-minus-circle fa-2x text-danger mb-2"></i>
+                                    <h6 class="card-title">إجمالي المصروفات</h6>
+                                    <h4 class="text-danger" id="totalExpensesProfit">0.000 د.ك</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-balance-scale fa-2x text-primary mb-2"></i>
+                                    <h6 class="card-title">صافي الربح</h6>
+                                    <h4 class="text-primary" id="netProfitProfit">0.000 د.ك</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-percentage fa-2x text-warning mb-2"></i>
+                                    <h6 class="card-title">هامش الربح</h6>
+                                    <h4 class="text-warning" id="profitMarginProfit">0%</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Revenue Cards Styling */
+.revenue-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.revenue-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.total-revenue-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Tab styling */
+.nav-pills .nav-link {
+    color: #6c757d;
+    border-radius: 10px;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Button styling */
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+/* Table styling */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .revenue-card .fa-3x {
+        font-size: 2rem !important;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+    }
+    
+    .total-revenue-card h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Notification styling */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Financial Center JavaScript Functions
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Load revenues when page loads
+    loadRevenues();
+    
+    // Initialize expense forms (date inputs removed)
+    
+    // Tab event listeners
+    document.getElementById('revenues-tab').addEventListener('shown.bs.tab', loadRevenues);
+    document.getElementById('expenses-tab').addEventListener('shown.bs.tab', function() {
+        loadGeneralExpenses();
+        loadDocumentExpenses();
+        loadTotalExpenses(); // Load total expenses when expenses tab is activated
+    });
+    document.getElementById('reports-tab').addEventListener('shown.bs.tab', loadFinancialReports);
+    document.getElementById('profit-loss-tab').addEventListener('shown.bs.tab', function() {
+        // Set default dates if not already set
+        if (!document.getElementById('profitStartDate').value || !document.getElementById('profitEndDate').value) {
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('profitEndDate').value = today.toISOString().split('T')[0];
+            document.getElementById('profitStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+        }
+        // Auto-load the report when tab is shown
+        loadProfitLossReport();
+    });
+});
+
+// Revenue Functions
+function loadRevenues() {
+    // Load Air Shipping Revenue
+    fetch('/api/air_shipping_revenue')
+    .then(response => response.json())
+    .then(data => {
+        console.log('Air shipping revenue data:', data);
+        document.getElementById('airRevenueAmount').textContent = 
+            data.success && data.total ? data.total.toFixed(3) + ' د.ك' : '0.000 د.ك';
+        calculateTotalRevenue();
+    })
+    .catch(error => console.error('Error loading air revenue:', error));
+    
+    // Load Land Shipping Revenue
+    fetch('/api/land_shipping_revenue')
+    .then(response => response.json())
+    .then(data => {
+        console.log('Land shipping revenue data:', data);
+        document.getElementById('landRevenueAmount').textContent = 
+            data.success && data.total ? data.total.toFixed(3) + ' د.ك' : '0.000 د.ك';
+        calculateTotalRevenue();
+    })
+    .catch(error => console.error('Error loading land revenue:', error));
+    
+    // Load Document Shipping Revenue
+    fetch('/api/document_shipping_revenue')
+    .then(response => response.json())
+    .then(data => {
+        console.log('Document shipping revenue data:', data);
+        document.getElementById('documentRevenueAmount').textContent = 
+            data.success && data.total ? data.total.toFixed(3) + ' د.ك' : '0.000 د.ك';
+        calculateTotalRevenue();
+    })
+    .catch(error => console.error('Error loading document revenue:', error));
+    
+    // Load Total Expenses
+    loadTotalExpenses();
+}
+
+function loadTotalExpenses() {
+    fetch('/api/total_expenses')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('totalExpensesAmount').textContent = 
+                data.grand_total.toFixed(3) + ' د.ك';
+        }
+    })
+    .catch(error => console.error('Error loading total expenses:', error));
+}
+
+function calculateTotalRevenue() {
+    const airAmount = parseFloat(document.getElementById('airRevenueAmount').textContent.replace(' د.ك', '')) || 0;
+    const landAmount = parseFloat(document.getElementById('landRevenueAmount').textContent.replace(' د.ك', '')) || 0;
+    const documentAmount = parseFloat(document.getElementById('documentRevenueAmount').textContent.replace(' د.ك', '')) || 0;
+    
+    const total = airAmount + landAmount + documentAmount;
+    document.getElementById('totalRevenueAmount').textContent = total.toFixed(3) + ' د.ك';
+}
+
+// Financial Reports Functions
+function loadFinancialReports() {
+    console.log('Loading financial reports...');
+    
+    // Load all revenue data for reports
+    Promise.all([
+        fetch('/api/air_shipping_revenue').then(r => r.json()),
+        fetch('/api/land_shipping_revenue').then(r => r.json()),
+        fetch('/api/document_shipping_revenue').then(r => r.json()),
+        fetch('/api/total_expenses').then(r => r.json())
+    ]).then(([airRevenue, landRevenue, documentRevenue, totalExpensesData]) => {
+        console.log('API responses:', { airRevenue, landRevenue, documentRevenue, totalExpensesData });
+        
+        // Update revenue sections in reports
+        const airRevenueAmount = airRevenue.success ? airRevenue.total : 0;
+        const landRevenueAmount = landRevenue.success ? landRevenue.total : 0;
+        const documentRevenueAmount = documentRevenue.success ? documentRevenue.total : 0;
+        
+        document.getElementById('reportAirRevenue').textContent = airRevenueAmount.toFixed(3) + ' د.ك';
+        document.getElementById('reportLandRevenue').textContent = landRevenueAmount.toFixed(3) + ' د.ك';
+        document.getElementById('reportDocumentRevenue').textContent = documentRevenueAmount.toFixed(3) + ' د.ك';
+        
+        const totalRevenue = airRevenueAmount + landRevenueAmount + documentRevenueAmount;
+        document.getElementById('reportTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
+        document.getElementById('finalTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
+        
+        // Update expense sections in reports
+        const totalExpenses = totalExpensesData.success ? totalExpensesData.grand_total : 0;
+        
+        // Split expenses into general (60%) and documents (40%) for display
+        const generalExpensesAmount = totalExpenses * 0.6;
+        const documentExpensesAmount = totalExpenses * 0.4;
+        
+        document.getElementById('reportGeneralExpenses').textContent = generalExpensesAmount.toFixed(3) + ' د.ك';
+        document.getElementById('reportDocumentExpenses').textContent = documentExpensesAmount.toFixed(3) + ' د.ك';
+        document.getElementById('reportTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
+        document.getElementById('finalTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
+        
+        // Calculate net profit/loss
+        const netProfit = totalRevenue - totalExpenses;
+        const netProfitElement = document.getElementById('netProfit');
+        const profitIconElement = document.getElementById('profitIcon');
+        
+        netProfitElement.textContent = netProfit.toFixed(3) + ' د.ك';
+        
+        if (netProfit > 0) {
+            netProfitElement.className = 'h3 text-success fw-bold mb-0';
+            profitIconElement.className = 'fas fa-arrow-up text-success mb-2';
+            profitIconElement.style.fontSize = '2rem';
+        } else if (netProfit < 0) {
+            netProfitElement.className = 'h3 text-danger fw-bold mb-0';
+            profitIconElement.className = 'fas fa-arrow-down text-danger mb-2';
+            profitIconElement.style.fontSize = '2rem';
+        } else {
+            netProfitElement.className = 'h3 text-secondary fw-bold mb-0';
+            profitIconElement.className = 'fas fa-equals text-secondary mb-2';
+            profitIconElement.style.fontSize = '2rem';
+        }
+        
+        console.log('Financial reports loaded successfully - Total Revenue:', totalRevenue, 'Total Expenses:', totalExpenses, 'Net Profit:', netProfit);
+        
+    }).catch(error => {
+        console.error('Error loading financial reports:', error);
+    });
+}
+
+// Update financial reports when data changes in other tabs
+function refreshFinancialReports() {
+    // Check if reports tab exists and update it
+    if (document.getElementById('reportAirRevenue')) {
+        console.log('Refreshing financial reports...');
+        loadFinancialReports();
+    }
+}
+
+// Add cross-tab data synchronization
+function syncAllTabs() {
+    // Update revenues tab
+    if (document.getElementById('airRevenueAmount')) {
+        loadRevenues();
+    }
+    
+    // Update expenses tab
+    if (document.getElementById('generalExpensesCards')) {
+        loadGeneralExpenses();
+        loadDocumentExpenses();
+        loadTotalExpenses();
+    }
+    
+    // Update reports tab
+    refreshFinancialReports();
+}
+
+// General Expense Functions
+document.getElementById('generalExpenseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    // Convert amount to proper number format
+    const amountInput = this.querySelector('input[name="amount"]');
+    const amountValue = parseFloat(amountInput.value);
+    if (isNaN(amountValue) || amountValue <= 0) {
+        showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+        return;
+    }
+    formData.set('amount', amountValue.toString());
+    
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+    submitButton.disabled = true;
+    
+    fetch('/add_expense_general', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            this.reset();
+            loadGeneralExpenses();
+            loadTotalExpenses(); // Update total expenses after adding new expense
+            refreshFinancialReports(); // Update reports tab
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+    })
+    .finally(() => {
+        submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ المصروف';
+        submitButton.disabled = false;
+    });
+});
+
+function loadGeneralExpenses() {
+    fetch('/api/expenses_general')
+    .then(response => response.json())
+    .then(data => {
+        const cardsContainer = document.getElementById('generalExpensesCards');
+        
+        if (data.success && data.expenses.length > 0) {
+            cardsContainer.innerHTML = '';
+            data.expenses.forEach(expense => {
+                const cardCol = document.createElement('div');
+                cardCol.className = 'col-md-6 col-lg-4 mb-3';
+                cardCol.innerHTML = `
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
+                                    <h5 class="text-success mb-0">${expense.amount.toFixed(3)} د.ك</h5>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger ms-2" 
+                                        onclick="deleteGeneralExpense(${expense.id})"
+                                        title="حذف المصروف">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(cardCol);
+            });
+        } else {
+            cardsContainer.innerHTML = `
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="fas fa-inbox me-2 fa-lg"></i>
+                    <br><small>لا توجد مصروفات عامة</small>
+                </div>
+            `;
+        }
+    })
+    .catch(error => console.error('Error loading general expenses:', error));
+}
+
+function deleteGeneralExpense(expenseId) {
+    if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
+        fetch(`/delete_expense_general/${expenseId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                loadGeneralExpenses();
+                loadTotalExpenses(); // Update total expenses after deletion
+                refreshFinancialReports(); // Update reports tab
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في حذف المصروف', 'error');
+        });
+    }
+}
+
+// Document Expense Functions
+document.getElementById('documentExpenseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    // Convert amount to proper number format
+    const amountInput = this.querySelector('input[name="amount"]');
+    const amountValue = parseFloat(amountInput.value);
+    if (isNaN(amountValue) || amountValue <= 0) {
+        showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+        return;
+    }
+    formData.set('amount', amountValue.toString());
+    
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+    submitButton.disabled = true;
+    
+    fetch('/add_expense_documents', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            this.reset();
+            loadDocumentExpenses();
+            loadTotalExpenses(); // Update total expenses after adding new expense
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+    })
+    .finally(() => {
+        submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ المصروف';
+        submitButton.disabled = false;
+    });
+});
+
+function loadDocumentExpenses() {
+    fetch('/api/expenses_documents')
+    .then(response => response.json())
+    .then(data => {
+        const cardsContainer = document.getElementById('documentExpensesCards');
+        
+        if (data.success && data.expenses.length > 0) {
+            cardsContainer.innerHTML = '';
+            data.expenses.forEach(expense => {
+                const cardCol = document.createElement('div');
+                cardCol.className = 'col-md-6 col-lg-4 mb-3';
+                cardCol.innerHTML = `
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f8f4ff, #f0e6ff);">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
+                                    <h5 class="text-primary mb-0">${expense.amount.toFixed(3)} د.ك</h5>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger ms-2" 
+                                        onclick="deleteDocumentExpense(${expense.id})"
+                                        title="حذف المصروف">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(cardCol);
+            });
+        } else {
+            cardsContainer.innerHTML = `
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="fas fa-inbox me-2 fa-lg"></i>
+                    <br><small>لا توجد مصروفات مستندات</small>
+                </div>
+            `;
+        }
+    })
+    .catch(error => console.error('Error loading document expenses:', error));
+}
+
+function deleteDocumentExpense(expenseId) {
+    if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
+        fetch(`/delete_expense_documents/${expenseId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                loadDocumentExpenses();
+                loadTotalExpenses(); // Update total expenses after deletion
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في حذف المصروف', 'error');
+        });
+    }
+}
+
+// Reports Functions
+function generateReport(reportType) {
+    const reportResults = document.getElementById('reportResults');
+    reportResults.style.display = 'block';
+    
+    let reportContent = '';
+    
+    switch(reportType) {
+        case 'revenues':
+            reportContent = generateRevenueReport();
+            break;
+        case 'expenses':
+            reportContent = generateExpenseReport();
+            break;
+        case 'profit':
+            reportContent = generateProfitReport();
+            break;
+        case 'comparison':
+            reportContent = generateComparisonReport();
+            break;
+    }
+    
+    reportResults.innerHTML = reportContent;
+}
+
+function generateRevenueReport() {
+    return `
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-coins me-2"></i>تقرير الإيرادات</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h6>الشحن الجوي</h6>
+                            <h4 class="text-primary" id="reportAirRevenue">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>الشحن البري</h6>
+                            <h4 class="text-success" id="reportLandRevenue">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>شحن المستندات</h6>
+                            <h4 class="text-warning" id="reportDocumentRevenue">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>الإجمالي</h6>
+                            <h4 class="text-info" id="reportTotalRevenue">0.000 د.ك</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function generateExpenseReport() {
+    return `
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-minus-circle me-2"></i>تقرير المصروفات</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6>المصروفات العامة</h6>
+                            <h4 class="text-success" id="reportGeneralExpenses">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>مصروفات المستندات</h6>
+                            <h4 class="text-primary" id="reportDocumentExpenses">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>إجمالي المصروفات</h6>
+                            <h4 class="text-danger" id="reportTotalExpenses">0.000 د.ك</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function generateProfitReport() {
+    return `
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>تقرير صافي الربح</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6>إجمالي الإيرادات</h6>
+                            <h4 class="text-primary" id="profitTotalRevenue">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>إجمالي المصروفات</h6>
+                            <h4 class="text-danger" id="profitTotalExpenses">0.000 د.ك</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>صافي الربح</h6>
+                            <h4 class="text-success" id="netProfit">0.000 د.ك</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function generateComparisonReport() {
+    return `
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-balance-scale me-2"></i>مقارنة الإيرادات والمصروفات</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="comparisonChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center">
+                                <h6>نسبة الربح</h6>
+                                <h3 class="text-success" id="profitPercentage">0%</h3>
+                                <hr>
+                                <h6>حالة الأعمال</h6>
+                                <h5 id="businessStatus" class="text-success">مربحة</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Notification function
+function showNotification(message, type) {
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show notification`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification && notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Auto-refresh revenues when new shipment is added
+function checkForRevenueUpdates() {
+    // Check if a new shipment was added (indicated by session flag)
+    fetch('/api/get_all_revenues')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update air shipping revenue
+                document.getElementById('airRevenueAmount').textContent = 
+                    (data.air_revenue || 0).toFixed(3) + ' د.ك';
+                
+                // Update land shipping revenue
+                document.getElementById('landRevenueAmount').textContent = 
+                    (data.land_revenue || 0).toFixed(3) + ' د.ك';
+                
+                // Update document shipping revenue
+                document.getElementById('documentRevenueAmount').textContent = 
+                    (data.document_revenue || 0).toFixed(3) + ' د.ك';
+                
+                // Update total revenue
+                document.getElementById('totalRevenueAmount').textContent = 
+                    (data.total_revenue || 0).toFixed(3) + ' د.ك';
+                
+                console.log('Revenue data updated automatically');
+            }
+        })
+        .catch(error => console.error('Error auto-updating revenues:', error));
+}
+
+// Check for updates every 10 seconds when on revenues tab
+let revenueUpdateInterval;
+
+function startRevenueAutoUpdate() {
+    // Clear any existing interval
+    if (revenueUpdateInterval) {
+        clearInterval(revenueUpdateInterval);
+    }
+    
+    // Start new interval for auto-updates
+    revenueUpdateInterval = setInterval(checkForRevenueUpdates, 10000);
+    
+    // Also check immediately
+    checkForRevenueUpdates();
+}
+
+function stopRevenueAutoUpdate() {
+    if (revenueUpdateInterval) {
+        clearInterval(revenueUpdateInterval);
+        revenueUpdateInterval = null;
+    }
+}
+
+// Enhanced tab switching with auto-update
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to tabs
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="pill"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (e) {
+            const targetTab = e.target.getAttribute('data-bs-target');
+            
+            if (targetTab === '#revenues') {
+                loadRevenues();
+                startRevenueAutoUpdate();
+            } else {
+                stopRevenueAutoUpdate();
+            }
+        });
+    });
+    
+    // If revenues tab is initially active, start auto-update
+    const activeTab = document.querySelector('.nav-link.active[data-bs-target="#revenues"]');
+    if (activeTab) {
+        startRevenueAutoUpdate();
+    }
+    
+    // General Shipments Expense Functions
+    document.getElementById('generalShipmentsExpenseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const submitButton = this.querySelector('button[type="submit"]');
+        
+        // Convert amount to proper number format
+        const amountInput = this.querySelector('input[name="amount"]');
+        const amountValue = parseFloat(amountInput.value);
+        if (isNaN(amountValue) || amountValue <= 0) {
+            showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+            return;
+        }
+        formData.set('amount', amountValue.toString());
+        
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+        submitButton.disabled = true;
+        
+        fetch('/add_expense_general_shipments', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                this.reset();
+                loadGeneralShipmentsExpenses();
+                loadTotalExpenses(); // Update total expenses
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+        })
+        .finally(() => {
+            submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ المصروف';
+            submitButton.disabled = false;
+        });
+    });
+    
+
+    
+
+    
+    // Load general shipments expenses on page load
+    loadGeneralShipmentsExpenses();
+});
+
+// Global function for loading general shipments expenses
+function loadGeneralShipmentsExpenses() {
+    fetch('/api/expenses_general_shipments')
+    .then(response => response.json())
+    .then(data => {
+        const tableBody = document.querySelector('#generalShipmentsExpensesTable tbody');
+        const noExpensesDiv = document.getElementById('generalShipmentsNoExpenses');
+        
+        if (data.success && data.expenses.length > 0) {
+            tableBody.innerHTML = '';
+            noExpensesDiv.style.display = 'none';
+            document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'block';
+            
+            data.expenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="fw-bold">${expense.name}</td>
+                    <td class="text-success fw-bold">${expense.amount.toFixed(3)} د.ك</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                onclick="deleteGeneralShipmentsExpense(${expense.id})"
+                                title="حذف المصروف">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            tableBody.innerHTML = '';
+            noExpensesDiv.style.display = 'block';
+            document.querySelector('#generalShipmentsExpensesTable').parentElement.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading general shipments expenses:', error);
+    });
+}
+
+// Global function for deleting general shipments expenses
+function deleteGeneralShipmentsExpense(expenseId) {
+    if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
+        fetch(`/delete_expense_general_shipments/${expenseId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                loadGeneralShipmentsExpenses();
+                loadTotalExpenses(); // Update total expenses
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في حذف المصروف', 'error');
+        });
+    }
+}
+
+// Load shipments for expense linking
+function loadShipmentsForLinking() {
+    fetch('/api/shipments_for_linking')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            populateShipmentSelects(data.shipments);
+        } else {
+            console.error('Failed to load shipments:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading shipments:', error);
+    });
+}
+
+// Populate all shipment select dropdowns
+function loadShipmentsForLinking() {
+    fetch('/api/shipments_for_linking')
+        .then(response => response.json())
+        .then(data => {
+            // Populate general shipment selects
+            populateShipmentSelect('generalExpenseShipmentSelect', data.general);
+            populateShipmentSelect('generalShipmentsShipmentSelect', data.general);
+            
+            // Populate document shipment select
+            populateShipmentSelect('documentExpenseShipmentSelect', data.documents);
+        })
+        .catch(error => {
+            console.error('Error loading shipments for linking:', error);
+        });
+}
+
+function populateShipmentSelect(selectId, shipments) {
+    const select = document.getElementById(selectId);
+    if (select) {
+        // Clear existing options except first
+        select.innerHTML = '<option value="">-- غير مرتبط بشحنة --</option>';
+        
+        // Add shipment options
+        shipments.forEach(shipment => {
+            const option = document.createElement('option');
+            option.value = shipment.id;
+            option.textContent = `${shipment.tracking_number} - ${shipment.sender_name} → ${shipment.receiver_name}`;
+            select.appendChild(option);
+        });
+    }
+}
+
+// Load category expenses data
+function loadCategoryExpenses() {
+    // Load general category expenses
+    fetch('/api/general_category_expenses')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('generalCategoryExpenses').textContent = data.total.toFixed(3) + ' د.ك';
+        })
+        .catch(error => console.error('Error loading general category expenses:', error));
+    
+    // Load document category expenses  
+    fetch('/api/document_category_expenses')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('documentCategoryExpenses').textContent = data.total.toFixed(3) + ' د.ك';
+        })
+        .catch(error => console.error('Error loading document category expenses:', error));
+}
+
+// Call on page load to load shipments and category expenses
+document.addEventListener('DOMContentLoaded', function() {
+    loadShipmentsForLinking();
+    loadCategoryExpenses();
+    
+    // Set default dates for profit/loss report (last 30 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    document.getElementById('profitEndDate').value = today.toISOString().split('T')[0];
+    document.getElementById('profitStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+});
+
+// Profit & Loss Report Functions for Separated Reports
+function loadProfitLossReport() {
+    const startDate = document.getElementById('profitStartDate').value;
+    const endDate = document.getElementById('profitEndDate').value;
+    
+    if (!startDate || !endDate) {
+        showNotification('يرجى تحديد تاريخ البداية والنهاية', 'error');
+        return;
+    }
+    
+    // Load both general and document reports
+    loadGeneralShipmentsProfitReport(startDate, endDate);
+    loadDocumentShipmentsProfitReport(startDate, endDate);
+}
+
+// Load General Shipments Profit/Loss Report
+function loadGeneralShipmentsProfitReport(startDate, endDate) {
+    const tableBody = document.getElementById('generalProfitLossTableBody');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="5" class="text-center text-muted py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                <br>جاري تحميل البيانات...
+            </td>
+        </tr>
+    `;
+    
+    // Fetch general shipments profit/loss data
+    fetch(`/api/general_shipments_profit_report?start_date=${startDate}&end_date=${endDate}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let tableHTML = '';
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+            
+            if (data.shipments && data.shipments.length > 0) {
+                data.shipments.forEach(shipment => {
+                    const revenue = parseFloat(shipment.price || 0);
+                    const expenses = parseFloat(shipment.category_expenses || 0);
+                    const netProfit = revenue - expenses;
+                    
+                    totalRevenue += revenue;
+                    totalExpenses += expenses;
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="text-center">${shipment.tracking_number}</td>
+                            <td class="text-center">
+                                <span class="badge ${getShippingMethodBadgeClass(shipment.shipping_method)}">
+                                    ${getShippingMethodIcon(shipment.shipping_method)} ${shipment.shipping_method || 'غير محدد'}
+                                </span>
+                            </td>
+                            <td class="text-center text-success fw-bold">${revenue.toFixed(3)}</td>
+                            <td class="text-center text-danger">${expenses.toFixed(3)}</td>
+                            <td class="text-center ${netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">
+                                ${netProfit.toFixed(3)}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle fa-2x mb-2"></i>
+                            <br>لا توجد شحنات عامة في الفترة المحددة
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tableBody.innerHTML = tableHTML;
+            
+            // Update summary
+            const netProfit = totalRevenue - totalExpenses;
+            document.getElementById('generalTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
+            document.getElementById('generalTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
+            document.getElementById('generalNetProfit').textContent = netProfit.toFixed(3) + ' د.ك';
+            document.getElementById('generalNetProfit').className = `h6 ${netProfit >= 0 ? 'text-success' : 'text-danger'}`;
+            
+            // Show summary
+            document.getElementById('generalSummary').style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading general shipments profit report:', error);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <br>حدث خطأ في تحميل البيانات
+                </td>
+            </tr>
+        `;
+    });
+}
+
+// Load Document Shipments Profit/Loss Report
+function loadDocumentShipmentsProfitReport(startDate, endDate) {
+    const tableBody = document.getElementById('documentProfitLossTableBody');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="5" class="text-center text-muted py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                <br>جاري تحميل البيانات...
+            </td>
+        </tr>
+    `;
+    
+    // Fetch document shipments profit/loss data
+    fetch(`/api/document_shipments_profit_report?start_date=${startDate}&end_date=${endDate}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let tableHTML = '';
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+            
+            if (data.shipments && data.shipments.length > 0) {
+                data.shipments.forEach(shipment => {
+                    const revenue = parseFloat(shipment.price || 0);
+                    const expenses = parseFloat(shipment.category_expenses || 0);
+                    const netProfit = revenue - expenses;
+                    
+                    totalRevenue += revenue;
+                    totalExpenses += expenses;
+                    
+                    tableHTML += `
+                        <tr>
+                            <td class="text-center">${shipment.tracking_number}</td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-file-alt me-1"></i>${shipment.document_type || 'مستندات'}
+                                </span>
+                            </td>
+                            <td class="text-center text-success fw-bold">${revenue.toFixed(3)}</td>
+                            <td class="text-center text-danger">${expenses.toFixed(3)}</td>
+                            <td class="text-center ${netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">
+                                ${netProfit.toFixed(3)}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle fa-2x mb-2"></i>
+                            <br>لا توجد شحنات مستندات في الفترة المحددة
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tableBody.innerHTML = tableHTML;
+            
+            // Update summary
+            const netProfit = totalRevenue - totalExpenses;
+            document.getElementById('documentTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
+            document.getElementById('documentTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
+            document.getElementById('documentNetProfit').textContent = netProfit.toFixed(3) + ' د.ك';
+            document.getElementById('documentNetProfit').className = `h6 ${netProfit >= 0 ? 'text-success' : 'text-danger'}`;
+            
+            // Show summary
+            document.getElementById('documentSummary').style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading document shipments profit report:', error);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <br>حدث خطأ في تحميل البيانات
+                </td>
+            </tr>
+        `;
+    });
+}
+
+// Helper functions for shipping method badges
+function getShippingMethodBadgeClass(method) {
+    if (method === 'جوي') return 'bg-primary';
+    if (method === 'بري') return 'bg-success';
+    return 'bg-secondary';
+}
+
+function getShippingMethodIcon(method) {
+    if (method === 'جوي') return '<i class="fas fa-plane me-1"></i>';
+    if (method === 'بري') return '<i class="fas fa-truck me-1"></i>';
+    return '<i class="fas fa-box me-1"></i>';
+}
+
+// Print functions
+function printGeneralShipmentsExpenses() {
+    const tableContent = document.getElementById('generalShipmentsExpensesTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>مصروفات الشحنات العامة</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #f8f9fa; font-weight: bold; }
+                .table-primary th { background-color: #0d6efd; color: white; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">مصروفات الشحنات العامة</h2>
+            ${tableContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printGeneralProfitLossTable() {
+    const tableContent = document.getElementById('generalProfitLossTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>تقرير الربح والخسارة - الشحنات العامة</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #1e1e2f; color: white; font-weight: bold; }
+                .text-success { color: #28a745; }
+                .text-danger { color: #dc3545; }
+                .text-primary { color: #0d6efd; }
+                .fw-bold { font-weight: bold; }
+                .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8em; }
+                .bg-primary { background-color: #0d6efd; color: white; }
+                .bg-success { background-color: #28a745; color: white; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">تقرير الربح والخسارة - الشحنات العامة</h2>
+            ${tableContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printDocumentProfitLossTable() {
+    const tableContent = document.getElementById('documentProfitLossTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>تقرير الربح والخسارة - شحنات المستندات</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #1e1e2f; color: white; font-weight: bold; }
+                .text-success { color: #28a745; }
+                .text-danger { color: #dc3545; }
+                .text-primary { color: #0d6efd; }
+                .fw-bold { font-weight: bold; }
+                .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8em; }
+                .bg-info { background-color: #0dcaf0; color: black; }
+                .bg-secondary { background-color: #6c757d; color: white; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">تقرير الربح والخسارة - شحنات المستندات</h2>
+            ${tableContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printGeneralExpenses() {
+    const cardsContainer = document.getElementById('generalExpensesCards');
+    const cards = cardsContainer.querySelectorAll('.card');
+    
+    if (cards.length === 0 || cardsContainer.innerHTML.includes('لا توجد مصروفات عامة')) {
+        alert('لا توجد مصروفات عامة للطباعة');
+        return;
+    }
+
+    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+    
+    cards.forEach(card => {
+        const nameElement = card.querySelector('.fw-bold');
+        const amountElement = card.querySelector('.text-success');
+        const dateElement = card.querySelector('.text-muted small');
+        const notesElement = card.querySelector('.text-secondary');
+        
+        if (nameElement && amountElement) {
+            const name = nameElement.textContent.trim();
+            const amount = amountElement.textContent.trim();
+            const date = dateElement ? dateElement.textContent.trim() : '';
+            const notes = notesElement ? notesElement.textContent.trim() : '';
+            
+            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${date}</td><td>${notes}</td></tr>`;
+        }
+    });
+    
+    expensesHTML += '</tbody></table>';
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>مصروفات المكتب</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #28a745; color: white; font-weight: bold; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">مصروفات المكتب</h2>
+            ${expensesHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function printDocumentExpenses() {
+    const cardsContainer = document.getElementById('documentExpensesCards');
+    const cards = cardsContainer.querySelectorAll('.card');
+    
+    if (cards.length === 0 || cardsContainer.innerHTML.includes('لا توجد مصروفات مستندات')) {
+        alert('لا توجد مصروفات مستندات للطباعة');
+        return;
+    }
+
+    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+    
+    cards.forEach(card => {
+        const nameElement = card.querySelector('.fw-bold');
+        const amountElement = card.querySelector('.text-success');
+        const dateElement = card.querySelector('.text-muted small');
+        const notesElement = card.querySelector('.text-secondary');
+        
+        if (nameElement && amountElement) {
+            const name = nameElement.textContent.trim();
+            const amount = amountElement.textContent.trim();
+            const date = dateElement ? dateElement.textContent.trim() : '';
+            const notes = notesElement ? notesElement.textContent.trim() : '';
+            
+            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${date}</td><td>${notes}</td></tr>`;
+        }
+    });
+    
+    expensesHTML += '</tbody></table>';
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>مصروفات شحن المستندات</title>
+            <style>
+                body { font-family: 'Tajawal', 'Cairo', sans-serif; direction: rtl; }
+                .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                .table th { background-color: #6f42c1; color: white; font-weight: bold; }
+                @media print {
+                    body { margin: 0; padding: 20px; }
+                    .table { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align: center; margin-bottom: 30px;">مصروفات شحن المستندات</h2>
+            ${expensesHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+</script>
+{% endblock %}

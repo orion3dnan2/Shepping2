@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة الشحنة - {{ shipment.tracking_number }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: white;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.4;
+            color: #000;
+            font-size: 13px;
+        }
+        
+        .invoice-container {
+            max-width: 19cm;
+            height: 12.5cm;
+            margin: 0 auto;
+            background: white;
+            padding: 0.6cm;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #000;
+            position: relative;
+        }
+        
+        .invoice-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.4cm;
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.3cm;
+            gap: 15px;
+        }
+        
+        .morsal-logo-invoice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .morsal-text-invoice {
+            font-size: 16px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .morsal-m-invoice {
+            background: #dc2626;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .company-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.1cm;
+            color: #000;
+        }
+        
+        .invoice-title {
+            background: white;
+            color: #000;
+            padding: 0.25cm;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid #000;
+            margin-bottom: 0.3cm;
+        }
+        
+        .tracking-section {
+            background: white;
+            color: #000;
+            padding: 0.25cm;
+            border: 1px solid #000;
+            text-align: center;
+            margin-bottom: 0.3cm;
+        }
+        
+        .tracking-label {
+            font-size: 0.8rem;
+            margin-bottom: 0.1cm;
+            font-weight: 500;
+        }
+        
+        .tracking-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3cm;
+            margin-bottom: 0.3cm;
+            flex: 1;
+        }
+        
+        .info-section {
+            background: white;
+            padding: 0.3cm;
+            border: 1px solid #000;
+            font-size: 0.75rem;
+        }
+        
+        .info-section h3 {
+            background: white;
+            color: #000;
+            padding: 0.15cm;
+            margin: -0.3cm -0.3cm 0.2cm -0.3cm;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-bottom: 1px solid #000;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.1cm 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #000;
+            flex: 1;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #000;
+            flex: 1.2;
+            text-align: left;
+        }
+        
+        .price-section {
+            background: white;
+            color: #000;
+            padding: 0.25cm;
+            border: 2px solid #000;
+            text-align: center;
+            margin-bottom: 0.3cm;
+        }
+        
+        .price-label {
+            font-size: 0.8rem;
+            margin-bottom: 0.1cm;
+            font-weight: 600;
+        }
+        
+        .price-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .signatures-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4cm;
+            margin-top: auto;
+            padding-top: 0.3cm;
+        }
+        
+        .signature-section {
+            padding: 0.25cm;
+            background: white;
+            border: 1px solid #000;
+            text-align: center;
+            min-height: 1.2cm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .signature-box {
+            border-bottom: 2px dashed #000;
+            background: white;
+            height: 0.8cm;
+            width: 100%;
+            margin: 0.2cm 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .signature-label {
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.1cm;
+        }
+        
+
+        
+        .action-buttons {
+            text-align: center;
+            margin: 0.3cm 0;
+            gap: 1cm;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 0.3cm 0.6cm;
+            border: 2px solid #000;
+            background: white;
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #f8f9fa;
+        }
+        
+        @media print {
+            @page {
+                size: A5;
+                margin: 0.4cm;
+            }
+            
+            body {
+                background: white;
+                font-size: 11px;
+                color: #000;
+            }
+            
+            .invoice-container {
+                height: auto;
+                max-height: 11cm;
+                margin: 0;
+                padding: 0.3cm;
+                border: 2px solid #000;
+            }
+            
+            .action-buttons {
+                display: none;
+            }
+            
+            .company-name {
+                font-size: 1.1rem;
+            }
+            
+            .tracking-number {
+                font-size: 1rem;
+            }
+            
+            .price-value {
+                font-size: 1.1rem;
+            }
+            
+            .info-section {
+                font-size: 0.7rem;
+            }
+            
+            .signature-box {
+                height: 0.6cm;
+                border-bottom: 2px dashed #000;
+            }
+            
+            .signatures-container {
+                gap: 0.2cm;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .invoice-container {
+                padding: 0.4cm;
+                height: auto;
+                max-width: 90%;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 0.2cm;
+            }
+            
+            .logo {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+            
+            .company-name {
+                font-size: 1.1rem;
+            }
+            
+            .tracking-number {
+                font-size: 1rem;
+            }
+            
+            .price-value {
+                font-size: 1.1rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.2cm;
+            }
+            
+            .info-section {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="morsal-logo-invoice">
+                <div class="morsal-text-invoice">مرسال</div>
+                <div class="morsal-m-invoice">M</div>
+            </div>
+            <div class="company-name">مرسال إكسبرس للاستيراد والتصدير</div>
+        </div>
+
+        <!-- Invoice Title -->
+        <div class="invoice-title">
+            فاتورة شحنة
+        </div>
+
+        <!-- Tracking Number -->
+        <div class="tracking-section">
+            <div class="tracking-label">رقم التتبع</div>
+            <div class="tracking-number">{{ shipment.tracking_number }}</div>
+        </div>
+
+        <!-- Main Information Grid -->
+        <div class="info-grid">
+            <!-- Sender Information -->
+            <div class="info-section">
+                <h3>بيانات المرسل</h3>
+                <div class="info-item">
+                    <span class="info-label">الاسم:</span>
+                    <span class="info-value">{{ shipment.sender_name or 'غير محدد' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">الهاتف:</span>
+                    <span class="info-value">{{ shipment.sender_phone or 'غير محدد' }}</span>
+                </div>
+                {% if shipment.sender_address %}
+                <div class="info-item">
+                    <span class="info-label">العنوان:</span>
+                    <span class="info-value">{{ shipment.sender_address }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Receiver Information -->
+            <div class="info-section">
+                <h3>بيانات المستقبل</h3>
+                <div class="info-item">
+                    <span class="info-label">الاسم:</span>
+                    <span class="info-value">{{ shipment.receiver_name or 'غير محدد' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">الهاتف:</span>
+                    <span class="info-value">{{ shipment.receiver_phone or 'غير محدد' }}</span>
+                </div>
+                {% if shipment.receiver_address %}
+                <div class="info-item">
+                    <span class="info-label">العنوان:</span>
+                    <span class="info-value">{{ shipment.receiver_address }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Shipment Details -->
+        <div class="info-section" style="margin-bottom: 0.3cm;">
+            <h3>تفاصيل الشحنة</h3>
+            <div class="info-item">
+                <span class="info-label">نوع الشحنة:</span>
+                <span class="info-value">
+                    {% if shipment.package_type == 'document' %}
+                        مستندات
+                    {% elif shipment.package_type == 'electronics' %}
+                        إلكترونيات
+                    {% elif shipment.package_type == 'clothes' %}
+                        ملابس
+                    {% elif shipment.package_type == 'books' %}
+                        كتب
+                    {% elif shipment.package_type == 'medicine' %}
+                        أدوية
+                    {% elif shipment.package_type == 'food' %}
+                        مواد غذائية
+                    {% elif shipment.package_type == 'general' %}
+                        عام
+                    {% else %}
+                        {{ shipment.package_type }}
+                    {% endif %}
+                </span>
+            </div>
+            {% if shipment.package_type == 'document' %}
+            <div class="info-item">
+                <span class="info-label">نوع الإجراء:</span>
+                <span class="info-value">
+                    {% if shipment.document_type %}
+                        {% if shipment.document_type == 'certificate' %}
+                            شهادة
+                        {% elif shipment.document_type == 'official_document' %}
+                            وثيقة رسمية
+                        {% elif shipment.document_type == 'passport' %}
+                            جواز سفر
+                        {% elif shipment.document_type == 'contract' %}
+                            عقد
+                        {% else %}
+                            {{ shipment.document_type }}
+                        {% endif %}
+                    {% else %}
+                        إجراءات عامة
+                    {% endif %}
+                </span>
+            </div>
+            {% else %}
+            <div class="info-item">
+                <span class="info-label">المحتويات:</span>
+                <span class="info-value">
+                    {% if shipment.package_contents %}
+                        {{ shipment.package_contents }}
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </span>
+            </div>
+            {% if shipment.weight %}
+            <div class="info-item">
+                <span class="info-label">الوزن:</span>
+                <span class="info-value">{{ shipment.weight }} كغ</span>
+            </div>
+            {% endif %}
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">التاريخ:</span>
+                <span class="info-value">{{ shipment.created_at.strftime('%Y-%m-%d') }}</span>
+            </div>
+        </div>
+
+        <!-- Price -->
+        <div class="price-section">
+            <div class="price-label">إجمالي المبلغ</div>
+            <div class="price-value">{{ "%.3f"|format(shipment.price) }} د.ك</div>
+        </div>
+
+        <!-- Signature Sections -->
+        <div class="signatures-container">
+            <div class="signature-section">
+                <div class="signature-label">توقيع الموظف</div>
+                <div class="signature-box"></div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-label">توقيع المرسل</div>
+                <div class="signature-box"></div>
+            </div>
+        </div>
+
+
+
+        <!-- Action Buttons (hidden in print) -->
+        <div class="action-buttons">
+            <button class="btn btn-print" onclick="window.print()">طباعة</button>
+            <button class="btn btn-close" onclick="window.close()">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        // Auto focus on print button when page loads
+        window.onload = function() {
+            document.querySelector('.btn-print').focus();
+        };
+        
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+            if (e.key === 'Escape') {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1831 @@
+{% extends "base.html" %}
+
+{% block title %}الشحنات{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Tab Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-pills nav-fill shipments-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="general-tab" data-bs-toggle="pill" data-bs-target="#general-shipments" type="button" role="tab" aria-controls="general-shipments" aria-selected="true">
+                        <i class="fas fa-box me-2"></i>
+                        الشحنات العامة
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="document-tab" data-bs-toggle="pill" data-bs-target="#document-shipments" type="button" role="tab" aria-controls="document-shipments" aria-selected="false">
+                        <i class="fas fa-file-alt me-2"></i>
+                        شحنات المستندات
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="unpaid-tab" data-bs-toggle="pill" data-bs-target="#unpaid-shipments" type="button" role="tab" aria-controls="unpaid-shipments" aria-selected="false">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        شحنات غير مكتملة الدفع
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="shipmentsTabContent">
+        <!-- General Shipments Tab -->
+        <div class="tab-pane fade show active" id="general-shipments" role="tabpanel" aria-labelledby="general-tab">
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold text-dark">
+                        <i class="fas fa-box me-2"></i>
+                        الشحنات العامة
+                    </h2>
+                    <div class="d-flex gap-2">
+                        <button onclick="printShipmentTable('general')" class="btn btn-outline-secondary">
+                            <i class="fas fa-print me-2"></i>طباعة الشحنات
+                        </button>
+                        <button onclick="exportCSV('general')" class="btn btn-outline-success">
+                            <i class="fas fa-file-csv me-2"></i>تصدير CSV
+                        </button>
+                        {% if current_user.has_permission('add_shipment') %}
+                        <a href="{{ url_for('add_shipment') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>إضافة شحنة جديدة
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- General Shipments Status Sub-tabs -->
+                <div class="status-tabs-container mb-4">
+                    <ul class="nav nav-pills status-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-status="all" data-type="general" onclick="filterByStatus('general', 'all', this)">
+                                <i class="fas fa-list me-1"></i>عرض الكل
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="created" data-type="general" onclick="filterByStatus('general', 'created', this)">
+                                <i class="fas fa-plus-circle me-1"></i>تم الإنشاء
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="packaged" data-type="general" onclick="filterByStatus('general', 'packaged', this)">
+                                <i class="fas fa-box me-1"></i>تم التغليف
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="dispatching" data-type="general" onclick="filterByStatus('general', 'dispatching', this)">
+                                <i class="fas fa-shipping-fast me-1"></i>جاري الإرسال
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="shipped" data-type="general" onclick="filterByStatus('general', 'shipped', this)">
+                                <i class="fas fa-plane me-1"></i>تم الإرسال
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="in_transit" data-type="general" onclick="filterByStatus('general', 'in_transit', this)">
+                                <i class="fas fa-truck me-1"></i>في الطريق
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="received" data-type="general" onclick="filterByStatus('general', 'received', this)">
+                                <i class="fas fa-hand-holding me-1"></i>تم الاستلام
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="delivered" data-type="general" onclick="filterByStatus('general', 'delivered', this)">
+                                <i class="fas fa-check-circle me-1"></i>تم التسليم
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="cancelled" data-type="general" onclick="filterByStatus('general', 'cancelled', this)">
+                                <i class="fas fa-times-circle me-1"></i>ملغاة
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+        <!-- General Shipments Table -->
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">الشحنات العامة</h6>
+                <button class="btn btn-outline-success btn-sm" onclick="printShipmentTable('general')">
+                    <i class="fas fa-print me-1"></i>
+                    طباعة الجدول
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="generalShipmentsTable">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="text-center tracking-cell">رقم التتبع</th>
+                                <th class="text-center status-cell">حالة الشحنة</th>
+                                <th class="text-center sender-cell">اسم المرسل</th>
+                                <th class="text-center receiver-cell">اسم المستلم</th>
+                                <th class="text-center shipping-method-cell">طريق الشحن</th>
+                                <th class="text-center weight-cell">الوزن</th>
+                                <th class="text-center contents-cell">المحتويات</th>
+                                <th class="text-center date-cell">التاريخ</th>
+                                <th class="text-center actions-cell">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shipment in regular_shipments %}
+                            <tr class="shipment-row">
+                                <td class="tracking-cell text-center">
+                                    <a href="{{ url_for('track_shipment', tracking_number=shipment.tracking_number) }}" 
+                                       class="tracking-link">
+                                        {{ shipment.tracking_number }}
+                                    </a>
+                                </td>
+                                <td class="status-cell text-center">
+                                    {% set status_info = get_shipment_status_display(shipment.status) %}
+                                    <span class="status-badge {{ status_info.class }}">{{ status_info.name }}</span>
+                                </td>
+                                <td class="sender-cell text-center">
+                                    <div class="user-name">{{ shipment.sender_name }}</div>
+                                </td>
+                                <td class="receiver-cell text-center">
+                                    <div class="user-name">{{ shipment.receiver_name }}</div>
+                                </td>
+                                <td class="shipping-method-cell text-center">
+                                    {% if shipment.shipping_method %}
+                                        {% if shipment.shipping_method == 'جوي' %}
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-plane me-1"></i>جوي
+                                            </span>
+                                        {% elif shipment.shipping_method == 'بري' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-truck me-1"></i>بري
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ shipment.shipping_method }}</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="weight-cell text-center">
+                                    {% if shipment.weight and shipment.weight > 0 %}
+                                        {{ "%.2f"|format(shipment.weight) }} كج
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="contents-cell text-center">
+                                    {% if shipment.package_contents %}
+                                        {{ shipment.package_contents }}
+                                    {% else %}
+                                        {{ shipment.package_type }}
+                                    {% endif %}
+                                </td>
+                                <td class="date-cell text-center">
+                                    <div class="date-info">
+                                        <div class="date-main">{{ shipment.created_at.strftime('%Y-%m-%d') }}</div>
+                                        <div class="date-time">{{ shipment.created_at.strftime('%H:%M') }}</div>
+                                    </div>
+                                </td>
+                                <td class="actions-cell text-center">
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit-btn" 
+                                                onclick="location.href='{{ url_for('edit_shipment', shipment_id=shipment.id) }}'"
+                                                title="تعديل الشحنة">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" 
+                                                onclick="confirmDelete({{ shipment.id }}, '{{ shipment.tracking_number }}')"
+                                                title="حذف الشحنة">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="action-btn print-btn" 
+                                                onclick="window.open('{{ url_for('print_invoice', shipment_id=shipment.id) }}', '_blank')"
+                                                title="طباعة فاتورة">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <button class="action-btn sticker-btn" 
+                                                onclick="window.open('{{ url_for('print_sticker', shipment_id=shipment.id) }}', '_blank')"
+                                                title="طباعة استيكر">
+                                            <i class="fas fa-tag"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not regular_shipments %}
+                            <tr>
+                                <td colspan="10" class="text-center py-4">
+                                    <div class="empty-state">
+                                        <i class="fas fa-box-open text-muted mb-3" style="font-size: 3rem;"></i>
+                                        <p class="text-muted">لا توجد شحنات عامة</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+
+        <!-- Document Shipments Tab -->
+        <div class="tab-pane fade" id="document-shipments" role="tabpanel" aria-labelledby="document-tab">
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold text-dark">
+                        <i class="fas fa-file-alt me-2"></i>
+                        شحنات المستندات
+                    </h2>
+                    <div class="d-flex gap-2">
+                        <button onclick="printShipmentTable('document')" class="btn btn-outline-secondary">
+                            <i class="fas fa-print me-2"></i>طباعة الشحنات
+                        </button>
+                        <button onclick="exportCSV('document')" class="btn btn-outline-success">
+                            <i class="fas fa-file-csv me-2"></i>تصدير CSV
+                        </button>
+                        {% if current_user.has_permission('add_shipment') %}
+                        <a href="{{ url_for('add_shipment') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>إضافة شحنة جديدة
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Document Shipments Status Sub-tabs -->
+                <div class="status-tabs-container mb-4">
+                    <ul class="nav nav-pills status-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-status="all" data-type="document" onclick="filterByStatus('document', 'all', this)">
+                                <i class="fas fa-list me-1"></i>عرض الكل
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="created" data-type="document" onclick="filterByStatus('document', 'created', this)">
+                                <i class="fas fa-plus-circle me-1"></i>تم الإنشاء
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="packaged" data-type="document" onclick="filterByStatus('document', 'packaged', this)">
+                                <i class="fas fa-box me-1"></i>تم التغليف
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="dispatching" data-type="document" onclick="filterByStatus('document', 'dispatching', this)">
+                                <i class="fas fa-shipping-fast me-1"></i>جاري الإرسال
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="shipped" data-type="document" onclick="filterByStatus('document', 'shipped', this)">
+                                <i class="fas fa-plane me-1"></i>تم الإرسال
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="in_transit" data-type="document" onclick="filterByStatus('document', 'in_transit', this)">
+                                <i class="fas fa-truck me-1"></i>في الطريق
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="received" data-type="document" onclick="filterByStatus('document', 'received', this)">
+                                <i class="fas fa-hand-holding me-1"></i>تم الاستلام
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="delivered" data-type="document" onclick="filterByStatus('document', 'delivered', this)">
+                                <i class="fas fa-check-circle me-1"></i>تم التسليم
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-status="cancelled" data-type="document" onclick="filterByStatus('document', 'cancelled', this)">
+                                <i class="fas fa-times-circle me-1"></i>ملغاة
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+        <!-- Document Shipments Table -->
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">شحنات المستندات</h6>
+                <button class="btn btn-outline-success btn-sm" onclick="printShipmentTable('document')">
+                    <i class="fas fa-print me-1"></i>
+                    طباعة الجدول
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="documentShipmentsTable">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="text-center tracking-cell">رقم التتبع</th>
+                                <th class="text-center status-cell">حالة الشحنة</th>
+                                <th class="text-center sender-cell">اسم المرسل</th>
+                                <th class="text-center receiver-cell">اسم المستلم</th>
+                                <th class="text-center document-type-cell">نوع المستند</th>
+                                <th class="text-center contents-cell">الإجراء</th>
+                                <th class="text-center date-cell">التاريخ</th>
+                                <th class="text-center actions-cell">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shipment in document_shipments %}
+                            <tr class="shipment-row">
+                                <td class="tracking-cell text-center">
+                                    <a href="{{ url_for('track_document', tracking_number=shipment.tracking_number) }}" 
+                                       class="tracking-link">
+                                        {{ shipment.tracking_number }}
+                                    </a>
+                                </td>
+                                <td class="status-cell text-center">
+                                    {% set status_info = get_shipment_status_display(shipment.status) %}
+                                    <span class="status-badge {{ status_info.class }}">{{ status_info.name }}</span>
+                                </td>
+                                <td class="sender-cell text-center">
+                                    <div class="user-name">{{ shipment.sender_name }}</div>
+                                </td>
+                                <td class="receiver-cell text-center">
+                                    <div class="user-name">{{ shipment.receiver_name }}</div>
+                                </td>
+                                <td class="document-type-cell text-center">
+                                    {% if shipment.document_type %}
+                                        {{ get_document_type_arabic(shipment.document_type) }}
+                                    {% else %}
+                                        مستندات
+                                    {% endif %}
+                                </td>
+                                <td class="contents-cell text-center">
+                                    {% if shipment.package_contents %}
+                                        {{ shipment.package_contents }}
+                                    {% else %}
+                                        غير محدد
+                                    {% endif %}
+                                </td>
+                                <td class="date-cell text-center">
+                                    <div class="date-info">
+                                        <div class="date-main">{{ shipment.created_at.strftime('%Y-%m-%d') }}</div>
+                                        <div class="date-time">{{ shipment.created_at.strftime('%H:%M') }}</div>
+                                    </div>
+                                </td>
+                                <td class="actions-cell text-center">
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit-btn" 
+                                                onclick="location.href='{{ url_for('edit_shipment', shipment_id=shipment.id) }}'"
+                                                title="تعديل الشحنة">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" 
+                                                onclick="confirmDelete({{ shipment.id }}, '{{ shipment.tracking_number }}')"
+                                                title="حذف الشحنة">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="action-btn print-btn" 
+                                                onclick="window.open('{{ url_for('print_invoice', shipment_id=shipment.id) }}', '_blank')"
+                                                title="طباعة فاتورة">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <button class="action-btn sticker-btn" 
+                                                onclick="window.open('{{ url_for('print_sticker', shipment_id=shipment.id) }}', '_blank')"
+                                                title="طباعة استيكر">
+                                            <i class="fas fa-tag"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not document_shipments %}
+                            <tr>
+                                <td colspan="9" class="text-center py-4">
+                                    <div class="empty-state">
+                                        <i class="fas fa-file-alt text-muted mb-3" style="font-size: 3rem;"></i>
+                                        <p class="text-muted">لا توجد شحنات مستندات</p>
+                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+        
+        <!-- Unpaid Shipments Tab -->
+        <div class="tab-pane fade" id="unpaid-shipments" role="tabpanel" aria-labelledby="unpaid-tab">
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold text-dark">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        شحنات غير مكتملة الدفع
+                    </h2>
+                    <div class="d-flex gap-2">
+                        <button onclick="printTable('unpaidShipmentsTable')" class="btn btn-outline-secondary">
+                            <i class="fas fa-print me-2"></i>طباعة الجدول
+                        </button>
+                        <button onclick="exportCSV('unpaid')" class="btn btn-outline-success">
+                            <i class="fas fa-file-csv me-2"></i>تصدير CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Unpaid Shipments Table -->
+                <div class="table-container">
+                    <table class="table table-striped table-hover align-middle" id="unpaidShipmentsTable">
+                        <thead>
+                            <tr>
+                                <th class="tracking-column">رقم التتبع</th>
+                                <th class="sender-column">اسم المرسل</th>
+                                <th class="receiver-column">اسم المستلم</th>
+                                <th class="cost-column">تكلفة الشحنة</th>
+                                <th class="paid-column">المبلغ المدفوع</th>
+                                <th class="remaining-column">المبلغ المتبقي</th>
+                                <th class="payment-column">تم الدفع</th>
+                                <th class="actions-column">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shipment in unpaid_shipments %}
+                            <tr data-shipment-id="{{ shipment.id }}">
+                                <td class="tracking-column">
+                                    <a href="{% if shipment.package_type == 'document' %}{{ url_for('track_document', tracking_number=shipment.tracking_number) }}{% else %}{{ url_for('track_shipment', tracking_number=shipment.tracking_number) }}{% endif %}" 
+                                       class="text-decoration-none fw-bold tracking-link" 
+                                       title="تتبع الشحنة">
+                                        {{ shipment.tracking_number }}
+                                    </a>
+                                </td>
+                                <td class="sender-column">
+                                    <div class="sender-info">
+                                        <div class="sender-name">{{ shipment.sender_name }}</div>
+                                    </div>
+                                </td>
+                                <td class="receiver-column">
+                                    <div class="receiver-info">
+                                        <div class="receiver-name">{{ shipment.receiver_name }}</div>
+                                    </div>
+                                </td>
+                                <td class="cost-column text-center">
+                                    <span class="fw-bold text-primary">{{ "%.3f" | format(shipment.price) }} د.ك</span>
+                                </td>
+                                <td class="paid-column text-center">
+                                    <span class="fw-bold text-success">{{ "%.3f" | format(shipment.paid_amount if shipment.paid_amount else 0.0) }} د.ك</span>
+                                </td>
+                                <td class="remaining-column text-center">
+                                    <span class="fw-bold text-danger">{{ "%.3f" | format(shipment.remaining_amount if shipment.remaining_amount is not none else 0.0) }} د.ك</span>
+                                </td>
+                                <td class="payment-column text-center">
+                                    <button type="button" class="btn btn-sm btn-success" 
+                                            onclick="openPaymentModal({{ shipment.id }}, '{{ shipment.tracking_number }}', {{ shipment.remaining_amount if shipment.remaining_amount is not none else 0.0 }})"
+                                            title="إكمال الدفع">
+                                        <i class="fas fa-credit-card"></i>
+                                    </button>
+                                </td>
+                                <td class="actions-column">
+                                    <div class="btn-group" role="group">
+                                        {% if current_user.has_permission('Home') %}
+                                        <a href="{{ url_for('edit_shipment', shipment_id=shipment.id) }}" 
+                                           class="btn btn-sm btn-outline-purple action-btn" 
+                                           title="تعديل الشحنة">
+                                            ✏️
+                                        </a>
+                                        {% endif %}
+                                        
+                                        <a href="{{ url_for('print_invoice', shipment_id=shipment.id) }}" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-info action-btn" 
+                                           title="طباعة الفاتورة">
+                                            🖨️
+                                        </a>
+                                        
+                                        {% if current_user.has_permission('Home') %}
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger action-btn" 
+                                                onclick="confirmDelete({{ shipment.id }}, '{{ shipment.tracking_number }}')" 
+                                                title="حذف الشحنة">
+                                            🗑️
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="empty-state">
+                                        <i class="fas fa-check-circle text-success" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                        <h5 class="text-muted">جميع الشحنات مدفوعة بالكامل!</h5>
+                                        <p class="text-muted">لا توجد شحنات بمبالغ مستحقة في الوقت الحالي.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">تأكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف الشحنة رقم <strong id="shipmentNumber"></strong>؟</p>
+                <p class="text-danger">هذا الإجراء لا يمكن التراجع عنه.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">حذف</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Tab Styling */
+.shipments-tabs {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 0.25rem;
+    margin-bottom: 2rem;
+}
+
+.shipments-tabs .nav-link {
+    border-radius: 8px;
+    border: none;
+    color: #6c757d;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    margin: 0 0.25rem;
+}
+
+.shipments-tabs .nav-link:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.shipments-tabs .nav-link.active {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.shipments-tabs .nav-link i {
+    margin-left: 0.5rem;
+}
+
+.tab-content {
+    min-height: 400px;
+}
+
+.tab-pane {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.tab-pane.active.show {
+    opacity: 1;
+}
+
+/* Mobile responsiveness for tabs */
+@media (max-width: 768px) {
+    .shipments-tabs .nav-link {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .shipments-tabs .nav-link i {
+        display: none;
+    }
+}
+
+/* Status Sub-tabs Styling */
+.status-tabs-container {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.status-tabs {
+    margin-bottom: 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.status-tabs .nav-item {
+    flex: 1;
+    min-width: 140px;
+}
+
+.status-tabs .nav-link {
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-tabs .nav-link:hover {
+    background: #e9ecef;
+    color: #495057;
+    border-color: #adb5bd;
+}
+
+.status-tabs .nav-link.active {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-color: #28a745;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.status-tabs .nav-link i {
+    margin-left: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* Status-specific colors */
+.status-tabs .nav-link[data-status="all"].active {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+.status-tabs .nav-link[data-status="created"].active {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.status-tabs .nav-link[data-status="packaged"].active {
+    background: linear-gradient(135deg, #6f42c1, #5a2d91);
+}
+
+.status-tabs .nav-link[data-status="dispatching"].active {
+    background: linear-gradient(135deg, #fd7e14, #e55100);
+}
+
+.status-tabs .nav-link[data-status="shipped"].active {
+    background: linear-gradient(135deg, #20c997, #17a589);
+}
+
+.status-tabs .nav-link[data-status="in_transit"].active {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+.status-tabs .nav-link[data-status="received"].active {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+}
+
+.status-tabs .nav-link[data-status="delivered"].active {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.status-tabs .nav-link[data-status="cancelled"].active {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+/* Mobile responsiveness for status tabs */
+@media (max-width: 768px) {
+    .status-tabs .nav-item {
+        min-width: 120px;
+        flex: 1 1 calc(50% - 0.5rem);
+    }
+    
+    .status-tabs .nav-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    .status-tabs .nav-link i {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .status-tabs .nav-item {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+    
+    .status-tabs-container {
+        padding: 0.75rem;
+    }
+}
+
+/* Table Styling */
+.table-header {
+    background: linear-gradient(135deg, #1e1e2f 0%, #2d3748 100%);
+    color: white;
+}
+
+.table-header th {
+    border: none;
+    padding: 0.75rem 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.shipment-row {
+    border-bottom: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.shipment-row:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.shipment-row td {
+    padding: 0.75rem 0.5rem;
+    vertical-align: middle;
+    border: none;
+    font-size: 0.9rem;
+}
+
+/* Column Width Optimization */
+.tracking-cell {
+    width: 12%;
+    min-width: 100px;
+}
+
+.status-cell {
+    width: 10%;
+    min-width: 90px;
+}
+
+.sender-cell,
+.receiver-cell {
+    width: 14%;
+    min-width: 110px;
+}
+
+.shipping-method-cell {
+    width: 10%;
+    min-width: 90px;
+}
+
+.weight-cell {
+    width: 8%;
+    min-width: 70px;
+}
+
+.document-type-cell {
+    width: 8%;
+    min-width: 70px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.contents-cell {
+    width: 18%;
+    min-width: 140px;
+}
+
+.cost-cell {
+    width: 10%;
+    min-width: 80px;
+}
+
+.date-cell {
+    width: 12%;
+    min-width: 100px;
+}
+
+.actions-cell {
+    width: 8%;
+    min-width: 80px;
+}
+
+/* Payment Columns for Unpaid Shipments */
+.paid-column {
+    width: 12%;
+    min-width: 100px;
+}
+
+.remaining-column {
+    width: 12%;
+    min-width: 100px;
+}
+
+/* Tracking Number */
+.tracking-link {
+    color: #007bff;
+    font-weight: 600;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.tracking-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.status-created {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.status-packaged {
+    background: linear-gradient(135deg, #6f42c1, #5a2d91);
+    color: white;
+}
+
+.status-dispatching {
+    background: linear-gradient(135deg, #fd7e14, #e55100);
+    color: white;
+}
+
+.status-shipped {
+    background: linear-gradient(135deg, #20c997, #17a589);
+    color: white;
+}
+
+.status-in-transit {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+}
+
+.status-received {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+}
+
+.status-delivered {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.status-cancelled {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+/* Legacy status support */
+.status-processing {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #212529;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #ffc107, #ffcd39);
+    color: #212529;
+}
+
+/* User Info */
+.user-info {
+    text-align: center;
+    line-height: 1.3;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    display: block;
+}
+
+.user-phone {
+    font-size: 0.7rem;
+    color: #6c757d;
+    direction: ltr;
+    unicode-bidi: bidi-override;
+    display: block;
+    font-weight: 400;
+}
+
+/* Weight and Cost */
+.weight-cell {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.price-text {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+/* Date Info */
+.date-info {
+    text-align: center;
+}
+
+.date-main {
+    font-weight: 600;
+    color: #2d3748;
+    font-family: 'Courier New', monospace;
+}
+
+.date-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-family: 'Courier New', monospace;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.3rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+}
+
+.edit-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+.delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.print-btn {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: white;
+}
+
+.print-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+    padding: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .shipment-row td {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.85rem;
+    }
+    
+    .table-header th {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.85rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        min-width: 70px;
+    }
+    
+    .user-name {
+        font-size: 0.8rem;
+    }
+    
+    .user-phone {
+        font-size: 0.7rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Tablet optimizations */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .shipment-row td {
+        padding: 0.7rem 0.4rem;
+        font-size: 0.85rem;
+    }
+    
+    .table-header th {
+        padding: 0.7rem 0.4rem;
+        font-size: 0.85rem;
+    }
+    
+    .tracking-cell {
+        width: 11%;
+    }
+    
+    .status-cell {
+        width: 9%;
+    }
+    
+    .sender-cell,
+    .receiver-cell {
+        width: 17%;
+    }
+    
+    .weight-cell {
+        width: 7%;
+    }
+    
+    .document-type-cell {
+        width: 7%;
+    }
+    
+    .contents-cell {
+        width: 19%;
+    }
+    
+    .cost-cell {
+        width: 9%;
+    }
+    
+    .date-cell {
+        width: 11%;
+    }
+    
+    .actions-cell {
+        width: 10%;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        min-width: 70px;
+    }
+    
+    .user-name {
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .user-phone {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .shipment-row td {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.8rem;
+    }
+    
+    .table-header th {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+        min-width: 60px;
+    }
+    
+    .user-name {
+        font-size: 0.75rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .user-phone {
+        font-size: 0.6rem;
+    }
+    
+    .action-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+    }
+    
+    .action-buttons {
+        gap: 0.2rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .action-buttons {
+        display: none;
+    }
+    
+    .btn {
+        display: none;
+    }
+    
+    .table-header {
+        background: #1e1e2f !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    .status-badge {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}
+
+/* Print styles for shipment tables */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+        font-family: 'Tajawal', sans-serif;
+    }
+    
+    .container-fluid,
+    .nav,
+    .btn,
+    .d-flex,
+    .status-tabs-container,
+    .actions-column,
+    .cost-column {
+        display: none !important;
+    }
+    
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+    }
+    
+    .print-table {
+        display: table !important;
+        width: 100% !important;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    
+    .print-table th,
+    .print-table td {
+        border: 1px solid #000 !important;
+        padding: 8px 6px !important;
+        text-align: center;
+        font-size: 12px !important;
+        color: black !important;
+    }
+    
+    .print-table th {
+        background: #f5f5f5 !important;
+        font-weight: bold;
+    }
+    
+    .print-table .tracking-column { width: 15%; }
+    .print-table .sender-column { width: 15%; }
+    .print-table .receiver-column { width: 15%; }
+    .print-table .weight-column { width: 10%; }
+    .print-table .type-column { width: 12%; }
+    .print-table .contents-column { width: 18%; }
+    .print-table .date-column { width: 15%; }
+    
+    .print-footer {
+        display: block !important;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 10px;
+        color: #666;
+    }
+    
+    .status-badge {
+        background: none !important;
+        color: black !important;
+        border: 1px solid #000 !important;
+        padding: 2px 6px !important;
+        font-size: 10px !important;
+    }
+}
+</style>
+
+<script>
+// Print functionality for shipment tables
+function printShipmentTable(type) {
+    // Get the appropriate table
+    let tableId, title;
+    if (type === 'general') {
+        tableId = 'generalShipmentsTable';
+        title = 'الشحنات العامة';
+    } else if (type === 'document') {
+        tableId = 'documentShipmentsTable';
+        title = 'شحنات المستندات';
+    }
+    
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    // Clone the table for printing
+    const printTable = table.cloneNode(true);
+    printTable.className = 'print-table';
+    
+    // Remove cost and actions columns from headers
+    const headers = printTable.querySelectorAll('thead th');
+    headers.forEach(header => {
+        if (header.classList.contains('cost-column') || 
+            header.classList.contains('actions-column')) {
+            header.remove();
+        }
+    });
+    
+    // Remove cost and actions columns from rows
+    const rows = printTable.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        cells.forEach(cell => {
+            if (cell.classList.contains('cost-column') || 
+                cell.classList.contains('actions-column')) {
+                cell.remove();
+            }
+        });
+    });
+    
+    // Create print content
+    const currentDate = new Date().toLocaleDateString('ar-EG');
+    const printContent = `
+        <div class="print-header">
+            <h1>مرسال إكسبرس للاستيراد والتصدير</h1>
+            <h2>${title}</h2>
+            <p>تاريخ الطباعة: ${currentDate}</p>
+        </div>
+        ${printTable.outerHTML}
+        <div class="print-footer">
+            <p>تم إنشاء هذا التقرير من نظام إدارة الشحنات - مرسال إكسبرس للاستيراد والتصدير</p>
+        </div>
+    `;
+    
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+            <meta charset="UTF-8">
+            <title>طباعة ${title}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Tajawal', Arial, sans-serif;
+                    direction: rtl;
+                    margin: 20px;
+                    background: white;
+                    color: black;
+                }
+                .print-header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                    border-bottom: 2px solid #000;
+                    padding-bottom: 10px;
+                }
+                .print-header h1 {
+                    font-size: 24px;
+                    margin: 10px 0;
+                }
+                .print-header h2 {
+                    font-size: 18px;
+                    margin: 5px 0;
+                }
+                .print-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                }
+                .print-table th,
+                .print-table td {
+                    border: 1px solid #000;
+                    padding: 8px 6px;
+                    text-align: center;
+                    font-size: 12px;
+                }
+                .print-table th {
+                    background: #f5f5f5;
+                    font-weight: bold;
+                }
+                .print-footer {
+                    text-align: center;
+                    margin-top: 20px;
+                    font-size: 10px;
+                    color: #666;
+                }
+                .status-badge {
+                    background: none !important;
+                    color: black !important;
+                    border: 1px solid #000;
+                    padding: 2px 6px;
+                    font-size: 10px;
+                    border-radius: 3px;
+                }
+            </style>
+        </head>
+        <body>
+            ${printContent}
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Wait for content to load then print
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+}
+
+// Confirm Delete Function
+function confirmDelete(shipmentId, trackingNumber) {
+    document.getElementById('shipmentNumber').textContent = trackingNumber;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Show loading state
+        const deleteBtn = document.getElementById('confirmDeleteBtn');
+        const originalText = deleteBtn.textContent;
+        deleteBtn.textContent = 'جاري الحذف...';
+        deleteBtn.disabled = true;
+        
+        fetch(`/delete_shipment/${shipmentId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error || 'خطأ في الخادم');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Remove the row from table without page reload
+                const shipmentRow = document.querySelector(`button[onclick*="${shipmentId}"]`).closest('tr');
+                if (shipmentRow) {
+                    shipmentRow.style.transition = 'opacity 0.3s ease';
+                    shipmentRow.style.opacity = '0';
+                    setTimeout(() => {
+                        shipmentRow.remove();
+                        // Check if table is empty and show empty state
+                        checkEmptyTables();
+                    }, 300);
+                }
+                
+                // Show success message
+                showNotification('تم حذف الشحنة بنجاح', 'success');
+                modal.hide();
+            } else {
+                throw new Error(data.error || 'حدث خطأ غير معروف');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            let errorMessage = 'حدث خطأ أثناء حذف الشحنة';
+            
+            if (error.message.includes('غير موجودة')) {
+                errorMessage = 'هذه الشحنة غير موجودة أو تم حذفها مسبقاً';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            showNotification(errorMessage, 'error');
+        })
+        .finally(() => {
+            // Reset button state
+            deleteBtn.textContent = originalText;
+            deleteBtn.disabled = false;
+            modal.hide();
+        });
+    };
+}
+
+// Check if tables are empty and show appropriate message
+function checkEmptyTables() {
+    const generalTable = document.getElementById('generalShipmentsTable');
+    const documentTable = document.getElementById('documentShipmentsTable');
+    
+    if (generalTable) {
+        const generalRows = generalTable.querySelector('tbody').children.length;
+        if (generalRows === 0) {
+            const tbody = generalTable.querySelector('tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-4">
+                        <div class="empty-state">
+                            <i class="fas fa-box-open text-muted mb-3" style="font-size: 3rem;"></i>
+                            <p class="text-muted">لا توجد شحنات عامة</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+    
+    if (documentTable) {
+        const documentRows = documentTable.querySelector('tbody').children.length;
+        if (documentRows === 0) {
+            const tbody = documentTable.querySelector('tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt text-muted mb-3" style="font-size: 3rem;"></i>
+                            <p class="text-muted">لا توجد شحنات مستندات</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+
+// Show notification function
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 4000);
+}
+
+// Status Filtering Functions
+function filterByStatus(shipmentType, status, clickedButton) {
+    // Remove active class from all status tabs of this type
+    const statusTabs = document.querySelectorAll(`[data-type="${shipmentType}"]`);
+    statusTabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Add active class to clicked button
+    clickedButton.classList.add('active');
+    
+    // Get the appropriate table
+    const tableId = shipmentType === 'general' ? 'generalShipmentsTable' : 'documentShipmentsTable';
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector('tbody');
+    const rows = tbody.querySelectorAll('tr:not(.empty-state-row)');
+    
+    let visibleCount = 0;
+    
+    // Filter rows based on status
+    rows.forEach(row => {
+        if (row.querySelector('.empty-state')) {
+            return; // Skip empty state rows
+        }
+        
+        const statusCell = row.querySelector('.status-cell');
+        if (!statusCell) return;
+        
+        const statusBadge = statusCell.querySelector('.status-badge');
+        if (!statusBadge) return;
+        
+        const rowStatus = getStatusFromBadge(statusBadge);
+        
+        if (status === 'all' || rowStatus === status) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Show empty state if no rows are visible
+    showEmptyStateIfNeeded(tbody, visibleCount, shipmentType);
+}
+
+// Helper function to extract status from badge classes
+function getStatusFromBadge(badge) {
+    const classList = badge.classList;
+    if (classList.contains('status-created')) return 'created';
+    if (classList.contains('status-packaged')) return 'packaged';
+    if (classList.contains('status-dispatching')) return 'dispatching';
+    if (classList.contains('status-shipped')) return 'shipped';
+    if (classList.contains('status-in-transit')) return 'in_transit';
+    if (classList.contains('status-received')) return 'received';
+    if (classList.contains('status-delivered')) return 'delivered';
+    if (classList.contains('status-cancelled')) return 'cancelled';
+    
+    // Legacy status support
+    if (classList.contains('status-pending')) return 'pending';
+    if (classList.contains('status-processing')) return 'processing';
+    
+    return 'unknown';
+}
+
+// Show empty state message when no shipments match filter
+function showEmptyStateIfNeeded(tbody, visibleCount, shipmentType) {
+    // Remove existing empty state
+    const existingEmpty = tbody.querySelector('.filter-empty-state');
+    if (existingEmpty) {
+        existingEmpty.remove();
+    }
+    
+    if (visibleCount === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.className = 'filter-empty-state';
+        emptyRow.innerHTML = `
+            <td colspan="${shipmentType === 'general' ? 9 : 9}" class="text-center py-4">
+                <div class="empty-state">
+                    <i class="fas fa-search text-muted mb-3" style="font-size: 3rem;"></i>
+                    <p class="text-muted">لا توجد شحنات تطابق هذا الفلتر</p>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(emptyRow);
+    }
+}
+
+// Reset status tabs when switching main tabs
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle main tab switching
+    const mainTabs = document.querySelectorAll('#general-tab, #document-tab');
+    mainTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetType = this.id.includes('general') ? 'general' : 'document';
+            
+            // Reset status tabs to "All" for the activated tab
+            setTimeout(() => {
+                const allButton = document.querySelector(`[data-type="${targetType}"][data-status="all"]`);
+                if (allButton) {
+                    filterByStatus(targetType, 'all', allButton);
+                }
+            }, 100);
+        });
+    });
+});
+
+// Print Table Function
+function printTable(tableId) {
+    const table = document.getElementById(tableId);
+    const newWin = window.open('', 'Print-Window');
+    newWin.document.open();
+    newWin.document.write(`
+        <html>
+        <head>
+            <title>طباعة الجدول</title>
+            <style>
+                body { font-family: 'Tajawal', Arial, sans-serif; direction: rtl; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                th { background-color: #f8f9fa; font-weight: bold; }
+                .action-buttons { display: none; }
+            </style>
+        </head>
+        <body>
+            ${table.outerHTML}
+        </body>
+        </html>
+    `);
+    newWin.document.close();
+    setTimeout(() => {
+        newWin.print();
+        newWin.close();
+    }, 250);
+}
+
+// Export CSV Function
+function exportCSV(type) {
+    const tableId = type === 'general' ? 'generalShipmentsTable' : 'documentShipmentsTable';
+    const table = document.getElementById(tableId);
+    const rows = table.querySelectorAll('tr');
+    let csv = [];
+    
+    for (let i = 0; i < rows.length; i++) {
+        const row = [], cols = rows[i].querySelectorAll('td, th');
+        
+        for (let j = 0; j < cols.length - 1; j++) { // Exclude actions column
+            let cellText = cols[j].innerText.replace(/"/g, '""');
+            row.push(`"${cellText}"`);
+        }
+        csv.push(row.join(','));
+    }
+    
+    const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+    const downloadLink = document.createElement('a');
+    downloadLink.download = `shipments_${type}_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+// Payment Modal Functions
+function openPaymentModal(shipmentId, trackingNumber, remainingAmount) {
+    document.getElementById('paymentShipmentId').value = shipmentId;
+    document.getElementById('paymentTrackingNumber').textContent = trackingNumber;
+    document.getElementById('paymentRemainingAmount').textContent = remainingAmount.toFixed(3);
+    document.getElementById('paymentAmount').value = remainingAmount.toFixed(3);
+    document.getElementById('paymentAmount').max = remainingAmount;
+    
+    const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    modal.show();
+}
+
+function processPayment() {
+    const shipmentId = document.getElementById('paymentShipmentId').value;
+    const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
+    const submitBtn = document.getElementById('submitPaymentBtn');
+    const originalText = submitBtn.textContent;
+    
+    // Validate payment amount
+    if (!paymentAmount || paymentAmount <= 0) {
+        showNotification('يرجى إدخال مبلغ صحيح', 'error');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.textContent = 'جارٍ المعالجة...';
+    submitBtn.disabled = true;
+    
+    // Send payment request
+    fetch('/api/process_payment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            shipment_id: shipmentId,
+            payment_amount: paymentAmount
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            
+            // If fully paid, remove row from unpaid table
+            if (data.fully_paid) {
+                const row = document.querySelector(`tr[data-shipment-id="${shipmentId}"]`);
+                if (row) {
+                    row.style.transition = 'opacity 0.3s ease';
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+                        
+                        // Check if table is empty
+                        const unpaidTable = document.getElementById('unpaidShipmentsTable');
+                        const remainingRows = unpaidTable.querySelectorAll('tbody tr:not(.filter-empty-state)').length;
+                        if (remainingRows === 0) {
+                            const tbody = unpaidTable.querySelector('tbody');
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-credit-card text-muted mb-3" style="font-size: 3rem;"></i>
+                                            <p class="text-muted">جميع الشحنات مكتملة الدفع</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    }, 300);
+                }
+            } else {
+                // Update remaining amount in the row
+                const row = document.querySelector(`tr[data-shipment-id="${shipmentId}"]`);
+                if (row) {
+                    const paidCell = row.querySelector('.paid-column span');
+                    const remainingCell = row.querySelector('.remaining-column span');
+                    
+                    if (paidCell) paidCell.textContent = data.new_paid_amount.toFixed(3) + ' د.ك';
+                    if (remainingCell) remainingCell.textContent = data.new_remaining_amount.toFixed(3) + ' د.ك';
+                    
+                    // Update payment button with new remaining amount
+                    const paymentBtn = row.querySelector('.payment-column button');
+                    if (paymentBtn) {
+                        paymentBtn.setAttribute('onclick', 
+                            `openPaymentModal(${shipmentId}, '${data.tracking_number}', ${data.new_remaining_amount})`);
+                    }
+                }
+            }
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+            modal.hide();
+        } else {
+            showNotification(data.message || 'حدث خطأ أثناء معالجة الدفع', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    });
+}
+</script>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title" id="paymentModalLabel">
+                    <i class="fas fa-credit-card me-2"></i>إكمال الدفع
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="payment-info mb-4">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label text-muted fw-bold">رقم التتبع</label>
+                            <p class="fs-6 fw-bold text-dark" id="paymentTrackingNumber">-</p>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted fw-bold">المبلغ المتبقي</label>
+                            <p class="fs-6 fw-bold text-danger" id="paymentRemainingAmount">0.000 د.ك</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="paymentAmount" class="form-label fw-bold">مبلغ الدفع</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-lg" id="paymentAmount" 
+                               placeholder="0.000" inputmode="decimal" pattern="[0-9]*\.?[0-9]*"
+                               style="border-radius: 10px 0 0 10px; border: 2px solid #e9ecef;">
+                        <span class="input-group-text fw-bold" style="border-radius: 0 10px 10px 0; border: 2px solid #e9ecef; border-left: none;">د.ك</span>
+                    </div>
+                    <div class="form-text text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>يمكنك دفع المبلغ كاملاً أو جزء منه
+                    </div>
+                </div>
+                
+                <input type="hidden" id="paymentShipmentId">
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 1rem 1.5rem 1.5rem;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px;">
+                    <i class="fas fa-times me-2"></i>إلغاء
+                </button>
+                <button type="button" class="btn btn-success" id="submitPaymentBtn" onclick="processPayment()" 
+                        style="border-radius: 10px; background: linear-gradient(135deg, #28a745, #20c997); border: none;">
+                    <i class="fas fa-check me-2"></i>تأكيد الدفع
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

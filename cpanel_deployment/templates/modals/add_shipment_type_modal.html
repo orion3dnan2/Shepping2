@@ -1,0 +1,32 @@
+<!-- Add Shipment Type Modal -->
+<div class="modal fade" id="addShipmentTypeModal" tabindex="-1" aria-labelledby="addShipmentTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addShipmentTypeModalLabel">إضافة نوع شحنة جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ url_for('add_shipment_type') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="shipmentNameAr" class="form-label">الاسم بالعربية *</label>
+                        <input type="text" class="form-control" id="shipmentNameAr" name="name_ar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="shipmentNameEn" class="form-label">الاسم بالإنجليزية</label>
+                        <input type="text" class="form-control" id="shipmentNameEn" name="name_en">
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="shipmentActive" name="is_active" checked>
+                        <label class="form-check-label" for="shipmentActive">نشط</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

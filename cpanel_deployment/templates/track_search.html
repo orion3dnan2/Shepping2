@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+
+{% block title %}تتبع الشحنات{% endblock %}
+{% block page_title %}تتبع الشحنات{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile Responsive Tracking */
+    @media (max-width: 768px) {
+        .search-container {
+            padding: 15px;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-input {
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        
+        .search-btn {
+            width: 100%;
+        }
+        
+        .tracking-example {
+            padding: 15px;
+        }
+        
+        .example-tracking {
+            font-size: 0.9rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .feature-card {
+            padding: 15px;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .search-container {
+            padding: 10px;
+        }
+        
+        .search-title {
+            font-size: 1.5rem;
+        }
+        
+        .search-subtitle {
+            font-size: 0.9rem;
+        }
+        
+        .feature-card {
+            padding: 12px;
+        }
+        
+        .feature-title {
+            font-size: 1rem;
+        }
+    }
+    .track-container {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem 0;
+    }
+    
+    .track-card {
+        background: white;
+        border-radius: 2rem;
+        padding: 3rem 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+    }
+    
+    .track-header {
+        margin-bottom: 2rem;
+    }
+    
+    .track-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .track-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.8rem;
+    }
+    
+    .track-subtitle {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-btn {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 50px;
+        padding: 0.5rem 1.25rem;
+        color: #495057;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-btn:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-form {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem 1rem 5rem;
+        border: 2px solid #e9ecef;
+        border-radius: 1rem;
+        font-size: 1.1rem;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+    
+    .search-btn {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-btn:hover {
+        background: linear-gradient(135deg, #5a6fd8, #6a42a3);
+        transform: translateY(-50%) translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .search-icon {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 1.2rem;
+        pointer-events: none;
+    }
+    
+    .error-message {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #f1aeb5;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .error-icon {
+        width: 40px;
+        height: 40px;
+        background: #dc3545;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .example-numbers {
+        background: #e7f3ff;
+        border: 1px solid #bee5eb;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .example-title {
+        font-weight: 600;
+        color: #0c5460;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .example-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .example-number {
+        background: white;
+        border: 1px solid #b8daff;
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        color: #0c5460;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .example-number:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    @media (max-width: 768px) {
+        .track-card {
+            margin: 1rem;
+            padding: 2rem 1.5rem;
+        }
+        
+        .track-title {
+            font-size: 2rem;
+        }
+        
+        .track-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+        
+        .search-input {
+            padding: 1rem 1rem 1rem 4rem;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            gap: 0.5rem;
+        }
+        
+        .quick-btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 1rem;
+        }
+    }
+    
+    /* Center tracking input text */
+    input[type="text"], .tracking-input {
+        text-align: center !important;
+    }
+    
+    .tracking-input::placeholder {
+        text-align: center !important;
+    }
+    
+    /* Ensure no RTL override */
+    .search-form {
+        direction: ltr;
+    }
+    
+    .search-input {
+        direction: ltr !important;
+        text-align: center !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="track-container">
+    <div class="track-card">
+        <div class="track-header">
+            <h1 class="track-title">
+                <div class="track-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                تتبع الشحنات
+            </h1>
+            <p class="track-subtitle">أدخل رقم التتبع لمعرفة حالة شحنتك</p>
+        </div>
+        
+        <!-- Quick Action Buttons -->
+        <div class="quick-actions">
+            <a href="{{ url_for('add_shipment') }}" class="quick-btn">
+                <i class="fas fa-plus me-1"></i>
+                إضافة شحنة
+            </a>
+            <a href="{{ url_for('index') }}" class="quick-btn">
+                <i class="fas fa-tachometer-alt me-1"></i>
+                لوحة التحكم
+            </a>
+            <a href="{{ url_for('financial_center') }}" class="quick-btn">
+                <i class="fas fa-chart-bar me-1"></i>
+                المركز المالي
+            </a>
+            <a href="{{ url_for('index') }}#shipments" class="quick-btn">
+                <i class="fas fa-list me-1"></i>
+                الشحنات
+            </a>
+        </div>
+        
+        <!-- Error Message -->
+        {% if error_message %}
+            <div class="error-message">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <strong>لم يتم العثور على الشحنة</strong>
+                    <div>{{ error_message }}</div>
+                    <small>تأكد من صحة رقم التتبع وحاول مرة أخرى</small>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Search Form -->
+        <form method="GET" class="search-form" id="trackForm">
+            <div class="position-relative">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       name="tracking_number" 
+                       class="search-input" 
+                       placeholder="أدخل رقم التتبع (مثال: SHIP-20250623-001)"
+                       value="{{ tracking_number or '' }}"
+                       required
+                       autocomplete="off">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                    تتبع
+                </button>
+            </div>
+        </form>
+        
+        <!-- Example Numbers -->
+        {% if not error_message and not tracking_number %}
+            <div class="example-numbers">
+                <div class="example-title">أمثلة على أرقام التتبع:</div>
+                <div class="example-list">
+                    {% for shipment in example_shipments %}
+                        <span class="example-number" onclick="fillTrackingNumber('{{ shipment.tracking_number }}')">
+                            {{ shipment.tracking_number }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-focus on search input
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="tracking_number"]');
+        if (searchInput && !searchInput.value) {
+            searchInput.focus();
+        }
+    });
+    
+    // Fill tracking number from examples
+    function fillTrackingNumber(trackingNumber) {
+        const input = document.querySelector('input[name="tracking_number"]');
+        input.value = trackingNumber;
+        input.focus();
+    }
+    
+    // Form submission with loading state
+    document.getElementById('trackForm').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('.search-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري البحث...';
+        submitBtn.disabled = true;
+        
+        // Re-enable button after form submission (in case of errors)
+        setTimeout(function() {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 3000);
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Focus search input on '/' key
+        if (e.key === '/' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            document.querySelector('input[name="tracking_number"]').focus();
+        }
+    });
+</script>
+{% endblock %}
