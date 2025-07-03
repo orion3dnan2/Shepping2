@@ -2,7 +2,7 @@ modules = ["web", "python-3.11", "dotnet-7.0", "nodejs-20", "postgresql-16"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["cacert", "cairo", "cargo", "chromedriver", "ffmpeg-full", "fontconfig", "freetype", "ghostscript", "gitFull", "glib", "glibcLocales", "gobject-introspection", "gtk3", "harfbuzz", "lcms2", "libcxx", "libffi", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pango", "pkg-config", "playwright-driver", "poppler_utils", "postgresql", "qhull", "rustc", "tcl", "tk", "xcodebuild", "zlib", "mysql80"]
+packages = ["cacert", "cairo", "cargo", "chromedriver", "ffmpeg-full", "fontconfig", "freetype", "ghostscript", "gitFull", "glib", "glibcLocales", "gobject-introspection", "gtk3", "harfbuzz", "lcms2", "libcxx", "libffi", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "mysql80", "openjpeg", "openssl", "pango", "pkg-config", "playwright-driver", "poppler_utils", "postgresql", "qhull", "rustc", "tcl", "tk", "xcodebuild", "zlib"]
 
 [deployment]
 deploymentTarget = "autoscale"
