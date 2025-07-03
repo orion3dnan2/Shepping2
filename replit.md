@@ -1026,6 +1026,9 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Created cpanel_config.py helper script for deployment configuration validation
   - Updated main.py with cPanel compatibility and environment variable defaults
   - Configured smaller connection pool sizes suitable for shared hosting limitations
+  - **Fixed multi-database support**: Application now automatically detects PostgreSQL vs MySQL and configures appropriately
+  - Enhanced app.py with intelligent database detection (PostgreSQL for Replit, MySQL for cPanel)
+  - Server error resolved - application working successfully with both database types
 - **July 1, 2025: Enhanced logo design and comprehensive zone management**
   - Added professional Morsal logo design to sidebar navigation with responsive mobile support
   - Redesigned professional invoice layout with logo positioned above "فاتورة شحن" title for enhanced aesthetics

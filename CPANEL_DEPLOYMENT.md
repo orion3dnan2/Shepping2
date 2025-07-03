@@ -1,9 +1,12 @@
 # دليل نشر التطبيق على cPanel
 
 ## المتطلبات الأساسية
-- cPanel hosting account with Python support
+- cPanel hosting account with Python support  
 - MySQL database access
 - SSH access (optional but recommended)
+
+## ملاحظة مهمة
+التطبيق يدعم كلاً من PostgreSQL (للبيئة الحالية) و MySQL (لـ cPanel). سيتم تحديد نوع قاعدة البيانات تلقائياً حسب URL الاتصال.
 
 ## خطوات التثبيت
 
