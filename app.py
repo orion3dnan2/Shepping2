@@ -32,12 +32,12 @@ if database_url and database_url.startswith("postgres://"):
 
 # Special handling for Render PostgreSQL SSL issues
 if database_url and "dpg-" in database_url and "render.com" in database_url:
-    # Render PostgreSQL - disable SSL completely to avoid certificate issues
+    # Render PostgreSQL requires SSL but without certificate verification
     if "sslmode" not in database_url:
         if "?" in database_url:
-            database_url += "&sslmode=disable"
+            database_url += "&sslmode=require&sslcert=&sslkey=&sslrootcert="
         else:
-            database_url += "?sslmode=disable"
+            database_url += "?sslmode=require&sslcert=&sslkey=&sslrootcert="
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -45,7 +45,11 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
     "pool_size": 10,
     "max_overflow": 20,
-    "echo": False
+    "echo": False,
+    "connect_args": {
+        "sslmode": "require",
+        "connect_timeout": 10,
+    }
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
