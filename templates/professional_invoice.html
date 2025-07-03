@@ -441,7 +441,40 @@
 
         <!-- Invoice Content -->
         <div class="invoice-content">
-            <!-- Contact Information -->
+            {% if shipment and shipment.package_type == 'document' and shipment.status == 'delivered' %}
+            <!-- Simplified Invoice for Delivered Documents -->
+            <div class="contact-info-section">
+                <div class="contact-row">
+                    <span class="contact-label">اسم المرسل:</span>
+                    <span class="contact-value">{{ shipment.sender_name if shipment else 'أحمد محمد علي' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">رقم الهاتف:</span>
+                    <span class="contact-value">{{ shipment.sender_phone if shipment else '+965 1234 5678' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">اسم المستلم:</span>
+                    <span class="contact-value">{{ shipment.receiver_name if shipment else 'فاطمة أحمد حسن' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">نوع الشحنة:</span>
+                    <span class="contact-value">{{ get_document_type_arabic(shipment.document_type) if shipment.document_type else 'مستندات' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">الإجراء:</span>
+                    <span class="contact-value">{{ shipment.package_contents if shipment.package_contents else 'غير محدد' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">رقم التتبع:</span>
+                    <span class="contact-value">{{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">حالة المستند:</span>
+                    <span class="contact-value">تم التسليم</span>
+                </div>
+            </div>
+            {% else %}
+            <!-- Standard Invoice -->
             <div class="contact-info-section">
                 <div class="contact-row">
                     <span class="contact-label">اسم المرسل:</span>
@@ -464,7 +497,9 @@
                     <span class="contact-value">{{ shipment.receiver_address if shipment and shipment.receiver_address else '—' }}</span>
                 </div>
             </div>
+            {% endif %}
 
+            {% if not (shipment and shipment.package_type == 'document' and shipment.status == 'delivered') %}
             <!-- Shipment Details -->
             <div class="shipment-details">
                 <h3>تفاصيل الشحنة</h3>
@@ -561,6 +596,7 @@
                     </tr>
                 </table>
             </div>
+            {% endif %}
         </div>
 
         <!-- Footer Signature (Employee Only) -->
