@@ -507,18 +507,22 @@
                         <td class="detail-label">رقم التتبع</td>
                         <td class="detail-value">{{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</td>
                     </tr>
+                    {% if not shipment or shipment.package_type != 'document' %}
                     <tr>
                         <td class="detail-label">الوزن</td>
                         <td class="detail-value">{{ "%.2f" | format(shipment.weight) if shipment and shipment.weight else "0.00" }} كيلو</td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td class="detail-label">الخصم</td>
                         <td class="detail-value">{{ "%.3f" | format(shipment.discount) if shipment and shipment.discount else "0.000" }} د.ك</td>
                     </tr>
+                    {% if not shipment or shipment.package_type != 'document' %}
                     <tr>
                         <td class="detail-label">البوليصة</td>
                         <td class="detail-value">{{ "%.3f" | format(shipment.waybill_price) if shipment and shipment.waybill_price else "0.000" }} د.ك</td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td class="detail-label">المبلغ المدفوع</td>
                         <td class="detail-value">{{ "%.3f" | format(shipment.paid_amount) if shipment and shipment.paid_amount else "0.000" }} د.ك</td>
