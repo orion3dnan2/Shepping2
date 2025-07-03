@@ -1005,6 +1005,12 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Real-time updates ensure changes in Settings immediately reflect in Add New Shipment dropdown
   - Removed "إجمالي الإيرادات المباشرة" sidebar panel with revenue breakdown
   - Deleted "الفاتورة التفاعلية" expense invoice panel from sidebar
+- **July 3, 2025: Enhanced invoice system and shipping sticker optimization**
+  - Modified document shipment invoices to exclude weight and waybill fields while keeping them for general shipments
+  - Added comprehensive print functionality to all financial center tables and profit/loss reports
+  - Optimized shipping sticker size to quarter A4 page (10.5cm × 14.8cm) with enhanced typography and spacing
+  - Added direction information to shipping sticker with abbreviated format (KW → SU, SU → KW)
+  - Improved font sizes and margins to effectively utilize the increased sticker space
 - **July 1, 2025: Enhanced logo design and comprehensive zone management**
   - Added professional Morsal logo design to sidebar navigation with responsive mobile support
   - Redesigned professional invoice layout with logo positioned above "فاتورة شحن" title for enhanced aesthetics

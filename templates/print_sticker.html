@@ -78,9 +78,31 @@
             font-size: 28px;
             font-weight: 700;
             color: #000;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #000;
             padding-bottom: 12px;
+        }
+
+        .direction-section {
+            margin-bottom: 20px;
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .direction-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .direction-code {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            font-family: 'Arial', sans-serif;
         }
 
         .contact-section {
@@ -219,6 +241,24 @@
         <!-- Tracking Number -->
         <div class="tracking-number">
             {{ shipment.tracking_number if shipment else 'SHIP-20250628-001' }}
+        </div>
+
+        <!-- Direction Information -->
+        <div class="direction-section">
+            <div class="direction-label">الاتجاه</div>
+            <div class="direction-code">
+                {% if shipment and shipment.direction %}
+                    {% if shipment.direction == 'kuwait_to_sudan' %}
+                        KW → SU
+                    {% elif shipment.direction == 'sudan_to_kuwait' %}
+                        SU → KW
+                    {% else %}
+                        KW → SU
+                    {% endif %}
+                {% else %}
+                    KW → SU
+                {% endif %}
+            </div>
         </div>
 
         <!-- Sender Information -->
