@@ -30,12 +30,14 @@ database_url = os.environ.get("DATABASE_URL")
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-# Add SSL parameters to database URL if not present
-if database_url and "sslmode" not in database_url:
-    if "?" in database_url:
-        database_url += "&sslmode=prefer"
-    else:
-        database_url += "?sslmode=prefer"
+# Special handling for Render PostgreSQL SSL issues
+if database_url and "dpg-" in database_url and "render.com" in database_url:
+    # Render PostgreSQL requires specific SSL handling
+    if "sslmode" not in database_url:
+        if "?" in database_url:
+            database_url += "&sslmode=require&sslcert=/dev/null&sslkey=/dev/null&sslrootcert=/dev/null"
+        else:
+            database_url += "?sslmode=require&sslcert=/dev/null&sslkey=/dev/null&sslrootcert=/dev/null"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {

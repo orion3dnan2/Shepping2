@@ -1,0 +1,8 @@
+الرابط الأصلي:
+postgresql://shipments_user:nbFq48a7W4Qv376fXLChL7Wenrh4TIgR@dpg-d1hm7pvfte5s73adkpp0-a.oregon-postgres.render.com/shipments_z1dk
+
+الرابط المُحدث (استخدم هذا في Render):
+postgresql://shipments_user:nbFq48a7W4Qv376fXLChL7Wenrh4TIgR@dpg-d1hm7pvfte5s73adkpp0-a.oregon-postgres.render.com/shipments_z1dk?sslmode=require&connect_timeout=30
+
+أو جرب هذا الرابط (بدون SSL):
+postgresql://shipments_user:nbFq48a7W4Qv376fXLChL7Wenrh4TIgR@dpg-d1hm7pvfte5s73adkpp0-a.oregon-postgres.render.com/shipments_z1dk?sslmode=disable
