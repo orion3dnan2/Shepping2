@@ -25,8 +25,8 @@
             max-width: 190mm;
             margin: 0 auto;
             background: white;
-            padding: 15mm;
-            min-height: 267mm;
+            padding: 10mm;
+            min-height: auto;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
         }
@@ -34,8 +34,8 @@
         /* Invoice Date Section */
         .invoice-date {
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 15px;
+            font-size: 12px;
             color: #333;
         }
 
@@ -101,8 +101,8 @@
 
         .logo-header {
             text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
             border-bottom: 1px solid #eee;
         }
 
@@ -113,25 +113,19 @@
 
         .company-title {
             color: #333;
-            font-size: 20px;
-            margin: 10px 0 5px 0;
+            font-size: 16px;
+            margin: 8px 0 5px 0;
             font-weight: 600;
-        }
-
-        .company-subtitle {
-            color: #666;
-            margin: 0 0 0 0;
-            font-size: 12px;
         }
 
         .invoice-title-section {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .invoice-main-title {
             color: #333;
-            font-size: 28px;
+            font-size: 20px;
             margin-bottom: 8px;
             font-weight: 700;
         }
@@ -155,8 +149,8 @@
 
         /* Contact Information Section */
         .contact-info-section {
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
             border: 1px solid #ccc;
             border-radius: 5px;
             background-color: #f9f9f9;
@@ -166,8 +160,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            padding: 8px 0;
+            margin-bottom: 8px;
+            padding: 5px 0;
             border-bottom: 1px solid #ddd;
         }
 
@@ -196,19 +190,19 @@
 
         /* Shipment Details */
         .shipment-details {
-            margin-bottom: 30px;
-            padding: 15px;
+            margin-bottom: 20px;
+            padding: 12px;
             border: 1px solid #ccc;
             text-align: center;
         }
 
         .shipment-details h3 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #000;
             border-bottom: 1px solid #ddd;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .details-table {
@@ -218,9 +212,10 @@
         }
 
         .details-table td {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid #ddd;
             text-align: center;
+            font-size: 13px;
         }
 
         .details-table .detail-label {
@@ -275,34 +270,34 @@
 
         /* Footer Signatures */
         .signature-section {
-            margin-top: 30px;
+            margin-top: 20px;
             display: flex;
             justify-content: center;
             align-items: flex-end;
             border-top: 1px solid #ccc;
-            padding-top: 15px;
+            padding-top: 12px;
         }
 
         .signature-box {
             text-align: center;
-            width: 180px;
+            width: 150px;
         }
 
         .signature-label {
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #000;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .signature-line {
             border-bottom: 1px solid #ccc;
-            height: 35px;
+            height: 30px;
             margin-bottom: 5px;
-            padding-top: 8px;
+            padding-top: 6px;
             text-align: center;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             color: #333;
         }
 
@@ -435,7 +430,7 @@
                 <div class="morsal-m-professional">M</div>
             </div>
             <h1 class="company-title">مرسال إكسبرس للاستيراد والتصدير</h1>
-            <p class="company-subtitle">خدمات الشحن السريع</p>
+
         </div>
 
         <!-- Invoice Title Section -->
@@ -512,7 +507,18 @@
                         <td class="detail-label">رقم التتبع</td>
                         <td class="detail-value">{{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</td>
                     </tr>
-
+                    <tr>
+                        <td class="detail-label">الوزن</td>
+                        <td class="detail-value">{{ "%.2f" | format(shipment.weight) if shipment and shipment.weight else "0.00" }} كيلو</td>
+                    </tr>
+                    <tr>
+                        <td class="detail-label">الخصم</td>
+                        <td class="detail-value">{{ "%.3f" | format(shipment.discount) if shipment and shipment.discount else "0.000" }} د.ك</td>
+                    </tr>
+                    <tr>
+                        <td class="detail-label">البوليصة</td>
+                        <td class="detail-value">{{ "%.3f" | format(shipment.waybill_price) if shipment and shipment.waybill_price else "0.000" }} د.ك</td>
+                    </tr>
                     <tr>
                         <td class="detail-label">المبلغ المدفوع</td>
                         <td class="detail-value">{{ "%.3f" | format(shipment.paid_amount) if shipment and shipment.paid_amount else "0.000" }} د.ك</td>

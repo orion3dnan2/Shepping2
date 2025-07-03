@@ -948,6 +948,16 @@ gunicorn --bind 0.0.0.0:5000 main:app
   - Hidden shipment types table in Settings → Manage Types page (document types table remains visible)
   - Removed duplicate "عامة" entry from shipment type dropdown in Add New Shipment form
   - Implemented dynamic region selection based on shipment direction (Sudan regions for Kuwait→Sudan, Kuwait regions for Sudan→Kuwait)
+- **July 3, 2025: Enhanced invoice design with A4 format optimization and additional details**
+  - Removed "خدمات الشحن السريع" subtitle from professional invoice header for cleaner look
+  - Reduced "فاتورة شحن" title font size from 28px to 20px for better proportions
+  - Added three new fields to invoice details: "الوزن" (Weight), "الخصم" (Discount), "البوليصة" (Waybill)
+  - Optimized invoice layout for A4 paper size by reducing padding, margins, and spacing
+  - Reduced company title font size from 20px to 16px and overall content margins
+  - Decreased padding in all sections: contact info (20px→15px), shipment details (15px→12px)
+  - Minimized table cell padding and added 13px font size for better space utilization
+  - Reduced signature section spacing and dimensions for compact A4-friendly format
+  - Invoice now prints perfectly on A4 paper with all requested details included
 - **July 3, 2025: Converted database configuration from PostgreSQL to MySQL for Render deployment**
   - Updated app.py database configuration to use MySQL with PyMySQL driver
   - Converted JSONB fields to standard JSON for MySQL compatibility
