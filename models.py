@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 import os
 import json
 import logging
@@ -11,7 +12,7 @@ class Admin(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    permissions = db.Column(JSON, nullable=True, default={})  # JSON field for permissions (MySQL compatible)
+    permissions = db.Column(JSONB, nullable=True, default={})  # JSONB field for permissions (PostgreSQL optimized)
     is_super_admin = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

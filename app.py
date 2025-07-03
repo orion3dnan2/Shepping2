@@ -25,43 +25,25 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 # Additional Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# configure the database - MySQL configuration for Render
+# configure the database - PostgreSQL configuration for Replit
 database_url = os.environ.get("DATABASE_URL")
 
-# Handle MySQL URL format conversion
+# Handle PostgreSQL URL format
 if database_url:
-    if database_url.startswith("mysql://"):
-        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
-    elif database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
-        # Convert PostgreSQL URL to MySQL format if needed
-        print("⚠️ PostgreSQL URL detected, please use MySQL URL instead")
-    elif not database_url.startswith("mysql+pymysql://"):
-        # Add PyMySQL driver if not specified
-        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
-
+    if database_url.startswith("postgres://"):
+        # Convert postgres:// to postgresql:// for compatibility
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-# MySQL-specific configuration
-if database_url and "mysql" in database_url:
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 3600,
-        "pool_pre_ping": True,
-        "pool_size": 5,
-        "max_overflow": 10,
-        "echo": False,
-        "connect_args": {
-            "charset": "utf8mb4",
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
-    }
-else:
-    # Keep PostgreSQL configuration as fallback
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 300,
-        "pool_pre_ping": True,
-        "pool_size": 5,
-        "max_overflow": 10,
-        "echo": False,
-    }
+
+# PostgreSQL-specific configuration
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+    "pool_size": 5,
+    "max_overflow": 10,
+    "echo": False,
+}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # initialize the app with the extension, flask-sqlalchemy >= 3.0.x
@@ -95,8 +77,19 @@ with app.app_context():
         from models import Admin
         admin = Admin.query.filter_by(username='admin').first()
         if not admin:
-            admin = Admin(username='admin', is_super_admin=True)
+            admin = Admin()
+            admin.username = 'admin'
+            admin.is_super_admin = True
             admin.set_password('admin123')
+            admin.set_permissions({
+                'home': True,
+                'shipments': True,
+                'tracking': True,
+                'reports': True,
+                'expenses': True,
+                'add_shipment': True,
+                'settings': True
+            })
             db.session.add(admin)
             db.session.commit()
             logging.info('Default super admin created: admin/admin123')
