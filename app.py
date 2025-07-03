@@ -27,6 +27,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # configure the database - PostgreSQL configuration for Render
 database_url = os.environ.get("DATABASE_URL")
+print(f"✅ DATABASE_URL from environment = {database_url}")
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
