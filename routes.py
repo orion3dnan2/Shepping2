@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from flask import render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from app import app, db
@@ -74,6 +74,11 @@ def permission_required(page):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+@app.route('/install-cpanel')
+def install_cpanel():
+    """Display cPanel installation guide"""
+    return send_from_directory('.', 'install_cpanel.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

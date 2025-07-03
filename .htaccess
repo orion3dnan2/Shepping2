@@ -1,0 +1,63 @@
+# Apache Configuration for Shipping Management System
+# cPanel Hosting Configuration
+
+RewriteEngine On
+
+# Redirect all requests to passenger_wsgi.py
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ passenger_wsgi.py [QSA,L]
+
+# Security Headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+# Environment Variables
+# MySQL Database Configuration
+SetEnv DATABASE_URL "mysql+pymysql://shipping_user:your_password@localhost/shipping_system"
+
+# Session Security
+SetEnv SESSION_SECRET "your-secure-random-session-key-change-this-in-production"
+
+# Flask Environment
+SetEnv FLASK_ENV "production"
+
+# Python Configuration for cPanel
+PassengerPython /home/cpanel_username/virtualenv/public_html/shipping/3.11/bin/python
+PassengerAppRoot /home/cpanel_username/public_html/shipping
+PassengerStartupFile passenger_wsgi.py
+PassengerAppType wsgi
+
+# Enable Passenger
+PassengerEnabled On
+
+# File Upload Settings
+LimitRequestBody 16777216
+# 16MB max upload size
+
+# Cache Static Files
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    Header append Cache-Control "public"
+</FilesMatch>
+
+# Protect sensitive files
+<FilesMatch "\.(py|pyc|pyo|db)$">
+    Require all denied
+</FilesMatch>
+
+# Allow specific Python files for WSGI
+<Files "passenger_wsgi.py">
+    Require all granted
+</Files>
+
+# Protect configuration files
+<Files ".htaccess">
+    Require all denied
+</Files>
+
+# Error Pages
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
