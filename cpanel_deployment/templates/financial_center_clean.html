@@ -1,0 +1,705 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-chart-line me-2 text-primary"></i>
+                    المركز المالي
+                </h2>
+            </div>
+
+            <!-- Navigation Pills -->
+            <ul class="nav nav-pills mb-4" id="financialTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="operational-costs-tab" data-bs-toggle="pill" data-bs-target="#operational-costs" type="button" role="tab">
+                        <i class="fas fa-minus-circle me-2"></i>المصروفات
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="revenues-tab" data-bs-toggle="pill" data-bs-target="#revenues" type="button" role="tab">
+                        <i class="fas fa-coins me-2"></i>الإيرادات
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="financialTabsContent">
+                
+                <!-- Expenses Tab -->
+                <div class="tab-pane fade show active" id="operational-costs" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            
+                            <!-- Recent Expenses Display -->
+                            <div class="form-card mb-4">
+                                <h5>
+                                    <i class="fas fa-chart-line me-2 text-danger"></i>
+                                    📉 المصروفات الأخيرة
+                                </h5>
+                                <div id="recentExpensesCard" class="text-center">
+                                    <div class="loading-spinner">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">جاري التحميل...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Expense Category Tabs -->
+                            <div class="form-card">
+                                <h5><i class="fas fa-minus-circle me-2"></i>إدارة المصروفات</h5>
+                                
+                                <!-- Sub-tabs for expense categories -->
+                                <ul class="nav nav-pills expense-sub-tabs mb-3" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active expense-sub-tab" id="general-shipping-tab" data-bs-toggle="pill" data-bs-target="#general-shipping" type="button" role="tab">
+                                            <i class="fas fa-box me-2"></i>شحنات عامة
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link expense-sub-tab" id="documents-tab" data-bs-toggle="pill" data-bs-target="#documents" type="button" role="tab">
+                                            <i class="fas fa-file-alt me-2"></i>مستندات
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <!-- Sub-tab Content -->
+                                <div class="tab-content">
+                                    <!-- General Shipping Expenses -->
+                                    <div class="tab-pane fade show active" id="general-shipping" role="tabpanel">
+                                        <div class="row">
+                                            <!-- Expense Form -->
+                                            <div class="col-md-8">
+                                                <div class="expense-form-container">
+                                                    <h6 class="mb-3"><i class="fas fa-plus-circle me-2"></i>إضافة مصروف شحنات عامة</h6>
+                                                    <form id="generalShippingExpenseForm">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">الفئة</label>
+                                                                <select class="form-select" name="category" required>
+                                                                    <option value="">اختر الفئة</option>
+                                                                    <option value="fuel">وقود</option>
+                                                                    <option value="maintenance">صيانة</option>
+                                                                    <option value="customs">جمارك</option>
+                                                                    <option value="transport">نقل</option>
+                                                                    <option value="storage">تخزين</option>
+                                                                    <option value="other">أخرى</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">المبلغ (د.ك)</label>
+                                                                <input type="text" class="form-control" name="amount" pattern="\d+(\.\d{1,3})?" inputmode="decimal" placeholder="0.000" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mt-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label">ملاحظات</label>
+                                                                <textarea class="form-control" name="description" rows="2" placeholder="تفاصيل إضافية (اختياري)"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <button type="submit" class="btn btn-success">
+                                                                <i class="fas fa-save me-2"></i>حفظ المصروف
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Expense Table -->
+                                            <div class="col-md-4">
+                                                <div class="expense-table-container">
+                                                    <h6 class="mb-3"><i class="fas fa-list me-2"></i>مصروفات الشحنات العامة</h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th width="60%">اسم المصروف</th>
+                                                                    <th width="25%">المبلغ</th>
+                                                                    <th width="15%">مسح</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="generalShippingExpensesTable">
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center text-muted">لا توجد مصروفات</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Documents Expenses -->
+                                    <div class="tab-pane fade" id="documents" role="tabpanel">
+                                        <div class="row">
+                                            <!-- Expense Form -->
+                                            <div class="col-md-8">
+                                                <div class="expense-form-container">
+                                                    <h6 class="mb-3"><i class="fas fa-plus-circle me-2"></i>إضافة مصروف مستندات</h6>
+                                                    <form id="documentsExpenseForm">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">نوع المصروف</label>
+                                                                <select class="form-select" name="category" required>
+                                                                    <option value="">اختر نوع المصروف</option>
+                                                                    <option value="توثيق خارجية">توثيق خارجية</option>
+                                                                    <option value="توثيق تعليم عالي">توثيق تعليم عالي</option>
+                                                                    <option value="أدلة جنائية/فيش">أدلة جنائية/فيش</option>
+                                                                    <option value="استخراج شهادة ثانوية">استخراج شهادة ثانوية</option>
+                                                                    <option value="استخراج شهادة جامعية">استخراج شهادة جامعية</option>
+                                                                    <option value="استخراج قسيمة زواج مدرجة">استخراج قسيمة زواج مدرجة</option>
+                                                                    <option value="استخراج قسيمة زواج غير مدرجة">استخراج قسيمة زواج غير مدرجة</option>
+                                                                    <option value="استخراج شهادة جامعية تفاصيل">استخراج شهادة جامعية تفاصيل</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">المبلغ (د.ك)</label>
+                                                                <input type="text" class="form-control" name="amount" pattern="\d+(\.\d{1,3})?" inputmode="decimal" placeholder="0.000" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mt-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label">ملاحظات</label>
+                                                                <textarea class="form-control" name="description" rows="2" placeholder="تفاصيل إضافية (اختياري)"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <button type="submit" class="btn btn-success">
+                                                                <i class="fas fa-save me-2"></i>حفظ المصروف
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Expense Table -->
+                                            <div class="col-md-4">
+                                                <div class="expense-table-container">
+                                                    <h6 class="mb-3"><i class="fas fa-list me-2"></i>مصروفات المستندات</h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th width="60%">اسم المصروف</th>
+                                                                    <th width="25%">المبلغ</th>
+                                                                    <th width="15%">مسح</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="documentsExpensesTable">
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center text-muted">لا توجد مصروفات</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenues Tab -->
+                <div class="tab-pane fade" id="revenues" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-card">
+                                <h5>
+                                    <i class="fas fa-coins me-2 text-success"></i>
+                                    إجمالي الإيرادات
+                                </h5>
+                                <div id="revenueSummaryCard" class="text-center">
+                                    <div class="revenue-breakdown">
+                                        <div class="breakdown-item">
+                                            <i class="fas fa-plane text-primary me-2"></i>
+                                            <span>إيرادات الشحن الجوي</span>
+                                            <span class="fw-bold text-success" id="airShippingRevenue">0.000 د.ك</span>
+                                        </div>
+                                        <div class="breakdown-item">
+                                            <i class="fas fa-truck text-success me-2"></i>
+                                            <span>إيرادات الشحن البري</span>
+                                            <span class="fw-bold text-success" id="landShippingRevenue">0.000 د.ك</span>
+                                        </div>
+                                        <div class="breakdown-item">
+                                            <i class="fas fa-file-alt text-warning me-2"></i>
+                                            <span>إيرادات شحن المستندات</span>
+                                            <span class="fw-bold text-success" id="documentShippingRevenue">0.000 د.ك</span>
+                                        </div>
+                                        <div class="breakdown-item border-top pt-3 mt-3">
+                                            <span class="fw-bold fs-5">إجمالي الإيرادات</span>
+                                            <span class="fw-bold fs-5 text-success" id="totalRevenues">0.000 د.ك</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Navigation Pills */
+.nav-pills {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.nav-pills .nav-link {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    color: #6c757d;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-pills .nav-link:hover {
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: white;
+    border-color: #6f42c1;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+}
+
+/* Sub-tabs for expenses */
+.expense-sub-tabs {
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.expense-sub-tab {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    color: #dc3545;
+    background: linear-gradient(135deg, #fff5f5, #ffe6e6);
+    border: 1px solid #f8d7da;
+    transition: all 0.3s ease;
+}
+
+.expense-sub-tab:hover {
+    background: linear-gradient(135deg, #ffe6e6, #ffcccc);
+    transform: translateY(-1px);
+}
+
+.expense-sub-tab.active {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    border-color: #dc3545;
+}
+
+/* Form Cards */
+.form-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    border: 1px solid #e3e6f0;
+}
+
+.form-card h5 {
+    color: #5a5c69;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e3e6f0;
+}
+
+/* Form styling */
+.form-label {
+    font-weight: 600;
+    color: #5a5c69;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #d1d3e2;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+
+/* Button styling */
+.btn {
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #20c997, #17a2b8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+/* Revenue breakdown styling */
+.revenue-breakdown {
+    padding: 1.5rem;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.breakdown-item span:first-child {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: #5a5c69;
+}
+
+/* Table styling */
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.table tbody td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    vertical-align: middle;
+    border-color: #e3e6f0;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    padding: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .form-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .nav-pills .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .breakdown-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .breakdown-item span:last-child {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 576px) {
+    .expense-sub-tabs .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .expense-sub-tabs i {
+        display: none;
+    }
+}
+</style>
+
+<script>
+// Load recent expenses on page load and tab activation
+document.addEventListener('DOMContentLoaded', function() {
+    loadRecentExpenses();
+    loadRevenueSummary();
+    
+    // Load expenses when switching tabs
+    document.getElementById('operational-costs-tab').addEventListener('shown.bs.tab', function() {
+        loadRecentExpenses();
+        loadExpenseTable('شحنات عامة');
+    });
+    
+    document.getElementById('revenues-tab').addEventListener('shown.bs.tab', function() {
+        loadRevenueSummary();
+    });
+    
+    // Load expense tables when switching sub-tabs
+    document.getElementById('general-shipping-tab').addEventListener('shown.bs.tab', function() {
+        loadExpenseTable('شحنات عامة');
+    });
+    
+    document.getElementById('documents-tab').addEventListener('shown.bs.tab', function() {
+        loadExpenseTable('مستندات');
+    });
+    
+    // Form submissions
+    document.getElementById('generalShippingExpenseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitExpenseForm(this, 'شحنات عامة');
+    });
+    
+    document.getElementById('documentsExpenseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitExpenseForm(this, 'مستندات');
+    });
+});
+
+// Function to load recent expenses
+function loadRecentExpenses() {
+    const container = document.getElementById('recentExpensesCard');
+    if (!container) return;
+    
+    fetch('/api/recent_expenses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.expenses && data.expenses.length > 0) {
+                let expensesHtml = '<div class="recent-expenses-list">';
+                data.expenses.forEach(expense => {
+                    expensesHtml += `
+                        <div class="expense-item">
+                            <span class="expense-name">${expense.name}</span>
+                            <span class="expense-amount">${expense.amount.toFixed(3)} د.ك</span>
+                        </div>
+                    `;
+                });
+                expensesHtml += `
+                    <div class="expense-total border-top pt-2 mt-2">
+                        <span class="fw-bold">المجموع: ${data.total.toFixed(3)} د.ك</span>
+                    </div>
+                </div>`;
+                container.innerHTML = expensesHtml;
+            } else {
+                container.innerHTML = '<div class="text-muted">لا توجد مصروفات حديثة</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading recent expenses:', error);
+            container.innerHTML = '<div class="text-danger">خطأ في تحميل المصروفات</div>';
+        });
+}
+
+// Function to load revenue summary
+function loadRevenueSummary() {
+    fetch('/api/get_all_revenues')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('airShippingRevenue').textContent = data.air_revenue.toFixed(3) + ' د.ك';
+                document.getElementById('landShippingRevenue').textContent = data.land_revenue.toFixed(3) + ' د.ك';
+                document.getElementById('documentShippingRevenue').textContent = data.document_revenue.toFixed(3) + ' د.ك';
+                document.getElementById('totalRevenues').textContent = data.total_revenue.toFixed(3) + ' د.ك';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading revenue summary:', error);
+        });
+}
+
+// Function to load expense table
+function loadExpenseTable(shippingType) {
+    const tableId = shippingType === 'شحنات عامة' ? 'generalShippingExpensesTable' : 'documentsExpensesTable';
+    const tbody = document.getElementById(tableId);
+    if (!tbody) return;
+    
+    fetch(`/api/shipping_expenses/${encodeURIComponent(shippingType)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.expenses && data.expenses.length > 0) {
+                let tableHtml = '';
+                data.expenses.forEach(expense => {
+                    tableHtml += `
+                        <tr>
+                            <td>${expense.name}</td>
+                            <td>${expense.amount.toFixed(3)} د.ك</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(${expense.id}, '${shippingType}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = tableHtml;
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">لا توجد مصروفات</td></tr>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading expense table:', error);
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">خطأ في تحميل البيانات</td></tr>';
+        });
+}
+
+// Function to submit expense form
+function submitExpenseForm(form, shippingType) {
+    const formData = new FormData(form);
+    formData.append('shipping_type', shippingType);
+    
+    fetch('/add_financial_transaction', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            form.reset();
+            loadExpenseTable(shippingType);
+            loadRecentExpenses();
+            showNotification('تم حفظ المصروف بنجاح', 'success');
+        } else {
+            showNotification(data.message || 'حدث خطأ في حفظ المصروف', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting expense:', error);
+        showNotification('حدث خطأ في حفظ المصروف', 'error');
+    });
+}
+
+// Function to delete expense
+function deleteExpense(expenseId, shippingType) {
+    if (!confirm('هل أنت متأكد من حذف هذا المصروف؟')) return;
+    
+    fetch(`/delete_financial_transaction/${expenseId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadExpenseTable(shippingType);
+            loadRecentExpenses();
+            showNotification('تم حذف المصروف بنجاح', 'success');
+        } else {
+            showNotification(data.message || 'حدث خطأ في حذف المصروف', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting expense:', error);
+        showNotification('حدث خطأ في حذف المصروف', 'error');
+    });
+}
+
+// Function to show notifications
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script>
+
+<style>
+/* Additional CSS for recent expenses display */
+.recent-expenses-list {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.expense-item:last-child {
+    border-bottom: none;
+}
+
+.expense-name {
+    font-weight: 500;
+    color: #5a5c69;
+}
+
+.expense-amount {
+    font-weight: 600;
+    color: #dc3545;
+}
+
+.expense-total {
+    text-align: center;
+    color: #dc3545;
+    font-size: 1.1rem;
+}
+
+/* Expense form container styling */
+.expense-form-container, .expense-table-container {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.expense-form-container h6, .expense-table-container h6 {
+    color: #495057;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}

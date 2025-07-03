@@ -1,0 +1,47 @@
+<!-- Edit Document Type Modal -->
+<div class="modal fade" id="editDocumentTypeModal" tabindex="-1" aria-labelledby="editDocumentTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDocumentTypeModalLabel">تعديل نوع الوثيقة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="" id="editDocumentTypeForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editDocumentTypeId" name="type_id">
+                    <div class="mb-3">
+                        <label for="editDocumentNameAr" class="form-label">الاسم بالعربية *</label>
+                        <input type="text" class="form-control" id="editDocumentNameAr" name="name_ar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDocumentNameEn" class="form-label">الاسم بالإنجليزية *</label>
+                        <input type="text" class="form-control" id="editDocumentNameEn" name="name_en" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDocumentPrice" class="form-label">السعر (د.ك) *</label>
+                        <input type="number" step="0.001" class="form-control" id="editDocumentPrice" name="price" min="0" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editDocumentActive" name="is_active">
+                        <label class="form-check-label" for="editDocumentActive">نشط</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editDocumentTypeModal = document.getElementById('editDocumentTypeModal');
+    editDocumentTypeModal.addEventListener('show.bs.modal', function() {
+        const typeId = document.getElementById('editDocumentTypeId').value;
+        const form = document.getElementById('editDocumentTypeForm');
+        form.action = "/edit_document_type/" + typeId;
+    });
+});
+</script>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة شحن - مرسال</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: white;
+            color: #000;
+            line-height: 1.6;
+            direction: rtl;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            max-width: 190mm;
+            margin: 0 auto;
+            background: white;
+            padding: 10mm;
+            min-height: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Invoice Date Section */
+        .invoice-date {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* Header Section */
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
+        }
+
+        .company-logo {
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .morsal-logo-professional {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .morsal-text-professional {
+            font-size: 18px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .morsal-m-professional {
+            background: #dc2626;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .company-logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .company-logo p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .invoice-title {
+            text-align: left;
+        }
+
+        .logo-header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo-header .morsal-logo-professional {
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .company-title {
+            color: #333;
+            font-size: 16px;
+            margin: 8px 0 5px 0;
+            font-weight: 600;
+        }
+
+        .invoice-title-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .invoice-main-title {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .invoice-title h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .invoice-number {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Main Content Area */
+        .invoice-content {
+            margin-bottom: 30px;
+        }
+
+        /* Contact Information Section */
+        .contact-info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .contact-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .contact-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .contact-label {
+            font-weight: 600;
+            color: #000;
+            font-size: 14px;
+            width: 30%;
+        }
+
+        .contact-value {
+            color: #333;
+            font-size: 14px;
+            text-align: left;
+            width: 65%;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        /* Shipment Details */
+        .shipment-details {
+            margin-bottom: 20px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .shipment-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 6px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .details-table td {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .details-table .detail-label {
+            font-weight: 600;
+            color: #000;
+            background-color: #f8f9fa;
+        }
+
+        .details-table .detail-value {
+            color: #333;
+        }
+
+        .cost-highlight {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        /* Contact Footer */
+        .contact-footer {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .contact-footer h4 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .contact-details {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .sender-info, .receiver-info {
+            flex: 1;
+            text-align: right;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .sender-info strong, .receiver-info strong {
+            color: #333;
+            font-size: 15px;
+        }
+
+        /* Footer Signatures */
+        .signature-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            border-top: 1px solid #ccc;
+            padding-top: 12px;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 150px;
+        }
+
+        .signature-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #000;
+            font-size: 12px;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #ccc;
+            height: 30px;
+            margin-bottom: 5px;
+            padding-top: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+                font-size: 12px;
+            }
+            
+            .invoice-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 10mm;
+                min-height: auto;
+                max-width: none;
+            }
+            
+            .control-buttons {
+                display: none;
+            }
+            
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            .signature-section {
+                bottom: 10mm;
+                left: 10mm;
+                right: 10mm;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .invoice-container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .invoice-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .company-logo {
+                order: 1;
+                margin-bottom: 20px;
+            }
+            
+            .invoice-title {
+                order: 2;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .signature-section {
+                position: static;
+                margin-top: 40px;
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .signature-box {
+                width: 100%;
+            }
+        }
+
+        /* Control Buttons */
+        .control-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .control-buttons button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .control-buttons button:hover {
+            background: #0056b3;
+        }
+
+        .control-buttons .close-btn {
+            background: #dc3545;
+        }
+
+        .control-buttons .close-btn:hover {
+            background: #c82333;
+        }
+
+        @media print {
+            .control-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="control-buttons">
+        <button onclick="window.print()" onkeydown="if(event.key==='Enter' || event.key===' ') window.print()">
+            طباعة الفاتورة
+        </button>
+        <button class="close-btn" onclick="window.close()" onkeydown="if(event.key==='Escape') window.close()">
+            إغلاق
+        </button>
+    </div>
+
+    <div class="invoice-container">
+        <!-- Invoice Date -->
+        <div class="invoice-date">
+            <strong>تاريخ إنشاء الفاتورة: {{ shipment.created_at.strftime('%Y-%m-%d %H:%M') if shipment else '2025-06-28 10:30' }}</strong>
+        </div>
+
+        <!-- Logo Section -->
+        <div class="logo-header">
+            <div class="morsal-logo-professional">
+                <div class="morsal-text-professional">مرسال</div>
+                <div class="morsal-m-professional">M</div>
+            </div>
+            <h1 class="company-title">مرسال إكسبرس للاستيراد والتصدير</h1>
+
+        </div>
+
+        <!-- Invoice Title Section -->
+        <div class="invoice-title-section">
+            <h2 class="invoice-main-title">فاتورة شحن</h2>
+            <div class="invoice-number">رقم الفاتورة: {{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</div>
+        </div>
+
+        <!-- Invoice Content -->
+        <div class="invoice-content">
+            {% if shipment and shipment.package_type == 'document' and shipment.status == 'delivered' %}
+            <!-- Simplified Invoice for Delivered Documents -->
+            <div class="contact-info-section">
+                <div class="contact-row">
+                    <span class="contact-label">اسم المرسل:</span>
+                    <span class="contact-value">{{ shipment.sender_name if shipment else 'أحمد محمد علي' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">رقم الهاتف:</span>
+                    <span class="contact-value">{{ shipment.sender_phone if shipment else '+965 1234 5678' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">اسم المستلم:</span>
+                    <span class="contact-value">{{ shipment.receiver_name if shipment else 'فاطمة أحمد حسن' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">نوع الشحنة:</span>
+                    <span class="contact-value">{{ get_document_type_arabic(shipment.document_type) if shipment.document_type else 'مستندات' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">الإجراء:</span>
+                    <span class="contact-value">{{ shipment.package_contents if shipment.package_contents else 'غير محدد' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">رقم التتبع:</span>
+                    <span class="contact-value">{{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">حالة المستند:</span>
+                    <span class="contact-value">تم التسليم</span>
+                </div>
+            </div>
+            {% else %}
+            <!-- Standard Invoice -->
+            <div class="contact-info-section">
+                <div class="contact-row">
+                    <span class="contact-label">اسم المرسل:</span>
+                    <span class="contact-value">{{ shipment.sender_name if shipment else 'أحمد محمد علي' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">رقم هاتف المرسل:</span>
+                    <span class="contact-value">{{ shipment.sender_phone if shipment else '+965 1234 5678' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">اسم المستلم:</span>
+                    <span class="contact-value">{{ shipment.receiver_name if shipment else 'فاطمة أحمد حسن' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">رقم هاتف المستلم:</span>
+                    <span class="contact-value">{{ shipment.receiver_phone if shipment else '+249 123 456 789' }}</span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-label">📍 عنوان المستلم:</span>
+                    <span class="contact-value">{{ shipment.receiver_address if shipment and shipment.receiver_address else '—' }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if not (shipment and shipment.package_type == 'document' and shipment.status == 'delivered') %}
+            <!-- Shipment Details -->
+            <div class="shipment-details">
+                <h3>تفاصيل الشحنة</h3>
+                <table class="details-table">
+                    <tr>
+                        <td class="detail-label">نوع الشحنة</td>
+                        <td class="detail-value">
+                            {% if shipment %}
+                                {% if shipment.package_type == 'document' %}
+                                    {{ get_document_type_arabic(shipment.document_type) if shipment.document_type else 'مستندات' }}
+                                {% else %}
+                                    {{ get_text('shipment_types')[shipment.package_type] if shipment.package_type in get_text('shipment_types') else shipment.package_type }}
+                                {% endif %}
+                            {% else %}
+                                إلكترونيات
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-label">
+                            {% if shipment and shipment.package_type == 'document' %}
+                                الإجراء
+                            {% else %}
+                                المحتويات
+                            {% endif %}
+                        </td>
+                        <td class="detail-value">
+                            {% if shipment %}
+                                {% if shipment.package_type == 'document' %}
+                                    {{ shipment.package_contents if shipment.package_contents else 'غير محدد' }}
+                                {% else %}
+                                    {{ shipment.package_contents if shipment.package_contents else 'غير محدد' }}
+                                {% endif %}
+                            {% else %}
+                                هاتف ذكي جديد
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="detail-label">رقم التتبع</td>
+                        <td class="detail-value">{{ shipment.tracking_number if shipment else 'SHIP-20250627-001' }}</td>
+                    </tr>
+                    {% if shipment and shipment.package_type == 'document' %}
+                    <tr>
+                        <td class="detail-label">حالة المستند</td>
+                        <td class="detail-value">
+                            {% if shipment.status == 'created' %}
+                                تم الإنشاء
+                            {% elif shipment.status == 'under_review' %}
+                                قيد المراجعة
+                            {% elif shipment.status == 'documents_received' %}
+                                تم استلام المستندات
+                            {% elif shipment.status == 'authentication_in_progress' %}
+                                التوثيق جاري
+                            {% elif shipment.status == 'authentication_completed' %}
+                                تم التوثيق
+                            {% elif shipment.status == 'sending_after_auth' %}
+                                الإرسال بعد التوثيق
+                            {% elif shipment.status == 'in_transit' %}
+                                في الطريق
+                            {% elif shipment.status == 'delivered' %}
+                                تم التسليم
+                            {% elif shipment.status == 'cancelled' %}
+                                ملغاة
+                            {% else %}
+                                {{ shipment.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% if not shipment or shipment.package_type != 'document' %}
+                    <tr>
+                        <td class="detail-label">الوزن</td>
+                        <td class="detail-value">{{ "%.2f" | format(shipment.weight) if shipment and shipment.weight else "0.00" }} كيلو</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="detail-label">الخصم</td>
+                        <td class="detail-value">{{ "%.3f" | format(shipment.discount) if shipment and shipment.discount else "0.000" }} د.ك</td>
+                    </tr>
+                    {% if not shipment or shipment.package_type != 'document' %}
+                    <tr>
+                        <td class="detail-label">البوليصة</td>
+                        <td class="detail-value">{{ "%.3f" | format(shipment.waybill_price) if shipment and shipment.waybill_price else "0.000" }} د.ك</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="detail-label">المبلغ المدفوع</td>
+                        <td class="detail-value">{{ "%.3f" | format(shipment.paid_amount) if shipment and shipment.paid_amount else "0.000" }} د.ك</td>
+                    </tr>
+                    <tr>
+                        <td class="detail-label">المبلغ المتبقي</td>
+                        <td class="detail-value cost-highlight">{{ "%.3f" | format(shipment.remaining_amount if shipment and shipment.remaining_amount is not none else 0.000) }} د.ك</td>
+                    </tr>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer Signature -->
+        <div class="signature-section">
+            <div class="signature-box">
+                {% if shipment and shipment.package_type == 'document' and shipment.status == 'delivered' %}
+                    <div class="signature-label">توقيع المرسل</div>
+                    <div class="signature-line">____________________</div>
+                {% else %}
+                    <div class="signature-label">توقيع الموظف</div>
+                    <div class="signature-line">{{ current_user.username }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus on print button for better accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const printBtn = document.querySelector('.control-buttons button');
+            if (printBtn) {
+                printBtn.focus();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault();
+                window.print();
+            }
+            if (event.key === 'Escape') {
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}تقارير الربح والخسارة للشحنات{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <h4 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        تقارير الربح والخسارة للشحنات
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Filters -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">فترة التقرير</label>
+                            <select class="form-select" id="reportPeriod">
+                                <option value="all">جميع الشحنات</option>
+                                <option value="today">اليوم</option>
+                                <option value="week">هذا الأسبوع</option>
+                                <option value="month">هذا الشهر</option>
+                                <option value="custom">فترة مخصصة</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="customDateRange" style="display: none;">
+                            <label class="form-label fw-bold">من تاريخ</label>
+                            <input type="date" class="form-control" id="startDate">
+                        </div>
+                        <div class="col-md-4" id="customDateRangeTo" style="display: none;">
+                            <label class="form-label fw-bold">إلى تاريخ</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="row mb-4" id="summaryCards">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #e8f5e8, #c8e6c9);">
+                                <div class="card-body p-4 text-center">
+                                    <i class="fas fa-shipping-fast text-success mb-2" style="font-size: 2rem;"></i>
+                                    <div class="fw-bold mb-1">إجمالي الشحنات</div>
+                                    <div id="totalShipments" class="h3 text-success fw-bold mb-0">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #e8f4fd, #bbdefb);">
+                                <div class="card-body p-4 text-center">
+                                    <i class="fas fa-arrow-up text-primary mb-2" style="font-size: 2rem;"></i>
+                                    <div class="fw-bold mb-1">إجمالي الإيرادات</div>
+                                    <div id="totalRevenue" class="h3 text-primary fw-bold mb-0">0.000 د.ك</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9);">
+                                <div class="card-body p-4 text-center">
+                                    <i class="fas fa-arrow-down text-danger mb-2" style="font-size: 2rem;"></i>
+                                    <div class="fw-bold mb-1">إجمالي المصروفات</div>
+                                    <div id="totalExpenses" class="h3 text-danger fw-bold mb-0">0.000 د.ك</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #fff3e0, #ffcc02);">
+                                <div class="card-body p-4 text-center">
+                                    <i id="netProfitIcon" class="fas fa-equals mb-2" style="font-size: 2rem;"></i>
+                                    <div class="fw-bold mb-1">صافي الربح/الخسارة</div>
+                                    <div id="netProfit" class="h3 fw-bold mb-0">0.000 د.ك</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipments Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="shipmentsTable">
+                            <thead style="background: linear-gradient(135deg, #667eea, #764ba2);" class="text-white">
+                                <tr>
+                                    <th style="width: 12%">رقم التتبع</th>
+                                    <th style="width: 10%">النوع</th>
+                                    <th style="width: 14%">المرسل</th>
+                                    <th style="width: 14%">المستلم</th>
+                                    <th style="width: 10%">الإيراد</th>
+                                    <th style="width: 12%">مصروفات الفئة</th>
+                                    <th style="width: 12%">صافي الربح</th>
+                                    <th style="width: 8%">الحالة</th>
+                                    <th style="width: 8%">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipmentsTableBody">
+                                <!-- سيتم تحميل البيانات ديناميكياً -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingState" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <div class="mt-2">جاري تحميل البيانات...</div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="text-center py-5" style="display: none;">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">لا توجد شحنات للفترة المحددة</h5>
+                        <p class="text-muted">جرب تغيير فترة التقرير أو إضافة شحنات جديدة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shipment Details Modal -->
+<div class="modal fade" id="shipmentDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-box me-2"></i>
+                    تفاصيل الربح والخسارة للشحنة
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="shipmentDetailsContent">
+                <!-- سيتم تحميل التفاصيل ديناميكياً -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load initial data
+    loadShipmentReports();
+    
+    // Period filter change
+    document.getElementById('reportPeriod').addEventListener('change', function() {
+        const period = this.value;
+        if (period === 'custom') {
+            document.getElementById('customDateRange').style.display = 'block';
+            document.getElementById('customDateRangeTo').style.display = 'block';
+        } else {
+            document.getElementById('customDateRange').style.display = 'none';
+            document.getElementById('customDateRangeTo').style.display = 'none';
+            loadShipmentReports();
+        }
+    });
+    
+    // Date range change
+    document.getElementById('startDate').addEventListener('change', loadShipmentReports);
+    document.getElementById('endDate').addEventListener('change', loadShipmentReports);
+});
+
+function loadShipmentReports() {
+    const period = document.getElementById('reportPeriod').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    // Show loading state
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('shipmentsTable').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('period', period);
+    if (period === 'custom' && startDate && endDate) {
+        params.append('start_date', startDate);
+        params.append('end_date', endDate);
+    }
+    
+    fetch(`/api/shipment_reports?${params.toString()}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateSummaryCards(data.summary);
+            updateShipmentsTable(data.shipments);
+            
+            if (data.shipments.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('shipmentsTable').style.display = 'none';
+            } else {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('shipmentsTable').style.display = 'table';
+            }
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading shipment reports:', error);
+        showNotification('حدث خطأ في تحميل التقارير', 'error');
+    })
+    .finally(() => {
+        document.getElementById('loadingState').style.display = 'none';
+    });
+}
+
+function updateSummaryCards(summary) {
+    document.getElementById('totalShipments').textContent = summary.total_shipments;
+    document.getElementById('totalRevenue').textContent = summary.total_revenue.toFixed(3) + ' د.ك';
+    document.getElementById('totalExpenses').textContent = summary.total_expenses.toFixed(3) + ' د.ك';
+    
+    const netProfit = summary.net_profit;
+    const netProfitElement = document.getElementById('netProfit');
+    const netProfitIcon = document.getElementById('netProfitIcon');
+    
+    netProfitElement.textContent = netProfit.toFixed(3) + ' د.ك';
+    
+    if (netProfit > 0) {
+        netProfitElement.className = 'h3 text-success fw-bold mb-0';
+        netProfitIcon.className = 'fas fa-arrow-up text-success mb-2';
+    } else if (netProfit < 0) {
+        netProfitElement.className = 'h3 text-danger fw-bold mb-0';
+        netProfitIcon.className = 'fas fa-arrow-down text-danger mb-2';
+    } else {
+        netProfitElement.className = 'h3 text-warning fw-bold mb-0';
+        netProfitIcon.className = 'fas fa-equals text-warning mb-2';
+    }
+}
+
+function updateShipmentsTable(shipments) {
+    const tbody = document.getElementById('shipmentsTableBody');
+    tbody.innerHTML = '';
+    
+    shipments.forEach(shipment => {
+        const row = document.createElement('tr');
+        
+        // Status badge
+        const statusBadge = getStatusBadge(shipment.status);
+        
+        // Profit/Loss color
+        const profitClass = shipment.net_profit > 0 ? 'text-success' : 
+                           shipment.net_profit < 0 ? 'text-danger' : 'text-warning';
+        
+        row.innerHTML = `
+            <td>
+                <span class="fw-bold" style="color: #00b7ff; font-family: 'Courier New', monospace;">
+                    ${shipment.tracking_number}
+                </span>
+            </td>
+            <td>
+                <span class="badge bg-info">${shipment.package_type_ar || shipment.package_type}</span>
+            </td>
+            <td class="fw-bold">${shipment.sender_name}</td>
+            <td class="fw-bold">${shipment.receiver_name}</td>
+            <td class="text-primary fw-bold">${shipment.price.toFixed(3)} د.ك</td>
+            <td class="text-warning fw-bold">${shipment.category_expenses.toFixed(3)} د.ك</td>
+            <td class="${profitClass} fw-bold">${shipment.net_profit.toFixed(3)} د.ك</td>
+            <td>${statusBadge}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" 
+                        onclick="showShipmentDetails(${shipment.id})" 
+                        title="عرض التفاصيل">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+function getStatusBadge(status) {
+    const statusMap = {
+        'created': { text: 'تم الإنشاء', class: 'bg-secondary' },
+        'packaged': { text: 'تم التعبئة', class: 'bg-info' },
+        'shipped': { text: 'في الطريق', class: 'bg-primary' },
+        'delivered': { text: 'تم التسليم', class: 'bg-success' },
+        'cancelled': { text: 'ملغاة', class: 'bg-danger' }
+    };
+    
+    const statusInfo = statusMap[status] || { text: status, class: 'bg-secondary' };
+    return `<span class="badge ${statusInfo.class}">${statusInfo.text}</span>`;
+}
+
+function showShipmentDetails(shipmentId) {
+    fetch(`/api/shipment_details/${shipmentId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = new bootstrap.Modal(document.getElementById('shipmentDetailsModal'));
+            document.getElementById('shipmentDetailsContent').innerHTML = generateShipmentDetailsHTML(data.shipment);
+            modal.show();
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading shipment details:', error);
+        showNotification('حدث خطأ في تحميل تفاصيل الشحنة', 'error');
+    });
+}
+
+function generateShipmentDetailsHTML(shipment) {
+    const expensesList = shipment.expenses.map(expense => `
+        <tr>
+            <td>${expense.name}</td>
+            <td>${expense.amount.toFixed(3)} د.ك</td>
+            <td>${expense.date}</td>
+            <td><span class="badge bg-secondary">${expense.type}</span></td>
+        </tr>
+    `).join('');
+    
+    return `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="fw-bold mb-3">معلومات الشحنة</h6>
+                <table class="table table-borderless table-sm">
+                    <tr><td class="fw-bold">رقم التتبع:</td><td>${shipment.tracking_number}</td></tr>
+                    <tr><td class="fw-bold">المرسل:</td><td>${shipment.sender_name}</td></tr>
+                    <tr><td class="fw-bold">المستلم:</td><td>${shipment.receiver_name}</td></tr>
+                    <tr><td class="fw-bold">النوع:</td><td>${shipment.package_type}</td></tr>
+                    <tr><td class="fw-bold">التاريخ:</td><td>${shipment.created_at}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold mb-3">الحساب المالي</h6>
+                <table class="table table-borderless table-sm">
+                    <tr><td class="fw-bold">سعر الشحنة:</td><td class="text-primary">${shipment.price.toFixed(3)} د.ك</td></tr>
+                    <tr><td class="fw-bold">مصروفات الفئة (موزعة):</td><td class="text-warning">${shipment.category_expenses ? shipment.category_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
+                    <tr><td class="fw-bold">مصروفات مباشرة:</td><td class="text-danger">${shipment.direct_expenses ? shipment.direct_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
+                    <tr><td class="fw-bold">صافي الربح:</td><td class="fw-bold ${shipment.net_profit > 0 ? 'text-success' : shipment.net_profit < 0 ? 'text-danger' : 'text-warning'}">${shipment.net_profit.toFixed(3)} د.ك</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <h6 class="fw-bold mb-3">تفاصيل المصروفات المرتبطة</h6>
+        ${shipment.expenses.length > 0 ? `
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>اسم المصروف</th>
+                            <th>المبلغ</th>
+                            <th>التاريخ</th>
+                            <th>النوع</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${expensesList}
+                    </tbody>
+                </table>
+            </div>
+        ` : `
+            <div class="text-center text-muted py-3">
+                <i class="fas fa-inbox fa-2x mb-2"></i>
+                <p>لا توجد مصروفات مرتبطة بهذه الشحنة</p>
+            </div>
+        `}
+    `;
+}
+</script>
+{% endblock %}
