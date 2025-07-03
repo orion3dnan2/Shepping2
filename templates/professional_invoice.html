@@ -599,11 +599,16 @@
             {% endif %}
         </div>
 
-        <!-- Footer Signature (Employee Only) -->
+        <!-- Footer Signature -->
         <div class="signature-section">
             <div class="signature-box">
-                <div class="signature-label">توقيع الموظف</div>
-                <div class="signature-line">{{ current_user.username }}</div>
+                {% if shipment and shipment.package_type == 'document' and shipment.status == 'delivered' %}
+                    <div class="signature-label">توقيع المرسل</div>
+                    <div class="signature-line">____________________</div>
+                {% else %}
+                    <div class="signature-label">توقيع الموظف</div>
+                    <div class="signature-line">{{ current_user.username }}</div>
+                {% endif %}
             </div>
         </div>
     </div>
