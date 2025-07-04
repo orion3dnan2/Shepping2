@@ -2742,6 +2742,43 @@ def update_waybill_price():
     return redirect(url_for('settings') + '#pricing')
 
 
+@app.route('/update_procedure_prices', methods=['POST'])
+@login_required
+@permission_required('Home')
+def update_procedure_prices():
+    """Update prices for all procedure types"""
+    try:
+        updated_count = 0
+        
+        # Get all form data
+        form_data = request.form
+        
+        # Process each price update
+        for key, value in form_data.items():
+            if key.startswith('price_'):
+                document_type_id = int(key.replace('price_', ''))
+                price = float(value) if value else 0.0
+                
+                # Update the document type price
+                document_type = DocumentType.query.get(document_type_id)
+                if document_type:
+                    document_type.price = price
+                    updated_count += 1
+        
+        # Commit all changes
+        db.session.commit()
+        
+        flash(f'تم تحديث أسعار {updated_count} من أنواع الإجراءات بنجاح', 'success')
+        
+    except ValueError:
+        flash('يرجى إدخال قيم صحيحة للأسعار', 'error')
+    except Exception as e:
+        flash('حدث خطأ أثناء تحديث الأسعار', 'error')
+        logging.error(f'Error updating procedure prices: {str(e)}')
+    
+    return redirect(url_for('settings') + '#pricing')
+
+
 # Edit Shipment Routes
 @app.route("/edit_shipment/<int:shipment_id>", methods=['GET'])
 @login_required

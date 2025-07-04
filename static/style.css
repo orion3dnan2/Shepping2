@@ -1759,3 +1759,52 @@ footer {
     background: linear-gradient(135deg, #64748b, #475569);
     color: #ffffff !important; 
 }
+
+/* Procedure Price Input Styles */
+.procedure-price-input {
+    max-width: 120px;
+    font-size: 0.9rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.procedure-price-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-save-procedure-prices {
+    background: linear-gradient(135deg, #198754, #157347);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-save-procedure-prices:hover {
+    background: linear-gradient(135deg, #157347, #0f5132);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-save-procedure-prices:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pricing-table .input-group-sm {
+    max-width: 150px;
+}
+
+.pricing-table .input-group-text {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}

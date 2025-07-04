@@ -259,32 +259,50 @@
                         <!-- Document Types Section -->
                         <div class="pricing-section">
                             <h4 class="section-title mb-3">أنواع الإجراءات للوثائق</h4>
-                            <div class="table-responsive">
-                                <table class="table table-hover pricing-table">
-                                    <thead class="table-header">
-                                        <tr>
-                                            <th>نوع الإجراء</th>
-                                            <th>الحالة</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for document_type in document_types %}
-                                        <tr>
-                                            <td>
-                                                <span class="fw-medium">{{ document_type.name_ar }}</span>
-                                            </td>
-                                            <td>
-                                                {% if document_type.is_active %}
-                                                    <span class="badge bg-success">نشط</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">غير نشط</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <form method="post" action="{{ url_for('update_procedure_prices') }}" id="procedurePricesForm">
+                                <div class="table-responsive">
+                                    <table class="table table-hover pricing-table">
+                                        <thead class="table-header">
+                                            <tr>
+                                                <th>نوع الإجراء</th>
+                                                <th>السعر (د.ك)</th>
+                                                <th>الحالة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for document_type in document_types %}
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-medium">{{ document_type.name_ar }}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="number" step="0.001" class="form-control procedure-price-input" 
+                                                               name="price_{{ document_type.id }}" 
+                                                               value="{{ '%.3f'|format(document_type.price) }}" 
+                                                               min="0" placeholder="0.000">
+                                                        <span class="input-group-text">د.ك</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {% if document_type.is_active %}
+                                                        <span class="badge bg-success">نشط</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">غير نشط</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-end mt-3">
+                                    <button type="submit" class="btn btn-primary btn-save-procedure-prices">
+                                        <i class="fas fa-save me-2"></i>
+                                        حفظ الأسعار
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
