@@ -377,6 +377,13 @@
                                     <option value="ملكال" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">ملكال</option>
                                     <option value="واو" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">واو</option>
                                     <option value="جوبا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">جوبا</option>
+                                    <!-- Kuwaiti regions for Sudan to Kuwait shipments -->
+                                    <option value="محافظة العاصمة" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone">محافظة العاصمة</option>
+                                    <option value="محافظة حولي" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone">محافظة حولي</option>
+                                    <option value="محافظة الفروانية" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone">محافظة الفروانية</option>
+                                    <option value="محافظة الجهراء" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone">محافظة الجهراء</option>
+                                    <option value="محافظة الأحمدي" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone">محافظة الأحمدي</option>
+                                    <option value="محافظة مبارك الكبير" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone">محافظة مبارك الكبير</option>
                                     {% for zone in zone_pricings %}
                                     <option value="{{ zone.zone_name_ar }}" 
                                             data-price="{{ zone.price_per_kg }}" 
@@ -730,11 +737,20 @@
             
             const optionDirection = option.getAttribute('data-direction');
             const isSudanZone = option.classList.contains('sudan-zone');
+            const isKuwaitZone = option.classList.contains('kuwait-zone');
             const isDbZone = option.classList.contains('db-zone');
             
             // Show Sudanese zones only for general shipments going Kuwait to Sudan
             if (isSudanZone) {
                 if (packageType === 'general' && direction === 'kuwait_to_sudan') {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            // Show Kuwaiti zones only for general shipments going Sudan to Kuwait
+            else if (isKuwaitZone) {
+                if (packageType === 'general' && direction === 'sudan_to_kuwait') {
                     option.style.display = 'block';
                 } else {
                     option.style.display = 'none';
