@@ -427,7 +427,7 @@
                                     </select>
                                 </div>
                                 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3" id="action_required_field">
                                     <label for="action_required" class="form-label required-field">الإجراء</label>
                                     <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
                                         <option value="">اختر نوع الإجراء</option>
@@ -515,15 +515,20 @@
         const packageContentsTextarea = document.getElementById('package_contents');
         const documentTypeSelect = document.getElementById('document_type');
         const actionRequiredInput = document.getElementById('action_required');
+        const actionRequiredField = document.getElementById('action_required_field');
         const weightField = document.getElementById('weight_field');
         const weightInput = document.getElementById('weight');
         const totalPriceInput = document.getElementById('total_price');
         
         if (packageType === 'document') {
-            // Show document type and action fields
+            // Show document type field
             documentTypeField.style.display = 'block';
             documentTypeSelect.required = true;
-            actionRequiredInput.required = true;
+            
+            // Hide action/procedure field for documents
+            actionRequiredField.style.display = 'none';
+            actionRequiredInput.value = '';
+            actionRequiredInput.required = false;
             
             // Hide and make optional: weight, price, contents for documents
             weightField.style.display = 'none';
@@ -538,11 +543,13 @@
             totalPriceInput.required = false;
             
         } else {
-            // Hide document type and action fields
+            // Hide document type field
             documentTypeField.style.display = 'none';
             documentTypeSelect.value = '';
             documentTypeSelect.required = false;
-            actionRequiredInput.value = '';
+            
+            // Show action/procedure field for non-documents
+            actionRequiredField.style.display = 'block';
             actionRequiredInput.required = false;
             
             // Show and make required: weight, contents for non-documents
