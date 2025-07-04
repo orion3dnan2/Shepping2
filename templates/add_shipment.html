@@ -356,10 +356,32 @@
                                 <label for="zone" class="form-label required-field">المنطقة</label>
                                 <select class="form-select" id="zone" name="zone" onchange="calculateZoneBasedPrice()">
                                     <option value="">اختر المنطقة</option>
+                                    <!-- Sudanese regions for Kuwait to Sudan shipments -->
+                                    <option value="الخرطوم" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">الخرطوم</option>
+                                    <option value="أم درمان" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">أم درمان</option>
+                                    <option value="بحري" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">بحري</option>
+                                    <option value="مدني" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">مدني</option>
+                                    <option value="كسلا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">كسلا</option>
+                                    <option value="القضارف" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">القضارف</option>
+                                    <option value="عطبرة" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">عطبرة</option>
+                                    <option value="بورتسودان" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">بورتسودان</option>
+                                    <option value="سنار" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">سنار</option>
+                                    <option value="الأبيض" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">الأبيض</option>
+                                    <option value="نيالا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">نيالا</option>
+                                    <option value="الفاشر" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">الفاشر</option>
+                                    <option value="جنينة" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">جنينة</option>
+                                    <option value="ودمدني" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">ودمدني</option>
+                                    <option value="كوستي" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">كوستي</option>
+                                    <option value="ربك" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">ربك</option>
+                                    <option value="الدمازين" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">الدمازين</option>
+                                    <option value="ملكال" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">ملكال</option>
+                                    <option value="واو" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">واو</option>
+                                    <option value="جوبا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone">جوبا</option>
                                     {% for zone in zone_pricings %}
                                     <option value="{{ zone.zone_name_ar }}" 
                                             data-price="{{ zone.price_per_kg }}" 
-                                            data-direction="{{ zone.direction }}">
+                                            data-direction="{{ zone.direction }}"
+                                            class="db-zone">
                                         {{ zone.zone_name_ar }}
                                     </option>
                                     {% endfor %}
@@ -578,6 +600,7 @@
         
         toggleDocumentType();
         toggleShippingMethod();
+        filterZonesByDirection();
         updateZonePricing();
         
         // Set appropriate price status message based on shipment type
@@ -680,39 +703,58 @@
         loadPricePerKg();
     };
     
-    // Function to filter zones based on selected direction  
+    // Function to filter zones based on selected direction and package type
     function filterZonesByDirection() {
         const directionSelect = document.getElementById('direction');
+        const packageTypeSelect = document.getElementById('package_type');
         const zoneSelect = document.getElementById('zone');
         
-        if (!directionSelect || !zoneSelect) return;
+        if (!directionSelect || !zoneSelect || !packageTypeSelect) return;
         
         const direction = directionSelect.value;
+        const packageType = packageTypeSelect.value;
         
         // Store current selection
         const currentZone = zoneSelect.value;
         
-        // Rebuild options based on direction
-        const firstOption = zoneSelect.querySelector('option[value=""]');  
-        zoneSelect.innerHTML = '';
-        zoneSelect.appendChild(firstOption);
+        // Get all existing options
+        const allOptions = Array.from(zoneSelect.options);
         
-        // Get all zones from server data
-        const allZones = {{ zone_pricings | tojson | safe }};
-        
-        allZones.forEach(zone => {
-            if (direction === '' || zone.direction === direction) {
-                const option = document.createElement('option');
-                option.value = zone.zone_name_ar;
-                option.textContent = zone.zone_name_ar;
-                option.setAttribute('data-price', zone.price_per_kg);
-                option.setAttribute('data-direction', zone.direction);
-                zoneSelect.appendChild(option);
+        // Show/hide options based on conditions
+        allOptions.forEach(option => {
+            if (option.value === '') {
+                // Always show the default option
+                option.style.display = 'block';
+                return;
+            }
+            
+            const optionDirection = option.getAttribute('data-direction');
+            const isSudanZone = option.classList.contains('sudan-zone');
+            const isDbZone = option.classList.contains('db-zone');
+            
+            // Show Sudanese zones only for general shipments going Kuwait to Sudan
+            if (isSudanZone) {
+                if (packageType === 'general' && direction === 'kuwait_to_sudan') {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            // Show database zones based on direction
+            else if (isDbZone) {
+                if (direction === '' || optionDirection === direction) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
             }
         });
         
-        // Reset zone selection when filtering
-        zoneSelect.value = '';
+        // Reset zone selection if current selection is now hidden
+        const currentOption = zoneSelect.querySelector(`option[value="${currentZone}"]`);
+        if (currentOption && currentOption.style.display === 'none') {
+            zoneSelect.value = '';
+        }
     }
     
     // Apply discount to the total price
