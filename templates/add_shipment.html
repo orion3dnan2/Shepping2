@@ -320,6 +320,7 @@
                                 <label for="package_type" class="form-label required-field">نوع الشحنة</label>
                                 <select class="form-select" id="package_type" name="package_type" required onchange="handleShipmentTypeChange()">
                                     <option value="">اختر نوع الشحنة</option>
+                                    <option value="general">عامة</option>
                                     <option value="document">مستندات</option>
                                     {% for shipment_type in shipment_types %}
                                     <option value="{{ shipment_type.name_en }}">{{ shipment_type.name_ar }}</option>
