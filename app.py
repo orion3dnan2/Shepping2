@@ -15,19 +15,18 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
-# create the app
+# Create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-change-this-for-production")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for to generate with https
+app.secret_key = os.environ.get("SESSION_SECRET")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# Additional Flask configuration for production stability
+# Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# configure the database, relative to the app instance folder
+# Configure the database
 database_url = os.environ.get("DATABASE_URL")
 if not database_url:
-    # Fallback to SQLite for development
-    database_url = "sqlite:///shipping_system.db"
+    raise RuntimeError("DATABASE_URL environment variable must be set")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -36,10 +35,8 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# initialize the app with the extension, flask-sqlalchemy >= 3.0.x
+# Initialize extensions
 db.init_app(app)
-
-# Initialize Flask-Migrate
 migrate = Migrate(app, db)
 
 # Initialize Flask-Login
