@@ -2,6 +2,10 @@ import os
 import logging
 from datetime import timedelta
 
+# Remove PostgreSQL environment variables to prevent conflicts
+for pg_var in ['PGDATABASE', 'PGHOST', 'PGPASSWORD', 'PGPORT', 'PGUSER']:
+    os.environ.pop(pg_var, None)
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -27,10 +31,16 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Database Configuration - MySQL only
 database_url = os.environ.get("DATABASE_URL")
-if not database_url:
-    # Default MySQL configuration for development
-    database_url = "mysql+pymysql://root:password123@localhost:3306/shipping_db"
-    print("INFO: Using default MySQL configuration for development")
+
+# Force MySQL configuration and override any PostgreSQL URLs
+if not database_url or database_url.startswith(('postgresql://', 'postgres://')):
+    # Override with MySQL configuration
+    database_url = "mysql+pymysql://root:@127.0.0.1:3306/shipping_db"
+    logging.info("Using MySQL fallback configuration (PostgreSQL detected and overridden)")
+elif not database_url.startswith('mysql+pymysql://'):
+    # Ensure it's MySQL with PyMySQL driver
+    database_url = "mysql+pymysql://root:@127.0.0.1:3306/shipping_db"
+    logging.info("Forcing MySQL configuration")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
