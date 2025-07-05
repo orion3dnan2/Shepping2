@@ -26,24 +26,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Database Configuration - MySQL only
-# Force MySQL usage - ignore any PostgreSQL environment variables
-mysql_url = os.environ.get("MYSQL_DATABASE_URL")
-
-if not mysql_url:
-    # For demonstration purposes, create a MySQL-compatible configuration
-    # In production, this should be set to your actual MySQL server
-    print("WARNING: MYSQL_DATABASE_URL not set. Using MySQL syntax for demonstration.")
-    print("INFO: Application is configured for MySQL - you need to set MYSQL_DATABASE_URL")
-    # For demo, we'll use a placeholder that would work with MySQL
-    mysql_url = "mysql+pymysql://root:password123@localhost:3306/shipping_db"
-
-# Ensure MySQL connection string format
-if mysql_url.startswith("mysql://"):
-    mysql_url = mysql_url.replace("mysql://", "mysql+pymysql://", 1)
-
-print(f"INFO: MySQL Configuration: {mysql_url.split('@')[0]}@****")
-print("INFO: This application is configured to work ONLY with MySQL databases")
-database_url = mysql_url
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 
 # MySQL-specific configuration
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -58,7 +41,6 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     }
 }
 
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # initialize the app with the extension, flask-sqlalchemy >= 3.0.x

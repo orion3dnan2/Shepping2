@@ -25,49 +25,21 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 # Additional Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Database Configuration - Support both SQLite and MySQL
-database_url = os.environ.get("DATABASE_URL")
+# Database Configuration - MySQL only
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 
-if database_url:
-    # Production: Use MySQL from environment (cPanel)
-    if database_url.startswith("mysql://"):
-        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
-    print(f"INFO: Using database from environment: {database_url.split('@')[0]}@****")
-    
-    # MySQL-specific configuration
-    if "mysql" in database_url:
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 3600,
-            "pool_pre_ping": True,
-            "pool_size": 3,
-            "max_overflow": 2,
-            "echo": False,
-            "connect_args": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
-        }
-    else:
-        # PostgreSQL configuration
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 300,
-            "pool_pre_ping": True,
-            "pool_size": 5,
-            "max_overflow": 10,
-            "echo": False,
-        }
-else:
-    # Development: Use SQLite
-    database_url = "sqlite:///instance/shipping.db"
-    print("INFO: Using SQLite database for development")
-    
-    # SQLite-specific configuration
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_pre_ping": True,
-        "echo": False,
+# MySQL-specific configuration
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 3600,
+    "pool_pre_ping": True,
+    "pool_size": 3,
+    "max_overflow": 2,
+    "echo": False,
+    "connect_args": {
+        "charset": "utf8mb4",
+        "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
     }
-
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # initialize the app with the extension, flask-sqlalchemy >= 3.0.x
