@@ -3948,3 +3948,9 @@ def api_delete_shipment(shipment_id):
     except Exception as e:
         logging.error(f'Error loading shipments for linking: {str(e)}')
         return jsonify({'success': False, 'message': f'حدث خطأ في تحميل الشحنات: {str(e)}'})
+
+# Debug route for testing user edit functionality
+@app.route('/debug-user-edit')
+def debug_user_edit():
+    """Debug page to test user edit functionality"""
+    return send_from_directory('.', 'debug_user_edit.html')
