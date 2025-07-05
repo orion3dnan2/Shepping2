@@ -1218,31 +1218,132 @@ function editDocumentType(id, nameAr, nameEn, price, isActive) {
 
 
 function editUser(id, username, permissions, isSuperAdmin) {
-    // Fill edit form
-    document.getElementById('editUserId').value = id;
-    document.getElementById('editUsername').value = username;
-    document.getElementById('editPassword').value = '';
-    document.getElementById('editConfirmPassword').value = '';
-    
-    // Set super admin checkbox
-    const superAdminCheckbox = document.getElementById('editIsSuperAdmin');
-    if (superAdminCheckbox) {
-        superAdminCheckbox.checked = isSuperAdmin;
+    try {
+        console.log('Edit user called:', {id, username, permissions, isSuperAdmin});
+        
+        // Fill edit form
+        const userIdField = document.getElementById('editUserId');
+        const usernameField = document.getElementById('editUsername');
+        const passwordField = document.getElementById('editPassword');
+        const confirmPasswordField = document.getElementById('editConfirmPassword');
+        
+        if (!userIdField || !usernameField) {
+            console.error('Required form fields not found');
+            alert('خطأ: لم يتم العثور على نموذج التعديل');
+            return;
+        }
+        
+        userIdField.value = id;
+        usernameField.value = username;
+        if (passwordField) passwordField.value = '';
+        if (confirmPasswordField) confirmPasswordField.value = '';
+        
+        // Set super admin checkbox
+        const superAdminCheckbox = document.getElementById('editIsSuperAdmin');
+        if (superAdminCheckbox) {
+            superAdminCheckbox.checked = isSuperAdmin;
+        }
+        
+        // Clear all permission checkboxes first
+        const permissionCheckboxes = document.querySelectorAll('#editUserModal input[name="permissions"]');
+        permissionCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // Set permissions checkboxes based on user permissions
+        if (permissions && typeof permissions === 'object') {
+            permissionCheckboxes.forEach(checkbox => {
+                const permissionKey = checkbox.value;
+                checkbox.checked = permissions[permissionKey] === true;
+            });
+        }
+        
+        // Update form action
+        const editForm = document.getElementById('editUserForm');
+        if (editForm) {
+            editForm.action = `/edit_user/${id}`;
+        }
+        
+        // Show modal
+        const modalElement = document.getElementById('editUserModal');
+        if (modalElement) {
+            // Try different ways to show the modal
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else if (typeof $ !== 'undefined' && $.fn.modal) {
+                $(modalElement).modal('show');
+            } else {
+                // Fallback: show modal manually
+                modalElement.style.display = 'block';
+                modalElement.classList.add('show');
+                document.body.classList.add('modal-open');
+                
+                // Add backdrop
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.id = 'editUserModalBackdrop';
+                document.body.appendChild(backdrop);
+            }
+        } else {
+            console.error('Modal element not found');
+            alert('خطأ: لم يتم العثور على نافذة التعديل');
+        }
+        
+    } catch (error) {
+        console.error('Error in editUser function:', error);
+        alert('حدث خطأ أثناء فتح نافذة التعديل: ' + error.message);
     }
-    
-    // Set permissions checkboxes - direct mapping
-    const permissionCheckboxes = document.querySelectorAll('#editUserModal input[name="permissions"]');
-    permissionCheckboxes.forEach(checkbox => {
-        const permissionKey = checkbox.value; // home, shipments, etc. (already lowercase in HTML)
-        checkbox.checked = permissions[permissionKey] || false;
-    });
-    
-    // Update form action
-    document.getElementById('editUserForm').action = `/edit_user/${id}`;
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-    modal.show();
+}
+
+// Function to close modal manually
+function closeEditUserModal() {
+    const modalElement = document.getElementById('editUserModal');
+    if (modalElement) {
+        // Try different ways to hide the modal
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        } else if (typeof $ !== 'undefined' && $.fn.modal) {
+            $(modalElement).modal('hide');
+        } else {
+            // Fallback: hide modal manually
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            
+            // Remove backdrop
+            const backdrop = document.getElementById('editUserModalBackdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+    }
+}
+
+// Delete user function
+function deleteUser(userId, username) {
+    if (confirm(`هل أنت متأكد من حذف المستخدم "${username}"؟\n\nهذا الإجراء لا يمكن التراجع عنه.`)) {
+        // Create a form to submit the delete request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/delete_user/${userId}`;
+        
+        // Add CSRF token if available
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = 'csrf_token';
+            tokenInput.value = csrfToken.getAttribute('content');
+            form.appendChild(tokenInput);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
 // Update price per kg display in real-time
