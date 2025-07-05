@@ -152,6 +152,11 @@ The system is specifically configured for cPanel hosting with:
    • Deployment instructions for cPanel hosting
    • Troubleshooting guides and error handling
    • Code examples for all major functions
+✅ July 05, 2025: Migrated to Replit environment with MySQL-only support
+   • Removed all SQLite dependencies and configurations
+   • Updated app.py to require MySQL connection exclusively
+   • Removed psycopg2-binary dependency from pyproject.toml
+   • Cleaned up instance directory and database files
 
 ## User Preferences
 

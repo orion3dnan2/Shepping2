@@ -25,47 +25,38 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1) # needed for url_for 
 # Additional Flask configuration for production stability
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Database Configuration - Support both SQLite and MySQL
-database_url = os.environ.get("DATABASE_URL")
+# Database Configuration - MySQL only
+# Force MySQL usage - ignore any PostgreSQL environment variables
+mysql_url = os.environ.get("MYSQL_DATABASE_URL")
 
-if database_url:
-    # Production: Use MySQL from environment (cPanel)
-    if database_url.startswith("mysql://"):
-        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
-    print(f"INFO: Using database from environment: {database_url.split('@')[0]}@****")
-    
-    # MySQL-specific configuration
-    if "mysql" in database_url:
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 3600,
-            "pool_pre_ping": True,
-            "pool_size": 3,
-            "max_overflow": 2,
-            "echo": False,
-            "connect_args": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            }
-        }
-    else:
-        # PostgreSQL configuration
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 300,
-            "pool_pre_ping": True,
-            "pool_size": 5,
-            "max_overflow": 10,
-            "echo": False,
-        }
-else:
-    # Development: Use SQLite
-    database_url = "sqlite:///instance/shipping.db"
-    print("INFO: Using SQLite database for development")
-    
-    # SQLite-specific configuration
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_pre_ping": True,
-        "echo": False,
+if not mysql_url:
+    # For demonstration purposes, create a MySQL-compatible configuration
+    # In production, this should be set to your actual MySQL server
+    print("WARNING: MYSQL_DATABASE_URL not set. Using MySQL syntax for demonstration.")
+    print("INFO: Application is configured for MySQL - you need to set MYSQL_DATABASE_URL")
+    # For demo, we'll use a placeholder that would work with MySQL
+    mysql_url = "mysql+pymysql://root:password123@localhost:3306/shipping_db"
+
+# Ensure MySQL connection string format
+if mysql_url.startswith("mysql://"):
+    mysql_url = mysql_url.replace("mysql://", "mysql+pymysql://", 1)
+
+print(f"INFO: MySQL Configuration: {mysql_url.split('@')[0]}@****")
+print("INFO: This application is configured to work ONLY with MySQL databases")
+database_url = mysql_url
+
+# MySQL-specific configuration
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 3600,
+    "pool_pre_ping": True,
+    "pool_size": 3,
+    "max_overflow": 2,
+    "echo": False,
+    "connect_args": {
+        "charset": "utf8mb4",
+        "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
     }
+}
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
