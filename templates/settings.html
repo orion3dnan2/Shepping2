@@ -359,13 +359,18 @@
                                     </div>
                                     
                                     <div class="user-actions">
-                                        <button class="btn btn-sm btn-outline-primary" 
-                                                onclick="editUser({{ user.id }}, '{{ user.username }}', {{ user.get_permissions()|tojson }}, {{ user.is_super_admin|lower }})">
+                                        <button class="btn btn-sm btn-outline-primary edit-user-btn" 
+                                                data-user-id="{{ user.id }}" 
+                                                data-username="{{ user.username }}" 
+                                                data-permissions="{{ user.get_permissions()|tojson|e }}" 
+                                                data-is-super-admin="{{ user.is_super_admin|lower }}">
                                             <i class="fas fa-edit me-1"></i>
                                             تعديل
                                         </button>
                                         {% if not user.is_super_admin or users|selectattr('is_super_admin')|list|length > 1 %}
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }}, '{{ user.username }}')">
+                                        <button class="btn btn-sm btn-outline-danger delete-user-btn" 
+                                                data-user-id="{{ user.id }}" 
+                                                data-username="{{ user.username }}">
                                             <i class="fas fa-trash me-1"></i>
                                             حذف
                                         </button>
@@ -905,14 +910,65 @@
 </style>
 
 <script>
-// User Management Functions
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Settings page JavaScript loaded');
+    
+    // Initialize User Management Event Listeners
+    initializeUserManagement();
+    
+    // Initialize other functions
+    initializePriceManagement();
+});
 
-// Edit User Function
-function editUser(id, username, permissions, isSuperAdmin) {
+// User Management Functions
+function initializeUserManagement() {
+    console.log('Initializing user management...');
+    
+    // Handle Edit User Buttons
+    const editButtons = document.querySelectorAll('.edit-user-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Edit button clicked');
+            
+            const userId = this.getAttribute('data-user-id');
+            const username = this.getAttribute('data-username');
+            const permissionsStr = this.getAttribute('data-permissions');
+            const isSuperAdmin = this.getAttribute('data-is-super-admin') === 'true';
+            
+            let permissions = {};
+            try {
+                permissions = JSON.parse(permissionsStr);
+            } catch (error) {
+                console.error('Error parsing permissions:', error);
+                permissions = {};
+            }
+            
+            console.log('Opening edit modal for:', {userId, username, permissions, isSuperAdmin});
+            openEditUserModal(userId, username, permissions, isSuperAdmin);
+        });
+    });
+    
+    // Handle Delete User Buttons
+    const deleteButtons = document.querySelectorAll('.delete-user-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const userId = this.getAttribute('data-user-id');
+            const username = this.getAttribute('data-username');
+            
+            deleteUser(userId, username);
+        });
+    });
+}
+
+function openEditUserModal(id, username, permissions, isSuperAdmin) {
     try {
-        console.log('Edit user called:', {id, username, permissions, isSuperAdmin});
+        console.log('Opening edit modal:', {id, username, permissions, isSuperAdmin});
         
-        // Fill edit form
+        // Fill form fields
         const userIdField = document.getElementById('editUserId');
         const usernameField = document.getElementById('editUsername');
         const passwordField = document.getElementById('editPassword');
@@ -920,10 +976,11 @@ function editUser(id, username, permissions, isSuperAdmin) {
         
         if (!userIdField || !usernameField) {
             console.error('Required form fields not found');
-            alert('خطأ: لم يتم العثور على نموذج التعديل');
+            alert('خطأ: لم يتم العثور على حقول النموذج المطلوبة');
             return;
         }
         
+        // Set form values
         userIdField.value = id;
         usernameField.value = username;
         if (passwordField) passwordField.value = '';
@@ -933,19 +990,26 @@ function editUser(id, username, permissions, isSuperAdmin) {
         const superAdminCheckbox = document.getElementById('editIsSuperAdmin');
         if (superAdminCheckbox) {
             superAdminCheckbox.checked = isSuperAdmin;
+            console.log('Super admin checkbox set to:', isSuperAdmin);
         }
         
-        // Clear all permission checkboxes first
+        // Handle permissions
         const permissionCheckboxes = document.querySelectorAll('#editUserModal input[name="permissions"]');
+        console.log('Found permission checkboxes:', permissionCheckboxes.length);
+        
+        // Clear all checkboxes first
         permissionCheckboxes.forEach(checkbox => {
             checkbox.checked = false;
         });
         
-        // Set permissions checkboxes based on user permissions
+        // Set permissions from user data
         if (permissions && typeof permissions === 'object') {
+            console.log('Setting permissions:', permissions);
             permissionCheckboxes.forEach(checkbox => {
                 const permissionKey = checkbox.value;
-                checkbox.checked = permissions[permissionKey] === true;
+                const hasPermission = permissions[permissionKey] === true;
+                checkbox.checked = hasPermission;
+                console.log(`Permission ${permissionKey}: ${hasPermission}`);
             });
         }
         
@@ -953,64 +1017,46 @@ function editUser(id, username, permissions, isSuperAdmin) {
         const editForm = document.getElementById('editUserForm');
         if (editForm) {
             editForm.action = `/edit_user/${id}`;
+            console.log('Form action set to:', editForm.action);
         }
         
         // Show modal
         const modalElement = document.getElementById('editUserModal');
-        if (modalElement) {
-            // Try different ways to show the modal
+        if (!modalElement) {
+            console.error('Modal element not found');
+            alert('خطأ: لم يتم العثور على نافذة التعديل');
+            return;
+        }
+        
+        // Show the modal using Bootstrap
+        try {
             if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
-            } else if (typeof $ !== 'undefined' && $.fn.modal) {
-                $(modalElement).modal('show');
+                console.log('Modal shown using Bootstrap');
             } else {
-                // Fallback: show modal manually
+                console.log('Bootstrap not available, showing modal manually');
                 modalElement.style.display = 'block';
                 modalElement.classList.add('show');
+                modalElement.style.paddingRight = '17px';
                 document.body.classList.add('modal-open');
+                document.body.style.paddingRight = '17px';
                 
                 // Add backdrop
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade show';
-                backdrop.id = 'editUserModalBackdrop';
-                document.body.appendChild(backdrop);
+                if (!document.querySelector('.modal-backdrop')) {
+                    const backdrop = document.createElement('div');
+                    backdrop.className = 'modal-backdrop fade show';
+                    document.body.appendChild(backdrop);
+                }
             }
-        } else {
-            console.error('Modal element not found');
-            alert('خطأ: لم يتم العثور على نافذة التعديل');
+        } catch (error) {
+            console.error('Error showing modal:', error);
+            alert('خطأ في فتح نافذة التعديل: ' + error.message);
         }
         
     } catch (error) {
-        console.error('Error in editUser function:', error);
+        console.error('Error in openEditUserModal:', error);
         alert('حدث خطأ أثناء فتح نافذة التعديل: ' + error.message);
-    }
-}
-
-// Function to close modal manually
-function closeEditUserModal() {
-    const modalElement = document.getElementById('editUserModal');
-    if (modalElement) {
-        // Try different ways to hide the modal
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-            }
-        } else if (typeof $ !== 'undefined' && $.fn.modal) {
-            $(modalElement).modal('hide');
-        } else {
-            // Fallback: hide modal manually
-            modalElement.style.display = 'none';
-            modalElement.classList.remove('show');
-            document.body.classList.remove('modal-open');
-            
-            // Remove backdrop
-            const backdrop = document.getElementById('editUserModalBackdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-        }
     }
 }
 
@@ -1048,6 +1094,24 @@ function deleteUser(userId, username) {
             showNotification('error', 'حدث خطأ أثناء حذف المستخدم');
         });
     }
+}
+
+// Initialize price management functionality
+function initializePriceManagement() {
+    console.log('Initializing price management...');
+    
+    // Initialize price display updates
+    const priceInputs = document.querySelectorAll('.price-per-kg-input, .price-per-kg-input-compact');
+    priceInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const value = this.value;
+            if (this.id === 'pricePerKgInput') {
+                updatePricePerKgDisplay(value);
+            } else if (this.id === 'packagingPriceInput') {
+                updatePackagingPriceDisplay(value);
+            }
+        });
+    });
 }
 
 
