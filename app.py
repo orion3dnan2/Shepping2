@@ -82,44 +82,44 @@ with app.app_context():
         # Make sure to import the models here or their tables won't be created
         import models  # noqa: F401
         
-        # Only initialize if we have a proper MySQL connection
-        if app.config["SQLALCHEMY_DATABASE_URI"] and "mysql" in app.config["SQLALCHEMY_DATABASE_URI"]:
-            # Create all database tables
-            db.create_all()
-            logging.info('MySQL database tables created/verified successfully')
-            
-            # Create default super admin if it doesn't exist
-            from models import Admin
-            admin = Admin.query.filter_by(username='admin').first()
-            if not admin:
-                admin = Admin()
-                admin.username = 'admin'
-                admin.is_super_admin = True
-                admin.set_password('admin123')
-                admin.set_permissions({
-                    'home': True,
-                    'shipments': True,
-                    'tracking': True,
-                    'reports': True,
-                    'expenses': True,
-                    'add_shipment': True,
-                    'settings': True
-                })
-                db.session.add(admin)
-                db.session.commit()
-                logging.info('Default super admin created: admin/admin123')
-            elif not admin.is_super_admin:
-                admin.is_super_admin = True
-                db.session.commit()
-                logging.info('Updated existing admin to super admin')
-        else:
-            logging.warning('MySQL database not configured. Please set DATABASE_URL with MySQL connection string.')
+        # Test database connectivity
+        db.engine.connect()
+        
+        # If connection succeeds, create tables and admin
+        db.create_all()
+        logging.info('MySQL database connected and tables created successfully')
+        
+        # Create default super admin if it doesn't exist
+        from models import Admin
+        admin = Admin.query.filter_by(username='admin').first()
+        if not admin:
+            admin = Admin()
+            admin.username = 'admin'
+            admin.is_super_admin = True
+            admin.set_password('admin123')
+            admin.set_permissions({
+                'home': True,
+                'shipments': True,
+                'tracking': True,
+                'reports': True,
+                'expenses': True,
+                'add_shipment': True,
+                'settings': True
+            })
+            db.session.add(admin)
+            db.session.commit()
+            logging.info('Default super admin created: admin/admin123')
+        elif not admin.is_super_admin:
+            admin.is_super_admin = True
+            db.session.commit()
+            logging.info('Updated existing admin to super admin')
             
     except Exception as e:
-        logging.error(f'Database initialization error: {str(e)}')
-        logging.info('Application configured for MySQL. Please ensure MySQL server is running and DATABASE_URL is set correctly.')
-        # Don't crash the app, let it start without database for debugging
-        pass
+        logging.warning(f'MySQL database not connected: {str(e)}')
+        logging.info('Starting application in demo mode without database')
+        
+        # Set flag to indicate demo mode
+        app.config['DEMO_MODE'] = True
 
-# Import routes after app initialization
+# Import routes regardless of database status
 import routes  # noqa: F401
