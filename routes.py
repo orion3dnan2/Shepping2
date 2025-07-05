@@ -10,119 +10,36 @@ from translations import get_text
 import json
 from functools import wraps
 
-# MySQL Migration Success Page - Show when database is not connected
+# Home page route
 @app.route('/')
 def home():
-    if app.config.get('DEMO_MODE'):
-        database_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
-        return Response(f'''
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الشحن - MySQL</title>
-    <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            margin: 0; padding: 20px; min-height: 100vh; color: #333;
-        }}
-        .container {{
-            max-width: 800px; margin: 0 auto; background: white;
-            border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden; animation: fadeIn 0.5s ease-in;
-        }}
-        .header {{
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white; padding: 40px; text-align: center;
-        }}
-        .content {{ padding: 40px; }}
-        .success-box {{
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            border: 2px solid #28a745; border-radius: 10px;
-            padding: 25px; margin: 20px 0; text-align: center;
-        }}
-        .config-box {{
-            background: #f8f9fa; border: 1px solid #dee2e6;
-            border-radius: 8px; padding: 20px; margin: 20px 0;
-            font-family: 'Courier New', monospace; direction: ltr; text-align: left;
-            word-break: break-all;
-        }}
-        .achievement {{
-            background: #e9ecef; border-left: 4px solid #28a745;
-            padding: 15px; margin: 10px 0; border-radius: 5px;
-        }}
-        @keyframes fadeIn {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
-        h1, h2, h3 {{ color: #333; }}
-        .highlight {{ color: #28a745; font-weight: bold; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎉 تم التحويل إلى MySQL بنجاح!</h1>
-            <p>نظام إدارة الشحن يعمل الآن حصرياً مع قاعدة بيانات MySQL</p>
-        </div>
-        <div class="content">
-            <div class="success-box">
-                <h2>✅ المهمة مكتملة بالكامل</h2>
-                <p><strong>تم حل المشكلة نهائياً</strong></p>
-                <p>النظام محوّل بالكامل إلى MySQL ولا يحاول استخدام PostgreSQL</p>
-            </div>
-            
-            <div class="config-box">
-                <strong>Database Configuration:</strong><br>
-                URI: {database_uri}<br><br>
-                <strong>Status:</strong> MySQL-only operation confirmed<br>
-                <strong>Driver:</strong> PyMySQL (pymysql)<br>
-                <strong>Charset:</strong> utf8mb4 (دعم كامل للعربية)<br>
-                <strong>Mode:</strong> Demo mode (database not connected)
-            </div>
-            
-            <h3>🏆 الإنجازات المحققة:</h3>
-            <div class="achievement">✅ إزالة جميع متغيرات PostgreSQL من البيئة تلقائياً</div>
-            <div class="achievement">✅ إجبار استخدام MySQL حتى مع وجود إعدادات PostgreSQL</div>
-            <div class="achievement">✅ تحسين إعدادات MySQL للإنتاج (utf8mb4, connection pooling)</div>
-            <div class="achievement">✅ الحفاظ على جميع الميزات (16 جدول، نظام مالي، تتبع)</div>
-            <div class="achievement">✅ دعم كامل للواجهة العربية والنصوص RTL</div>
-            <div class="achievement">✅ نظام يبدأ بدون أخطاء PostgreSQL</div>
-            
-            <h3>📊 الدليل التقني:</h3>
-            <div class="config-box">
-                <strong>مراجعة السجلات تُظهر:</strong><br>
-                ✓ "Using MySQL fallback configuration (PostgreSQL detected and overridden)"<br>
-                ✓ "Starting application in demo mode without database"<br>
-                ✓ pymysql.err.OperationalError (not psycopg2 errors)<br>
-                ✓ Connection attempts to MySQL port 3306, not PostgreSQL 5432
-            </div>
-            
-            <div class="config-box">
-                <strong>للنشر في الإنتاج:</strong><br>
-                1. اربط بخادم MySQL<br>
-                2. export DATABASE_URL="mysql+pymysql://user:pass@host:3306/shipping_db"<br>
-                3. gunicorn --bind 0.0.0.0:5000 main:app<br>
-                4. ادخل بـ admin/admin123
-            </div>
-            
-            <div class="success-box">
-                <h3>🎯 النتيجة النهائية</h3>
-                <p><strong>المشكلة حُلت نهائياً - التحويل مكتمل 100%</strong></p>
-                <p>النظام جاهز للإنتاج مع أي خادم MySQL</p>
-                <p class="highlight">✅ لا توجد أخطاء PostgreSQL بعد الآن</p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-        ''', mimetype='text/html')
-    
-    # Normal home page logic when database is connected
     try:
         if not current_user.is_authenticated:
             return redirect(url_for('login'))
-        # Continue with normal home page logic...
-    except:
+        
+        # Get dashboard statistics
+        total_shipments = Shipment.query.count()
+        total_general_shipments = Shipment.query.filter_by(package_type='general').count()
+        total_documents = Shipment.query.filter(Shipment.document_type.isnot(None)).count()
+        pending_shipments = Shipment.query.filter_by(status='created').count()
+        
+        # Get recent shipments
+        recent_shipments = Shipment.query.order_by(Shipment.created_at.desc()).limit(5).all()
+        
+        # Get financial stats
+        total_revenue = db.session.query(db.func.sum(FinancialTransaction.amount))\
+            .filter(FinancialTransaction.transaction_type=='revenue').scalar() or 0
+        
+        return render_template('dashboard.html',
+                             total_shipments=total_shipments,
+                             total_general_shipments=total_general_shipments,
+                             total_documents=total_documents,
+                             pending_shipments=pending_shipments,
+                             recent_shipments=recent_shipments,
+                             total_revenue=total_revenue)
+                             
+    except Exception as e:
+        app.logger.error(f'Dashboard error: {str(e)}')
         return redirect(url_for('login'))
 
 # Helper function to get document type Arabic name

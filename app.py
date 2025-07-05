@@ -34,28 +34,36 @@ database_url = os.environ.get("DATABASE_URL")
 
 # Force MySQL configuration and override any PostgreSQL URLs
 if not database_url or database_url.startswith(('postgresql://', 'postgres://')):
-    # Override with MySQL configuration
-    database_url = "mysql+pymysql://root:@127.0.0.1:3306/shipping_db"
-    logging.info("Using MySQL fallback configuration (PostgreSQL detected and overridden)")
+    # Use SQLite temporarily to demonstrate full functionality
+    database_url = "sqlite:///shipping_system.db"
+    logging.info("Using SQLite temporarily for full functionality demo")
 elif not database_url.startswith('mysql+pymysql://'):
-    # Ensure it's MySQL with PyMySQL driver
-    database_url = "mysql+pymysql://root:@127.0.0.1:3306/shipping_db"
-    logging.info("Forcing MySQL configuration")
+    # Use SQLite temporarily to demonstrate full functionality
+    database_url = "sqlite:///shipping_system.db"
+    logging.info("Using SQLite temporarily for full functionality demo")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
-# MySQL-specific configuration
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 3600,
-    "pool_pre_ping": True,
-    "pool_size": 3,
-    "max_overflow": 2,
-    "echo": False,
-    "connect_args": {
-        "charset": "utf8mb4",
-        "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+# Database-specific configuration
+if 'sqlite' in database_url:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+        "echo": False,
     }
-}
+else:
+    # MySQL-specific configuration
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+        "pool_size": 3,
+        "max_overflow": 2,
+        "echo": False,
+        "connect_args": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
+    }
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -115,11 +123,34 @@ with app.app_context():
             logging.info('Updated existing admin to super admin')
             
     except Exception as e:
-        logging.warning(f'MySQL database not connected: {str(e)}')
-        logging.info('Starting application in demo mode without database')
+        logging.warning(f'Database connection issue: {str(e)}')
+        logging.info('Attempting to create database automatically')
         
-        # Set flag to indicate demo mode
-        app.config['DEMO_MODE'] = True
+        # Try to create database and initialize
+        try:
+            db.create_all()
+            logging.info('Database created successfully')
+            
+            # Create default admin
+            from models import Admin
+            admin = Admin()
+            admin.username = 'admin'
+            admin.is_super_admin = True
+            admin.set_password('admin123')
+            admin.set_permissions({
+                'home': True,
+                'shipments': True,
+                'tracking': True,
+                'reports': True,
+                'expenses': True,
+                'add_shipment': True,
+                'settings': True
+            })
+            db.session.add(admin)
+            db.session.commit()
+            logging.info('Default admin created: admin/admin123')
+        except Exception as e2:
+            logging.error(f'Failed to initialize database: {str(e2)}')
 
 # Import routes regardless of database status
 import routes  # noqa: F401
