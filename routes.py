@@ -392,47 +392,33 @@ def add_shipment():
             # Debug: Log all form data
             app.logger.debug(f"Form data received: {dict(request.form)}")
             
-            # Get form data with defaults
+            # Get essential form data
             sender_name = request.form.get('sender_name', 'غير محدد').strip()
             sender_phone = request.form.get('sender_phone', '').strip()
-            sender_address = request.form.get('sender_address', '').strip()
-            sender_email = request.form.get('sender_email', '').strip()
-            
             receiver_name = request.form.get('receiver_name', 'غير محدد').strip()
             receiver_phone = request.form.get('receiver_phone', '').strip()
-            receiver_address = request.form.get('receiver_address', '').strip()
-            receiver_email = request.form.get('receiver_email', '').strip()
             
             direction = request.form.get('direction', 'kuwait_to_sudan').strip()
             package_type = request.form.get('package_type', 'general').strip()
-            shipping_method = request.form.get('shipping_method', '').strip()
-            package_contents = request.form.get('package_contents', '').strip()
-            action_required = request.form.get('action_required', '').strip()
             document_type = request.form.get('document_type', '').strip()
-            zone = request.form.get('zone', '').strip()
             
-            # Handle packaging checkbox
-            has_packaging = request.form.get('has_packaging') == '1'
-            packaging = ''  # Keep for backward compatibility
-            
-            # Handle policy checkbox
-            has_policy = request.form.get('has_policy') == '1'
-            
-            # Handle comment checkbox
-            has_comment = request.form.get('has_comment') == '1'
-            
-            # Handle manual waybill price
+            # Set default values for removed fields
+            sender_address = ''
+            sender_email = ''
+            receiver_address = ''
+            receiver_email = ''
+            shipping_method = ''
+            package_contents = ''
+            action_required = ''
+            zone = ''
+            has_packaging = False
+            packaging = ''
+            has_policy = False
+            has_comment = False
             waybill_price = 0.0
-            if has_policy:
-                waybill_price_str = request.form.get('waybill_price', '0').strip()
-                try:
-                    waybill_price = float(waybill_price_str) if waybill_price_str else 0.0
-                except ValueError:
-                    app.logger.debug(f"Invalid waybill_price: '{waybill_price_str}', defaulting to 0.0")
-                    waybill_price = 0.0
             
             # Handle numeric fields with proper validation
-            weight_str = request.form.get('weight', '1.0').strip()
+            weight_str = '1.0'  # Default weight for documents
             price_str = request.form.get('total_price', '0.0').strip()
             discount_str = request.form.get('discount', '0.0').strip()
             paid_amount_str = request.form.get('amount_paid', '0.0').strip()
@@ -441,10 +427,8 @@ def add_shipment():
             notes = request.form.get('notes', '').strip()
             status = request.form.get('status', 'created').strip()
             
-            app.logger.debug(f"Processed form data - weight: '{weight_str}', price: '{price_str}', discount: '{discount_str}', paid_amount: '{paid_amount_str}'")
-            
             # Initialize default values
-            weight = 1.0
+            weight = 1.0  # Default weight for documents
             price = 0.0
             discount = 0.0
             
@@ -483,10 +467,8 @@ def add_shipment():
                 except ValueError:
                     errors.append('المبلغ المدفوع يجب أن يكون رقماً صحيحاً')
                 
-                # Calculate and validate remaining amount
+                # Calculate remaining amount (no validation needed as it can be negative)
                 remaining_amount = (price - discount) - paid_amount
-                if remaining_amount < 0:
-                    errors.append('المبلغ المتبقي لا يمكن أن يكون سالباً - تحقق من المبالغ')
                 
                 # Set default values for non-required fields
                 package_contents = 'مستندات عامة'  # Default content description
