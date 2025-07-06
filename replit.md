@@ -182,6 +182,14 @@ The system is specifically configured for cPanel hosting with:
    • All core files optimized: app.py, main.py, routes.py, models.py
    • System running cleanly on port 5000 with proper error handling
 
+✅ July 06, 2025: Document Shipment Form Simplification
+   • Removed date input requirements from all expense forms (office, general shipments, documents)
+   • Modified backend routes to use current date automatically instead of user input
+   • Simplified document shipment forms by hiding policy (بوليصة), comment (تعليق), and zone (المنطقة) fields
+   • Document shipments now only show: direction, shipment type, customer price, discount, paid amount, remaining amount, notes
+   • Added JavaScript functions to toggle field visibility based on shipment type
+   • Updated both add_shipment.html and edit_shipment.html with consistent behavior
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

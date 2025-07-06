@@ -406,7 +406,7 @@
                         </div>
                         
                         <!-- Policy and Comment checkboxes -->
-                        <div class="row">
+                        <div class="row" id="policy_comment_row">
                             <div class="col-md-6 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="1" id="has_policy" name="has_policy" onchange="toggleWaybillPrice(); calculateZoneBasedPrice()">
@@ -607,6 +607,7 @@
         
         toggleDocumentType();
         toggleShippingMethod();
+        toggleDocumentFields(); // Add this new function
         filterZonesByDirection();
         updateZonePricing();
         
@@ -639,6 +640,34 @@
             // Hide shipping method field for documents or when no type selected
             shippingMethodRow.style.display = 'none';
             shippingMethodSelect.value = '';
+        }
+    }
+    
+    // Show/hide policy, comment, and zone fields for document shipments
+    function toggleDocumentFields() {
+        const packageType = document.getElementById('package_type').value;
+        const policyCommentRow = document.getElementById('policy_comment_row');
+        const zonePackagingRow = document.getElementById('zone_packaging_row');
+        
+        if (packageType === 'document') {
+            // Hide policy, comment, and zone fields for documents
+            if (policyCommentRow) policyCommentRow.style.display = 'none';
+            if (zonePackagingRow) zonePackagingRow.style.display = 'none';
+            
+            // Clear values
+            const hasPolicy = document.getElementById('has_policy');
+            const hasComment = document.getElementById('has_comment');
+            const zone = document.getElementById('zone');
+            const hasPackaging = document.getElementById('has_packaging');
+            
+            if (hasPolicy) hasPolicy.checked = false;
+            if (hasComment) hasComment.checked = false;
+            if (zone) zone.value = '';
+            if (hasPackaging) hasPackaging.checked = false;
+        } else {
+            // Show policy, comment, and zone fields for general shipments
+            if (policyCommentRow) policyCommentRow.style.display = 'block';
+            if (zonePackagingRow) zonePackagingRow.style.display = 'block';
         }
     }
     
