@@ -962,10 +962,12 @@
         <span class="field-value">{{ shipment.weight }} كج</span>
       </div>
       {% endif %}
+      {% if shipment.package_type != 'document' %}
       <div>
         <span class="field-label">التكلفة:</span>
         <span class="field-value">{{ "%.2f"|format(shipment.price) }} د.ك</span>
       </div>
+      {% endif %}
       {% if shipment.package_type != 'document' %}
       <div>
         <span class="field-label">تاريخ الإنشاء:</span>
