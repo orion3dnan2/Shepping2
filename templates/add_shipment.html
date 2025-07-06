@@ -654,21 +654,19 @@
             // Hide policy, comment, zone, and document type fields for documents
             if (policyCommentRow) policyCommentRow.style.display = 'none';
             if (zonePackagingRow) zonePackagingRow.style.display = 'none';
-            if (documentTypeField) documentTypeField.style.display = 'none';
+            if (documentTypeField) documentTypeField.style.display = 'block'; // Show document type field for documents
             
-            // Clear values
+            // Clear values for hidden fields
             const hasPolicy = document.getElementById('has_policy');
             const hasComment = document.getElementById('has_comment');
             const zone = document.getElementById('zone');
             const hasPackaging = document.getElementById('has_packaging');
-            const documentType = document.getElementById('document_type');
             const actionRequired = document.getElementById('action_required');
             
             if (hasPolicy) hasPolicy.checked = false;
             if (hasComment) hasComment.checked = false;
             if (zone) zone.value = '';
             if (hasPackaging) hasPackaging.checked = false;
-            if (documentType) documentType.value = '';
             if (actionRequired) actionRequired.value = '';
             
             // Set a fixed price for document shipments (30 KD)
