@@ -1053,5 +1053,23 @@
         // This function can be extended if needed for zone pricing updates
         filterZonesByDirection();
     }
+    
+    // Initialize calculations when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set original price attribute for discount calculations
+        const totalPriceField = document.getElementById('total_price');
+        if (totalPriceField && totalPriceField.value) {
+            totalPriceField.setAttribute('data-original-price', totalPriceField.value);
+        }
+        
+        // Calculate remaining amount on page load
+        calculateRemaining();
+        
+        // Initialize document type fields based on current package type
+        const packageType = document.getElementById('package_type').value;
+        if (packageType === 'document') {
+            toggleDocumentFields();
+        }
+    });
 </script>
 {% endblock %}
