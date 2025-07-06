@@ -191,6 +191,13 @@ The system is specifically configured for cPanel hosting with:
    • Updated both add_shipment.html and edit_shipment.html with consistent behavior
    • Migration from Replit Agent to Replit environment completed successfully
 
+✅ July 06, 2025: Document Shipment Details View Customization
+   • Updated shipment details view (track_shipment.html) to show only essential fields for document shipments
+   • Hidden unnecessary fields for documents: creation date, contents, zone, shipping method, policy, comment, packaging
+   • Document shipment details now display: weight, cost, document type, direction, discount (optional), paid amount, remaining amount, notes (optional), status
+   • Status field remains visible but is not required for document shipments
+   • Updated both frontend JavaScript and backend Flask validation to handle 6 required fields for documents: direction, document type, customer price, discount, paid amount, remaining amount
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
