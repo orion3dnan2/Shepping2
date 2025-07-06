@@ -3239,7 +3239,6 @@ def add_expense_general():
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
         notes = request.form.get('notes', '').strip()
-        expense_date_str = request.form.get('expense_date', '').strip()
         shipment_id = request.form.get('shipment_id') or None
         
         # Validate inputs
@@ -3249,9 +3248,6 @@ def add_expense_general():
         if not amount_str:
             return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
         
-        if not expense_date_str:
-            return jsonify({'success': False, 'message': 'يرجى تحديد تاريخ المصروف'})
-        
         try:
             amount = float(amount_str)
             if amount <= 0:
@@ -3259,10 +3255,8 @@ def add_expense_general():
         except ValueError:
             return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
         
-        try:
-            expense_date = datetime.strptime(expense_date_str, '%Y-%m-%d').date()
-        except ValueError:
-            return jsonify({'success': False, 'message': 'تنسيق التاريخ غير صحيح'})
+        # Use current date automatically
+        expense_date = datetime.now().date()
         
         # Create new expense  
         expense = ExpenseGeneral(
@@ -3293,7 +3287,6 @@ def add_expense_documents():
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
         notes = request.form.get('notes', '').strip()
-        expense_date_str = request.form.get('expense_date', '').strip()
         shipment_id = request.form.get('shipment_id') or None
         
         # Validate inputs
@@ -3303,9 +3296,6 @@ def add_expense_documents():
         if not amount_str:
             return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
         
-        if not expense_date_str:
-            return jsonify({'success': False, 'message': 'يرجى تحديد تاريخ المصروف'})
-        
         try:
             amount = float(amount_str)
             if amount <= 0:
@@ -3313,10 +3303,8 @@ def add_expense_documents():
         except ValueError:
             return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
         
-        try:
-            expense_date = datetime.strptime(expense_date_str, '%Y-%m-%d').date()
-        except ValueError:
-            return jsonify({'success': False, 'message': 'تنسيق التاريخ غير صحيح'})
+        # Use current date automatically
+        expense_date = datetime.now().date()
         
         # Create new expense
         expense = ExpenseDocuments(
@@ -3348,10 +3336,9 @@ def add_expense_general_shipments():
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
         notes = request.form.get('notes', '').strip()
-        expense_date_str = request.form.get('expense_date', '').strip()
         
-        if not name or not amount_str or not expense_date_str:
-            return jsonify({'success': False, 'message': 'جميع الحقول مطلوبة'})
+        if not name or not amount_str:
+            return jsonify({'success': False, 'message': 'اسم المصروف والمبلغ مطلوبان'})
         
         # Convert amount to float
         try:
@@ -3361,11 +3348,8 @@ def add_expense_general_shipments():
         except ValueError:
             return jsonify({'success': False, 'message': 'المبلغ غير صحيح'})
         
-        # Parse date
-        try:
-            expense_date = datetime.strptime(expense_date_str, '%Y-%m-%d').date()
-        except ValueError:
-            return jsonify({'success': False, 'message': 'تاريخ غير صحيح'})
+        # Use current date automatically
+        expense_date = datetime.now().date()
         
         # Create new expense with shipping_type for general shipments
         expense = FinancialTransaction(

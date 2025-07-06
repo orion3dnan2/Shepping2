@@ -1855,21 +1855,19 @@ function printGeneralExpenses() {
         return;
     }
 
-    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>الملاحظات</th></tr></thead><tbody>';
     
     cards.forEach(card => {
         const nameElement = card.querySelector('.fw-bold');
         const amountElement = card.querySelector('.text-success');
-        const dateElement = card.querySelector('.text-muted small');
         const notesElement = card.querySelector('.text-secondary');
         
         if (nameElement && amountElement) {
             const name = nameElement.textContent.trim();
             const amount = amountElement.textContent.trim();
-            const date = dateElement ? dateElement.textContent.trim() : '';
             const notes = notesElement ? notesElement.textContent.trim() : '';
             
-            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${date}</td><td>${notes}</td></tr>`;
+            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${notes}</td></tr>`;
         }
     });
     
@@ -1910,21 +1908,19 @@ function printDocumentExpenses() {
         return;
     }
 
-    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+    let expensesHTML = '<table class="table table-bordered"><thead><tr><th>اسم المصروف</th><th>المبلغ</th><th>الملاحظات</th></tr></thead><tbody>';
     
     cards.forEach(card => {
         const nameElement = card.querySelector('.fw-bold');
         const amountElement = card.querySelector('.text-success');
-        const dateElement = card.querySelector('.text-muted small');
         const notesElement = card.querySelector('.text-secondary');
         
         if (nameElement && amountElement) {
             const name = nameElement.textContent.trim();
             const amount = amountElement.textContent.trim();
-            const date = dateElement ? dateElement.textContent.trim() : '';
             const notes = notesElement ? notesElement.textContent.trim() : '';
             
-            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${date}</td><td>${notes}</td></tr>`;
+            expensesHTML += `<tr><td>${name}</td><td>${amount}</td><td>${notes}</td></tr>`;
         }
     });
     
