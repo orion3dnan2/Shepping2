@@ -198,6 +198,14 @@ The system is specifically configured for cPanel hosting with:
    • Status field remains visible but is not required for document shipments
    • Updated both frontend JavaScript and backend Flask validation to handle 6 required fields for documents: direction, document type, customer price, discount, paid amount, remaining amount
 
+✅ July 06, 2025: Fixed Document Shipment Form Validation and Status Updates
+   • Fixed JavaScript validation to properly handle document shipments by removing action_required field requirement
+   • Added total_price validation for document shipments to ensure price is set before submission
+   • Fixed track_document.html form action URL to use correct route path (/update-document-status/)
+   • Document shipments now require only: direction, document type, customer price, paid amount
+   • Discount and remaining amount are optional for document shipments
+   • Status update functions now work correctly for document tracking page
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
