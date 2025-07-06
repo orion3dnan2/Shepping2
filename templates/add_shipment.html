@@ -643,31 +643,45 @@
         }
     }
     
-    // Show/hide policy, comment, and zone fields for document shipments
+    // Show/hide policy, comment, zone, and document type fields for document shipments
     function toggleDocumentFields() {
         const packageType = document.getElementById('package_type').value;
         const policyCommentRow = document.getElementById('policy_comment_row');
         const zonePackagingRow = document.getElementById('zone_packaging_row');
+        const documentTypeField = document.getElementById('document_type_field');
         
         if (packageType === 'document') {
-            // Hide policy, comment, and zone fields for documents
+            // Hide policy, comment, zone, and document type fields for documents
             if (policyCommentRow) policyCommentRow.style.display = 'none';
             if (zonePackagingRow) zonePackagingRow.style.display = 'none';
+            if (documentTypeField) documentTypeField.style.display = 'none';
             
             // Clear values
             const hasPolicy = document.getElementById('has_policy');
             const hasComment = document.getElementById('has_comment');
             const zone = document.getElementById('zone');
             const hasPackaging = document.getElementById('has_packaging');
+            const documentType = document.getElementById('document_type');
+            const actionRequired = document.getElementById('action_required');
             
             if (hasPolicy) hasPolicy.checked = false;
             if (hasComment) hasComment.checked = false;
             if (zone) zone.value = '';
             if (hasPackaging) hasPackaging.checked = false;
+            if (documentType) documentType.value = '';
+            if (actionRequired) actionRequired.value = '';
+            
+            // Set a fixed price for document shipments (30 KD)
+            const totalPriceField = document.getElementById('total_price');
+            if (totalPriceField) {
+                totalPriceField.value = '30.00';
+                calculateRemaining();
+            }
         } else {
-            // Show policy, comment, and zone fields for general shipments
+            // Show policy, comment, zone, and document type fields for general shipments
             if (policyCommentRow) policyCommentRow.style.display = 'block';
             if (zonePackagingRow) zonePackagingRow.style.display = 'block';
+            if (documentTypeField) documentTypeField.style.display = 'none'; // Keep hidden for general shipments
         }
     }
     

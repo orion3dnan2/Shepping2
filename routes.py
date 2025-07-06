@@ -453,21 +453,12 @@ def add_shipment():
             
             # Process weight and price with comprehensive error handling
             if package_type == 'document':
-                # For documents: document_type required, weight/contents/price not required
-                if document_type:
-                    # For documents, store action_required in package_contents field
-                    if action_required:
-                        package_contents = action_required
-                    # Get price from document type
-                    try:
-                        doc_type = DocumentType.query.filter_by(name_en=document_type).first()
-                        if doc_type:
-                            price = doc_type.price
-                        app.logger.debug(f"Document type price: {price}")
-                    except Exception as e:
-                        app.logger.error(f"Error fetching document type price: {e}")
-                        price = 0.0
+                # For simplified documents: set default values
+                document_type = 'documents'  # Default document type
+                package_contents = 'مستندات عامة'  # Default content description
+                price = 30.0  # Fixed price for all documents (30 KD)
                 weight = 0.0  # Documents don't have weight
+                app.logger.debug(f"Document shipment - using default values: type={document_type}, price={price}")
             else:
                 # For non-documents: process weight and price
                 try:
@@ -2927,9 +2918,18 @@ def update_shipment(shipment_id):
         except ValueError:
             profit = 0.0
         
-        # For documents, store action_required in package_contents
-        if package_type == 'document' and action_required:
-            package_contents = action_required
+        # Handle simplified document shipments
+        if package_type == 'document':
+            # Set default values for simplified document workflow
+            document_type = 'documents'  # Default document type
+            package_contents = 'مستندات عامة'  # Default content description
+            price = 30.0  # Fixed price for all documents (30 KD)
+            weight = 0.0  # Documents don't have weight
+            zone = ''  # No zone for documents
+            has_packaging = False  # No packaging for documents
+            has_policy = False  # No policy for documents
+            has_comment = False  # No comment for documents
+            waybill_price = 0.0  # No waybill price for documents
         
         # Calculate remaining amount
         remaining_amount = price - paid_amount
