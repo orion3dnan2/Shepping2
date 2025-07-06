@@ -371,7 +371,7 @@
 
                 {% if current_user.is_authenticated %}
                 <!-- Hidden form for status updates -->
-                <form method="POST" action="/update-document-status/{{ shipment.id }}" style="display: none;">
+                <form id="status-update-form" method="POST" action="/update-document-status/{{ shipment.id }}" style="display: none;">
                     <select id="new_status" name="new_status">
                         <option value="document_received">تم استلام المستند</option>
                         <option value="document_sent">تم إرسال المستند</option>
@@ -382,6 +382,7 @@
                         <option value="received_after_auth">تم الاستلام بعد التوثيق</option>
                         <option value="delivered">تم التسليم</option>
                     </select>
+                    <input type="submit" style="display: none;">
                 </form>
                 {% endif %}
 
@@ -437,12 +438,21 @@
         const isCompleted = idx < currentStatusIndex;
         const isCurrent = idx === currentStatusIndex;
         
-        div.innerHTML = `
-            <div class="step-icon" onclick="handleStepClick(${idx}, '${step.key}', '${step.label}')" title="انقر للتحديث إلى هذه المرحلة">
-                ${isCompleted ? '✓' : idx + 1}
-            </div>
-            <div class="step-label" onclick="handleStepClick(${idx}, '${step.key}', '${step.label}')">${step.label}</div>
-        `;
+        // Create step icon
+        const stepIcon = document.createElement("div");
+        stepIcon.className = "step-icon";
+        stepIcon.title = "انقر للتحديث إلى هذه المرحلة";
+        stepIcon.innerHTML = isCompleted ? '✓' : (idx + 1);
+        stepIcon.addEventListener('click', () => handleStepClick(idx, step.key, step.label));
+        
+        // Create step label
+        const stepLabel = document.createElement("div");
+        stepLabel.className = "step-label";
+        stepLabel.textContent = step.label;
+        stepLabel.addEventListener('click', () => handleStepClick(idx, step.key, step.label));
+        
+        div.appendChild(stepIcon);
+        div.appendChild(stepLabel);
         
         container.appendChild(div);
     });
@@ -455,21 +465,37 @@
     
     // Handle step click to update status
     function handleStepClick(stepIndex, statusKey, statusLabel) {
+        // Confirm the action with the user
+        if (!confirm(`هل أنت متأكد من تحديث حالة المستند إلى: ${statusLabel}؟`)) {
+            return;
+        }
+        
         // Update the hidden form and submit immediately
-        document.getElementById('new_status').value = statusKey;
+        const statusSelect = document.getElementById('new_status');
+        const form = document.getElementById('status-update-form');
         
-        // Update the timeline preview
-        updateTimeline(stepIndex);
-        
-        // Update status badge
-        document.getElementById('status-text').textContent = statusLabel;
-        
-        // Update status badge class
-        const statusBadge = document.getElementById('status-badge');
-        statusBadge.className = `status-badge status-${statusKey}`;
-        
-        // Auto-submit the form
-        document.querySelector('form[action*="update-document-status"]').submit();
+        if (statusSelect && form) {
+            statusSelect.value = statusKey;
+            
+            // Show loading indicator
+            const timeline = document.getElementById('timeline-steps');
+            if (timeline) {
+                timeline.style.opacity = '0.5';
+                timeline.style.pointerEvents = 'none';
+            }
+            
+            // Add loading message
+            const statusBadge = document.getElementById('status-badge');
+            if (statusBadge) {
+                statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديث...';
+                statusBadge.className = 'status-badge';
+            }
+            
+            // Auto-submit the form (page will reload)
+            form.submit();
+        } else {
+            alert('خطأ: لم يتم العثور على النموذج المطلوب');
+        }
     }
     
 
