@@ -465,6 +465,8 @@
         container.appendChild(div);
     });
 
+    {% endif %}
+    
     {% if current_user.is_authenticated %}
     function updateStatus(statusKey, statusLabel) {
         document.getElementById('new_status').value = statusKey;
@@ -550,8 +552,6 @@
             };
         });
     }
-    
-
     {% endif %}
 </script>
 {% endblock %}

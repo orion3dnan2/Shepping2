@@ -399,6 +399,15 @@ textarea.form-control {
 .status-delivered { background: #c6f6d5; color: #2f855a; }
 .status-pending { background: #feebc8; color: #c05621; }
 
+/* Document status styles */
+.status-document-received { background: #e0e7ff; color: #3730a3; }
+.status-document-sent { background: #dbeafe; color: #1e40af; }
+.status-document-arrived { background: #f0f9ff; color: #0369a1; }
+.status-authentication-progress { background: #fef3c7; color: #92400e; }
+.status-authentication-completed { background: #dcfce7; color: #166534; }
+.status-sending-after-auth { background: #fef2f2; color: #dc2626; }
+.status-received-after-auth { background: #ecfdf5; color: #059669; }
+
 /* Currency styling */
 .shipments-table .currency-amount {
     color: #2d3748 !important;

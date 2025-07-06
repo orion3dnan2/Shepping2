@@ -75,6 +75,7 @@ def inject_get_text():
     def get_shipment_status_display(status):
         """Get Arabic display name and CSS class for shipment status"""
         status_map = {
+            # General shipment statuses
             'created': {'name': 'تم الإنشاء', 'class': 'status-created'},
             'packaged': {'name': 'تم التغليف', 'class': 'status-packaged'},
             'dispatching': {'name': 'جاري الإرسال', 'class': 'status-dispatching'},
@@ -83,6 +84,14 @@ def inject_get_text():
             'received': {'name': 'تم الاستلام', 'class': 'status-received'},
             'delivered': {'name': 'تم التسليم', 'class': 'status-delivered'},
             'cancelled': {'name': 'ملغي', 'class': 'status-cancelled'},
+            # Document shipment statuses
+            'document_received': {'name': 'تم استلام المستند', 'class': 'status-document-received'},
+            'document_sent': {'name': 'تم إرسال المستند', 'class': 'status-document-sent'},
+            'document_arrived': {'name': 'تم استلام المستند', 'class': 'status-document-arrived'},
+            'authentication_in_progress': {'name': 'جاري التوثيق', 'class': 'status-authentication-progress'},
+            'authentication_completed': {'name': 'تم التوثيق', 'class': 'status-authentication-completed'},
+            'sending_after_auth': {'name': 'جاري الإرسال بعد التوثيق', 'class': 'status-sending-after-auth'},
+            'received_after_auth': {'name': 'تم الاستلام بعد التوثيق', 'class': 'status-received-after-auth'},
             # Legacy status support
             'processing': {'name': 'قيد المعالجة', 'class': 'status-processing'},
             'pending': {'name': 'في الانتظار', 'class': 'status-pending'}
