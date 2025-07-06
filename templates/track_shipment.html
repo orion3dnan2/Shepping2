@@ -970,10 +970,12 @@
         <span class="field-value">{{ shipment.created_at.strftime('%Y-%m-%d') }}</span>
       </div>
       {% endif %}
+      {% if shipment.package_type != 'document' %}
       <div>
         <span class="field-label">المحتويات:</span>
         <span class="field-value">{{ shipment.package_contents or 'أغراض شخصية' }}</span>
       </div>
+      {% endif %}
       {% if shipment.document_type %}
       <div>
         <span class="field-label">نوع المستند:</span>
