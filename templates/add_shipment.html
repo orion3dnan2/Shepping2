@@ -1329,11 +1329,23 @@
     // Form validation on submit
     document.getElementById('shipmentForm').addEventListener('submit', function(e) {
         const packageType = document.getElementById('package_type').value;
-        const documentType = document.getElementById('document_type').value;
-        const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
         
-        // Custom validation for document shipments - only specific fields required
+        // Remove all required attributes from hidden fields for document shipments
         if (packageType === 'document') {
+            // Remove required from all hidden fields
+            const hiddenFields = [
+                'weight', 'package_contents', 'zone', 'shipping_method', 
+                'has_packaging', 'has_policy', 'has_comment', 'packaging'
+            ];
+            
+            hiddenFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.removeAttribute('required');
+                }
+            });
+            
+            // Custom validation for document shipments - only specific fields required
             const direction = document.getElementById('direction').value;
             const documentType = document.getElementById('document_type').value;
             const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
