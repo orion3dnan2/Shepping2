@@ -668,6 +668,23 @@
             if (discountField) discountField.setAttribute('required', 'required');
             if (remainingField) remainingField.setAttribute('required', 'required');
             
+            // Remove required from hidden fields for document shipments
+            const weightField = document.getElementById('weight');
+            const contentsField = document.getElementById('package_contents');
+            const zoneField = document.getElementById('zone');
+            const shippingMethodField = document.getElementById('shipping_method');
+            const packagingCheckbox = document.getElementById('has_packaging');
+            const policyCheckbox = document.getElementById('has_policy');
+            const commentCheckbox = document.getElementById('has_comment');
+            
+            if (weightField) weightField.removeAttribute('required');
+            if (contentsField) contentsField.removeAttribute('required');
+            if (zoneField) zoneField.removeAttribute('required');
+            if (shippingMethodField) shippingMethodField.removeAttribute('required');
+            if (packagingCheckbox) packagingCheckbox.removeAttribute('required');
+            if (policyCheckbox) policyCheckbox.removeAttribute('required');
+            if (commentCheckbox) commentCheckbox.removeAttribute('required');
+            
             // Also hide shipping method for documents
             const shippingMethodRow = document.getElementById('shipping_method_row');
             if (shippingMethodRow) shippingMethodRow.style.display = 'none';
@@ -729,6 +746,17 @@
             const remainingField = document.getElementById('remaining_amount');
             if (discountField) discountField.removeAttribute('required');
             if (remainingField) remainingField.removeAttribute('required');
+            
+            // Remove required from hidden fields for general shipments
+            const weightField = document.getElementById('weight');
+            const priceField = document.getElementById('total_price');
+            const contentsField = document.getElementById('package_contents');
+            const zoneField = document.getElementById('zone');
+            const shippingMethodField = document.getElementById('shipping_method');
+            
+            if (weightField) weightField.setAttribute('required', 'required');
+            if (priceField) priceField.setAttribute('required', 'required');
+            if (contentsField) contentsField.setAttribute('required', 'required');
             
             // Restore required attributes for general shipments
             const zone = document.getElementById('zone');
