@@ -667,6 +667,8 @@
             const hasPackaging = document.getElementById('has_packaging');
             const actionRequired = document.getElementById('action_required');
             const shippingMethod = document.getElementById('shipping_method');
+            const weight = document.getElementById('weight');
+            const packageContents = document.getElementById('package_contents');
             
             if (hasPolicy) hasPolicy.checked = false;
             if (hasComment) hasComment.checked = false;
@@ -679,6 +681,14 @@
             if (shippingMethod) {
                 shippingMethod.value = '';
                 shippingMethod.removeAttribute('required');
+            }
+            if (weight) {
+                weight.value = '';
+                weight.removeAttribute('required');
+            }
+            if (packageContents) {
+                packageContents.value = '';
+                packageContents.removeAttribute('required');
             }
             
             // Set a fixed price for document shipments (30 KD)
@@ -695,8 +705,17 @@
             
             // Restore required attributes for general shipments
             const zone = document.getElementById('zone');
+            const weight = document.getElementById('weight');
+            const packageContents = document.getElementById('package_contents');
+            
             if (zone) {
                 zone.setAttribute('required', 'required');
+            }
+            if (weight) {
+                weight.setAttribute('required', 'required');
+            }
+            if (packageContents) {
+                packageContents.setAttribute('required', 'required');
             }
         }
     }
