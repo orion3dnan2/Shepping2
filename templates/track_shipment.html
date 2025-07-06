@@ -978,6 +978,89 @@
         <span class="field-value">{{ shipment.document_type }}</span>
       </div>
       {% endif %}
+      
+      <!-- Show all fields for document shipments -->
+      {% if shipment.package_type == 'document' %}
+      <div>
+        <span class="field-label">اتجاه الشحنة:</span>
+        <span class="field-value">
+          {% if shipment.direction == 'kuwait_to_sudan' %}
+            من الكويت إلى السودان
+          {% elif shipment.direction == 'sudan_to_kuwait' %}
+            من السودان إلى الكويت
+          {% else %}
+            {{ shipment.direction }}
+          {% endif %}
+        </span>
+      </div>
+      
+      {% if shipment.zone %}
+      <div>
+        <span class="field-label">المنطقة:</span>
+        <span class="field-value">{{ shipment.zone }}</span>
+      </div>
+      {% endif %}
+      
+      {% if shipment.shipping_method %}
+      <div>
+        <span class="field-label">طريقة الشحن:</span>
+        <span class="field-value">
+          {% if shipment.shipping_method == 'جوي' %}
+            جوي
+          {% elif shipment.shipping_method == 'بري' %}
+            بري
+          {% else %}
+            {{ shipment.shipping_method }}
+          {% endif %}
+        </span>
+      </div>
+      {% endif %}
+      
+      <div>
+        <span class="field-label">الخصم:</span>
+        <span class="field-value">{{ "%.2f"|format(shipment.discount) }} د.ك</span>
+      </div>
+      
+      <div>
+        <span class="field-label">المبلغ المدفوع:</span>
+        <span class="field-value">{{ "%.2f"|format(shipment.paid_amount) }} د.ك</span>
+      </div>
+      
+      <div>
+        <span class="field-label">المبلغ المتبقي:</span>
+        <span class="field-value">{{ "%.2f"|format(shipment.remaining_amount) }} د.ك</span>
+      </div>
+      
+      <div>
+        <span class="field-label">بوليصة:</span>
+        <span class="field-value">{{ 'نعم' if shipment.has_policy else 'لا' }}</span>
+      </div>
+      
+      <div>
+        <span class="field-label">تعليق:</span>
+        <span class="field-value">{{ 'نعم' if shipment.has_comment else 'لا' }}</span>
+      </div>
+      
+      <div>
+        <span class="field-label">التغليف:</span>
+        <span class="field-value">{{ 'نعم' if shipment.has_packaging else 'لا' }}</span>
+      </div>
+      
+      {% if shipment.packaging %}
+      <div>
+        <span class="field-label">نوع التغليف:</span>
+        <span class="field-value">{{ shipment.packaging }}</span>
+      </div>
+      {% endif %}
+      
+      {% if shipment.waybill_price and shipment.waybill_price > 0 %}
+      <div>
+        <span class="field-label">سعر بوليصة الشحن:</span>
+        <span class="field-value">{{ "%.2f"|format(shipment.waybill_price) }} د.ك</span>
+      </div>
+      {% endif %}
+      {% endif %}
+      
       {% if shipment.notes %}
       <div>
         <span class="field-label">ملاحظات:</span>
