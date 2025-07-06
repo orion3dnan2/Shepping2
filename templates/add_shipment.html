@@ -651,10 +651,14 @@
         const documentTypeField = document.getElementById('document_type_field');
         
         if (packageType === 'document') {
-            // Hide policy, comment, zone, and document type fields for documents
+            // Hide policy, comment, zone, and shipping method fields for documents
             if (policyCommentRow) policyCommentRow.style.display = 'none';
             if (zonePackagingRow) zonePackagingRow.style.display = 'none';
             if (documentTypeField) documentTypeField.style.display = 'block'; // Show document type field for documents
+            
+            // Also hide shipping method for documents
+            const shippingMethodRow = document.getElementById('shipping_method_row');
+            if (shippingMethodRow) shippingMethodRow.style.display = 'none';
             
             // Clear values for hidden fields
             const hasPolicy = document.getElementById('has_policy');
@@ -662,12 +666,14 @@
             const zone = document.getElementById('zone');
             const hasPackaging = document.getElementById('has_packaging');
             const actionRequired = document.getElementById('action_required');
+            const shippingMethod = document.getElementById('shipping_method');
             
             if (hasPolicy) hasPolicy.checked = false;
             if (hasComment) hasComment.checked = false;
             if (zone) zone.value = '';
             if (hasPackaging) hasPackaging.checked = false;
             if (actionRequired) actionRequired.value = '';
+            if (shippingMethod) shippingMethod.value = '';
             
             // Set a fixed price for document shipments (30 KD)
             const totalPriceField = document.getElementById('total_price');
