@@ -677,7 +677,10 @@
                 zone.removeAttribute('required');
             }
             if (hasPackaging) hasPackaging.checked = false;
-            if (actionRequired) actionRequired.value = '';
+            if (actionRequired) {
+                actionRequired.value = '';
+                actionRequired.removeAttribute('required');
+            }
             if (shippingMethod) {
                 shippingMethod.value = '';
                 shippingMethod.removeAttribute('required');
@@ -1277,18 +1280,10 @@
         const documentType = document.getElementById('document_type').value;
         const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
         
-        // Validate document shipments
+        // Simplified validation for document shipments
         if (packageType === 'document') {
-            if (!documentType) {
-                e.preventDefault();
-                alert('يرجى اختيار نوع المستند');
-                return false;
-            }
-            if (totalPrice <= 0) {
-                e.preventDefault();
-                alert('يرجى اختيار نوع المستند أولاً لتحديد السعر');
-                return false;
-            }
+            // No additional validation needed for simplified document form
+            // Price is set automatically to 30 KD for all documents
         }
         
         // For general shipments, normal validation will handle required fields
