@@ -467,6 +467,27 @@ def add_shipment():
                 except ValueError:
                     errors.append('السعر يجب أن يكون رقماً صحيحاً')
                 
+                # Validate discount
+                try:
+                    discount = float(discount_str) if discount_str else 0.0
+                    if discount < 0:
+                        errors.append('الخصم لا يمكن أن يكون سالباً')
+                except ValueError:
+                    errors.append('الخصم يجب أن يكون رقماً صحيحاً')
+                
+                # Validate paid amount
+                try:
+                    paid_amount = float(paid_amount_str) if paid_amount_str else 0.0
+                    if paid_amount < 0:
+                        errors.append('المبلغ المدفوع لا يمكن أن يكون سالباً')
+                except ValueError:
+                    errors.append('المبلغ المدفوع يجب أن يكون رقماً صحيحاً')
+                
+                # Calculate and validate remaining amount
+                remaining_amount = (price - discount) - paid_amount
+                if remaining_amount < 0:
+                    errors.append('المبلغ المتبقي لا يمكن أن يكون سالباً - تحقق من المبالغ')
+                
                 # Set default values for non-required fields
                 package_contents = 'مستندات عامة'  # Default content description
                 weight = 0.0  # Documents don't have weight
