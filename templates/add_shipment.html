@@ -647,14 +647,23 @@
         const packageType = document.getElementById('package_type').value;
         const direction = document.getElementById('direction').value;
         const zonePackagingRow = document.getElementById('zone_packaging_row');
+        const weightContentsRow = document.getElementById('weight_contents_row');
         const zoneSelect = document.getElementById('zone');
+        const weightInput = document.getElementById('weight');
+        const packageContentsInput = document.getElementById('package_contents');
         const totalPriceField = document.getElementById('total_price');
         const priceStatus = document.getElementById('price_status');
         
         if (packageType === 'document') {
-            // Hide zone and packaging for documents
+            // Hide zone, weight, and packaging fields for documents
             zonePackagingRow.style.display = 'none';
+            weightContentsRow.style.display = 'none';
+            
+            // Remove required attributes for document shipments
             if (zoneSelect) zoneSelect.required = false;
+            if (weightInput) weightInput.required = false;
+            if (packageContentsInput) packageContentsInput.required = false;
+            
             totalPriceField.value = '';
             priceStatus.textContent = 'يرجى اختيار نوع المستند لتحديد السعر';
             priceStatus.className = 'text-muted mt-1';
@@ -663,9 +672,15 @@
         }
         
         if (packageType && packageType !== '') {
-            // Show zone and packaging for shipments
+            // Show zone, weight, and packaging fields for general shipments
             zonePackagingRow.style.display = 'block';
+            weightContentsRow.style.display = 'block';
+            
+            // Add required attributes for general shipments (zone and weight are required)
             if (zoneSelect) zoneSelect.required = true;
+            if (weightInput) weightInput.required = true;
+            // package contents is optional even for general shipments
+            if (packageContentsInput) packageContentsInput.required = false;
             
             filterZonesByDirection();
             
@@ -676,8 +691,15 @@
             priceStatus.className = 'text-muted mt-1';
             calculateRemaining();
         } else {
+            // Hide all specific fields when no type is selected
             zonePackagingRow.style.display = 'none';
+            weightContentsRow.style.display = 'none';
+            
+            // Remove all field requirements when no type is selected
             if (zoneSelect) zoneSelect.required = false;
+            if (weightInput) weightInput.required = false;
+            if (packageContentsInput) packageContentsInput.required = false;
+            
             totalPriceField.value = '';
             priceStatus.textContent = 'يتم تحديده تلقائياً حسب النوع والمنطقة والوزن';
             priceStatus.className = 'text-muted mt-1';
@@ -1170,6 +1192,30 @@
             }
         }
     }
+
+    // Form validation on submit
+    document.getElementById('shipmentForm').addEventListener('submit', function(e) {
+        const packageType = document.getElementById('package_type').value;
+        const documentType = document.getElementById('document_type').value;
+        const totalPrice = parseFloat(document.getElementById('total_price').value) || 0;
+        
+        // Validate document shipments
+        if (packageType === 'document') {
+            if (!documentType) {
+                e.preventDefault();
+                alert('يرجى اختيار نوع المستند');
+                return false;
+            }
+            if (totalPrice <= 0) {
+                e.preventDefault();
+                alert('يرجى اختيار نوع المستند أولاً لتحديد السعر');
+                return false;
+            }
+        }
+        
+        // For general shipments, normal validation will handle required fields
+        return true;
+    });
 
     // Initialize form on page load
     document.addEventListener('DOMContentLoaded', function() {
