@@ -443,13 +443,21 @@
         stepIcon.className = "step-icon";
         stepIcon.title = "انقر للتحديث إلى هذه المرحلة";
         stepIcon.innerHTML = isCompleted ? '✓' : (idx + 1);
-        stepIcon.addEventListener('click', () => handleStepClick(idx, step.key, step.label));
+        stepIcon.addEventListener('click', () => {
+            if (!isSubmitting) {
+                handleStepClick(idx, step.key, step.label);
+            }
+        });
         
         // Create step label
         const stepLabel = document.createElement("div");
         stepLabel.className = "step-label";
         stepLabel.textContent = step.label;
-        stepLabel.addEventListener('click', () => handleStepClick(idx, step.key, step.label));
+        stepLabel.addEventListener('click', () => {
+            if (!isSubmitting) {
+                handleStepClick(idx, step.key, step.label);
+            }
+        });
         
         div.appendChild(stepIcon);
         div.appendChild(stepLabel);
@@ -463,12 +471,23 @@
         document.getElementById('new_status').dispatchEvent(new Event('change'));
     }
     
+    // Flag to prevent multiple submissions
+    let isSubmitting = false;
+    
     // Handle step click to update status
     function handleStepClick(stepIndex, statusKey, statusLabel) {
+        // Prevent multiple submissions
+        if (isSubmitting) {
+            return;
+        }
+        
         // Confirm the action with the user
         if (!confirm(`هل أنت متأكد من تحديث حالة المستند إلى: ${statusLabel}؟`)) {
             return;
         }
+        
+        // Set flag to prevent multiple submissions
+        isSubmitting = true;
         
         // Update the hidden form and submit immediately
         const statusSelect = document.getElementById('new_status');
@@ -495,6 +514,7 @@
             form.submit();
         } else {
             alert('خطأ: لم يتم العثور على النموذج المطلوب');
+            isSubmitting = false; // Reset flag if error
         }
     }
     

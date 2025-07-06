@@ -1311,10 +1311,13 @@ def update_document_status(shipment_id):
     new_status = request.form.get('new_status')
     if new_status:
         old_status = shipment.status
-        shipment.status = new_status
-        db.session.commit()
-        flash(f'{get_text("document_status_updated")}: {get_document_status_text(new_status)}', 'success')
-        logging.info(f'Document status updated: {shipment.tracking_number} -> {old_status} to {new_status}')
+        if old_status != new_status:  # Only update if status is actually different
+            shipment.status = new_status
+            db.session.commit()
+            flash(f'تم تحديث حالة المستند إلى: {get_document_status_text(new_status)}', 'success')
+            logging.info(f'Document status updated: {shipment.tracking_number} -> {old_status} to {new_status}')
+        else:
+            flash('المستند في نفس الحالة المطلوبة', 'info')
     else:
         flash('يرجى اختيار حالة صحيحة', 'error')
     
