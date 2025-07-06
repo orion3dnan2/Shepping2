@@ -660,7 +660,7 @@
             const shippingMethodRow = document.getElementById('shipping_method_row');
             if (shippingMethodRow) shippingMethodRow.style.display = 'none';
             
-            // Clear values for hidden fields
+            // Clear values for hidden fields and remove required attributes
             const hasPolicy = document.getElementById('has_policy');
             const hasComment = document.getElementById('has_comment');
             const zone = document.getElementById('zone');
@@ -670,10 +670,16 @@
             
             if (hasPolicy) hasPolicy.checked = false;
             if (hasComment) hasComment.checked = false;
-            if (zone) zone.value = '';
+            if (zone) {
+                zone.value = '';
+                zone.removeAttribute('required');
+            }
             if (hasPackaging) hasPackaging.checked = false;
             if (actionRequired) actionRequired.value = '';
-            if (shippingMethod) shippingMethod.value = '';
+            if (shippingMethod) {
+                shippingMethod.value = '';
+                shippingMethod.removeAttribute('required');
+            }
             
             // Set a fixed price for document shipments (30 KD)
             const totalPriceField = document.getElementById('total_price');
@@ -686,6 +692,12 @@
             if (policyCommentRow) policyCommentRow.style.display = 'block';
             if (zonePackagingRow) zonePackagingRow.style.display = 'block';
             if (documentTypeField) documentTypeField.style.display = 'none'; // Keep hidden for general shipments
+            
+            // Restore required attributes for general shipments
+            const zone = document.getElementById('zone');
+            if (zone) {
+                zone.setAttribute('required', 'required');
+            }
         }
     }
     
