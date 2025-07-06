@@ -662,11 +662,11 @@
                 }
             }
             
-            // Make discount and remaining amount required for documents
+            // Discount and remaining amount are optional for documents
             const discountField = document.getElementById('discount');
             const remainingField = document.getElementById('remaining_amount');
-            if (discountField) discountField.setAttribute('required', 'required');
-            if (remainingField) remainingField.setAttribute('required', 'required');
+            if (discountField) discountField.removeAttribute('required');
+            if (remainingField) remainingField.removeAttribute('required');
             
             // Remove required from hidden fields for document shipments
             const weightField = document.getElementById('weight');
@@ -1517,7 +1517,7 @@
         // Check document-specific fields when document type is selected
         if (packageType === 'document') {
             const documentType = document.getElementById('document_type');
-            const actionRequired = document.getElementById('action_required');
+            const totalPrice = document.getElementById('total_price');
             
             if (!documentType.value.trim()) {
                 documentType.classList.add('is-invalid');
@@ -1526,10 +1526,18 @@
                 documentType.classList.remove('is-invalid');
             }
             
-            if (!actionRequired.value.trim()) {
-                actionRequired.classList.add('is-invalid');
+            // Check that total_price is set for document shipments
+            if (!totalPrice.value.trim() || parseFloat(totalPrice.value) <= 0) {
+                totalPrice.classList.add('is-invalid');
                 hasErrors = true;
             } else {
+                totalPrice.classList.remove('is-invalid');
+            }
+            
+            // action_required field is not required for document shipments
+            // Remove any validation errors from it
+            const actionRequired = document.getElementById('action_required');
+            if (actionRequired) {
                 actionRequired.classList.remove('is-invalid');
             }
         }
