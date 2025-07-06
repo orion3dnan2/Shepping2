@@ -98,135 +98,215 @@
         background: #4b5563;
         transform: translateY(-2px);
     }
-    
-    .price-breakdown {
-        background: #f8fafc;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 15px;
-        margin-top: 15px;
-        font-size: 14px;
-    }
-    
-    .price-breakdown strong {
-        color: #2d3748;
-    }
-    
-    .alert-warning {
-        background: #fef3cd;
-        border: 1px solid #faebcc;
-        color: #856404;
-        padding: 12px;
-        border-radius: 8px;
-        margin-top: 10px;
-        font-size: 14px;
-    }
-    
-    .text-muted {
-        color: #6c757d !important;
-        font-size: 13px;
-    }
-    
-    .required-field::after {
-        content: " *";
-        color: #dc3545;
-    }
-    
-    /* Responsive Design */
+
+    /* Mobile Responsive Design */
     @media (max-width: 768px) {
+        .form-card {
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        
+        .form-card-header {
+            padding: 15px;
+            font-size: 14px;
+        }
+        
+        .form-card-body {
+            padding: 15px;
+        }
+        
+        .row .col-md-6 {
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-control, .form-select {
+            font-size: 16px; /* Prevent zoom on iOS */
+        }
+        
+        /* Style text inputs for numeric fields */
+        input[inputmode="decimal"] {
+            text-align: right;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            direction: ltr;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding: 10px;
+        }
+        
+        .form-card-body {
+            padding: 10px;
+        }
+        
+        .form-label {
+            font-size: 13px;
+        }
+        
+        .form-control, .form-select {
+            padding: 10px;
+            font-size: 16px;
+        }
+    }
+    
+    .document-type-field {
+        display: none;
+        margin-top: 15px;
+    }
+    
+    .document-type-field.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .package-contents-field {
+        transition: all 0.3s ease;
+    }
+    
+    .package-contents-field.hidden {
+        display: none !important;
+    }
+    
+    .weight-field {
+        transition: all 0.3s ease;
+    }
+    
+    .weight-field.hidden {
+        display: none !important;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+    
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
         .form-card-body {
             padding: 20px;
         }
         
-        .form-control, .form-select {
-            padding: 10px 12px;
-            font-size: 16px; /* Prevent iOS zoom */
+        .form-card-header {
+            padding: 15px 20px;
         }
-        
-        .btn-primary, .btn-secondary {
-            padding: 12px 20px;
-            font-size: 14px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #ef4444;
+    }
+    
+    .text-muted {
+        color: #6b7280 !important;
+        font-size: 13px;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffecb3;
+        color: #856404;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        border: 1px solid #ffecb3;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <form method="POST" action="{{ url_for('update_shipment', shipment_id=shipment.id) }}" id="editShipmentForm">
-                <!-- معلومات المرسل -->
-                <div class="form-card">
-                    <div class="form-card-header">
-                        <i class="fas fa-user"></i>
-                        معلومات المرسل
-                    </div>
-                    <div class="form-card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="sender_name" class="form-label">اسم المرسل</label>
-                                <input type="text" class="form-control" id="sender_name" name="sender_name" 
-                                       value="{{ shipment.sender_name or '' }}" placeholder="الاسم الكامل للمرسل">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="sender_phone" class="form-label">رقم الهاتف</label>
-                                <input type="tel" class="form-control" id="sender_phone" name="sender_phone" 
-                                       value="{{ shipment.sender_phone or '' }}" placeholder="رقم الهاتف">
-                            </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <form method="POST" action="{{ url_for('update_shipment', shipment_id=shipment.id) }}" id="shipmentForm">
+                <div class="form-grid">
+                    <!-- Sender Information Card -->
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <i class="fas fa-user"></i>
+                            بيانات المرسل
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="sender_address" class="form-label">العنوان</label>
-                                <input type="text" class="form-control" id="sender_address" name="sender_address" 
-                                       value="{{ shipment.sender_address or '' }}" placeholder="العنوان الكامل">
+                        <div class="form-card-body">
+                            <div class="mb-3">
+                                <label for="sender_name" class="form-label required-field">الاسم</label>
+                                <input type="text" class="form-control" id="sender_name" name="sender_name" required value="{{ shipment.sender_name or '' }}">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            
+                            <div class="mb-3">
+                                <label for="sender_phone" class="form-label required-field">رقم الهاتف</label>
+                                <input type="tel" class="form-control" id="sender_phone" name="sender_phone" required value="{{ shipment.sender_phone or '' }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sender_address" class="form-label">العنوان في الكويت</label>
+                                <textarea class="form-control" id="sender_address" name="sender_address" rows="3" placeholder="العنوان التفصيلي (اختياري)">{{ shipment.sender_address or '' }}</textarea>
+                            </div>
+                            
+                            <div class="mb-0">
                                 <label for="sender_email" class="form-label">البريد الإلكتروني</label>
-                                <input type="email" class="form-control" id="sender_email" name="sender_email" 
-                                       value="{{ shipment.sender_email or '' }}" placeholder="البريد الإلكتروني">
+                                <input type="email" class="form-control" id="sender_email" name="sender_email" placeholder="example@email.com" value="{{ shipment.sender_email or '' }}">
+                                <div class="text-muted mt-1">لإرسال إشعارات حالة الشحنة</div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- معلومات المستلم -->
-                <div class="form-card">
-                    <div class="form-card-header">
-                        <i class="fas fa-user-check"></i>
-                        معلومات المستلم
-                    </div>
-                    <div class="form-card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="receiver_name" class="form-label">اسم المستلم</label>
-                                <input type="text" class="form-control" id="receiver_name" name="receiver_name" 
-                                       value="{{ shipment.receiver_name or '' }}" placeholder="الاسم الكامل للمستلم">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="receiver_phone" class="form-label">رقم الهاتف</label>
-                                <input type="tel" class="form-control" id="receiver_phone" name="receiver_phone" 
-                                       value="{{ shipment.receiver_phone or '' }}" placeholder="رقم الهاتف">
-                            </div>
+                    
+                    <!-- Receiver Information Card -->
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <i class="fas fa-users"></i>
+                            بيانات المستلم
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="receiver_address" class="form-label">العنوان</label>
-                                <input type="text" class="form-control" id="receiver_address" name="receiver_address" 
-                                       value="{{ shipment.receiver_address or '' }}" placeholder="العنوان الكامل">
+                        <div class="form-card-body">
+                            <div class="mb-3">
+                                <label for="receiver_name" class="form-label required-field">الاسم</label>
+                                <input type="text" class="form-control" id="receiver_name" name="receiver_name" required value="{{ shipment.receiver_name or '' }}">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            
+                            <div class="mb-3">
+                                <label for="receiver_phone" class="form-label required-field">رقم الهاتف</label>
+                                <input type="tel" class="form-control" id="receiver_phone" name="receiver_phone" required value="{{ shipment.receiver_phone or '' }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="receiver_address" class="form-label">العنوان في السودان</label>
+                                <textarea class="form-control" id="receiver_address" name="receiver_address" rows="3" placeholder="العنوان التفصيلي (اختياري)">{{ shipment.receiver_address or '' }}</textarea>
+                            </div>
+                            
+                            <div class="mb-0">
                                 <label for="receiver_email" class="form-label">البريد الإلكتروني</label>
-                                <input type="email" class="form-control" id="receiver_email" name="receiver_email" 
-                                       value="{{ shipment.receiver_email or '' }}" placeholder="البريد الإلكتروني">
+                                <input type="email" class="form-control" id="receiver_email" name="receiver_email" placeholder="example@email.com" value="{{ shipment.receiver_email or '' }}">
+                                <div class="text-muted mt-1">لإشعار المستلم بوصول الشحنة</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- تفاصيل الشحنة -->
+                
+                <!-- Shipment Details Card -->
                 <div class="form-card">
                     <div class="form-card-header">
                         <i class="fas fa-box"></i>
@@ -234,199 +314,211 @@
                     </div>
                     <div class="form-card-body">
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="direction" class="form-label">الاتجاه</label>
-                                <select class="form-select" id="direction" name="direction" onchange="filterZonesByDirection()">
-                                    <option value="kuwait_to_sudan" {{ 'selected' if shipment.direction == 'kuwait_to_sudan' else '' }}>الكويت إلى السودان</option>
-                                    <option value="sudan_to_kuwait" {{ 'selected' if shipment.direction == 'sudan_to_kuwait' else '' }}>السودان إلى الكويت</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="package_type" class="form-label">نوع الشحنة</label>
-                                <select class="form-select" id="package_type" name="package_type" onchange="toggleShipmentFields()">
-                                    <option value="general" {{ 'selected' if shipment.package_type != 'document' else '' }}>عامة</option>
+                            <div class="col-md-6 mb-3">
+                                <label for="package_type" class="form-label required-field">نوع الشحنة</label>
+                                <select class="form-select" id="package_type" name="package_type" required onchange="handleShipmentTypeChange()">
+                                    <option value="">اختر نوع الشحنة</option>
+                                    <option value="general" {{ 'selected' if shipment.package_type == 'general' or (shipment.package_type != 'document' and shipment.package_type) else '' }}>عامة</option>
                                     <option value="document" {{ 'selected' if shipment.package_type == 'document' else '' }}>مستندات</option>
+                                    {% for shipment_type in shipment_types %}
+                                    <option value="{{ shipment_type.name_en }}" {{ 'selected' if shipment.package_type == shipment_type.name_en else '' }}>{{ shipment_type.name_ar }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3" id="shipping_method_field" style="{{ 'display: none;' if shipment.package_type == 'document' else '' }}">
-                                <label for="shipping_method" class="form-label">طريقة الشحن</label>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="direction" class="form-label required-field">اتجاه الشحنة</label>
+                                <select class="form-select" id="direction" name="direction" required onchange="filterZonesByDirection(); updateZonePricing()">
+                                    <option value="">اختر الاتجاه</option>
+                                    <option value="kuwait_to_sudan" {{ 'selected' if shipment.direction == 'kuwait_to_sudan' else '' }}>من الكويت إلى السودان</option>
+                                    <option value="sudan_to_kuwait" {{ 'selected' if shipment.direction == 'sudan_to_kuwait' else '' }}>من السودان إلى الكويت</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Method Row (Only for General Shipments) -->
+                        <div class="row" id="shipping_method_row" style="{{ 'display: none;' if shipment.package_type == 'document' else '' }}">
+                            <div class="col-md-6 mb-3">
+                                <label for="shipping_method" class="form-label">طريق الشحن</label>
                                 <select class="form-select" id="shipping_method" name="shipping_method">
-                                    <option value="">اختر طريقة الشحن</option>
+                                    <option value="">اختر طريق الشحن</option>
                                     <option value="جوي" {{ 'selected' if shipment.shipping_method == 'جوي' else '' }}>جوي</option>
                                     <option value="بري" {{ 'selected' if shipment.shipping_method == 'بري' else '' }}>بري</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!-- الحقول الخاصة بالشحنات العامة (الوزن قبل السعر) -->
-                        <div id="general_fields" style="{{ 'display: none;' if shipment.package_type == 'document' else 'display: block;' }}">
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="zone" class="form-label">المنطقة</label>
-                                    <select class="form-select" id="zone" name="zone" onchange="updatePrice()">
-                                        <option value="">اختر المنطقة</option>
-                                        {% for zone in zone_pricings %}
-                                        <option value="{{ zone.zone_name_ar }}" 
-                                                data-price="{{ zone.price_per_kg }}" 
-                                                data-direction="{{ zone.direction }}"
-                                                {{ 'selected' if shipment.zone == zone.zone_name_ar else '' }}>
-                                            {{ zone.zone_name_ar }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
+                        <!-- Zone and packaging fields -->
+                        <div class="row" id="zone_packaging_row" style="{{ 'display: none;' if shipment.package_type == 'document' else '' }}">
+                            <div class="col-md-6 mb-3">
+                                <label for="zone" class="form-label required-field">المنطقة</label>
+                                <select class="form-select" id="zone" name="zone" onchange="calculateZoneBasedPrice()">
+                                    <option value="">اختر المنطقة</option>
+                                    <!-- Sudanese regions for Kuwait to Sudan shipments -->
+                                    <option value="الخرطوم" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'الخرطوم' else '' }}>الخرطوم</option>
+                                    <option value="أم درمان" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'أم درمان' else '' }}>أم درمان</option>
+                                    <option value="بحري" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'بحري' else '' }}>بحري</option>
+                                    <option value="مدني" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'مدني' else '' }}>مدني</option>
+                                    <option value="كسلا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'كسلا' else '' }}>كسلا</option>
+                                    <option value="القضارف" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'القضارف' else '' }}>القضارف</option>
+                                    <option value="عطبرة" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'عطبرة' else '' }}>عطبرة</option>
+                                    <option value="بورتسودان" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'بورتسودان' else '' }}>بورتسودان</option>
+                                    <option value="سنار" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'سنار' else '' }}>سنار</option>
+                                    <option value="الأبيض" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'الأبيض' else '' }}>الأبيض</option>
+                                    <option value="نيالا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'نيالا' else '' }}>نيالا</option>
+                                    <option value="الفاشر" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'الفاشر' else '' }}>الفاشر</option>
+                                    <option value="جنينة" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'جنينة' else '' }}>جنينة</option>
+                                    <option value="ودمدني" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'ودمدني' else '' }}>ودمدني</option>
+                                    <option value="كوستي" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'كوستي' else '' }}>كوستي</option>
+                                    <option value="ربك" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'ربك' else '' }}>ربك</option>
+                                    <option value="الدمازين" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'الدمازين' else '' }}>الدمازين</option>
+                                    <option value="ملكال" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'ملكال' else '' }}>ملكال</option>
+                                    <option value="واو" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'واو' else '' }}>واو</option>
+                                    <option value="جوبا" data-price="0" data-direction="kuwait_to_sudan" class="sudan-zone" {{ 'selected' if shipment.zone == 'جوبا' else '' }}>جوبا</option>
+                                    <!-- Kuwaiti regions for Sudan to Kuwait shipments -->
+                                    <option value="محافظة العاصمة" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone" {{ 'selected' if shipment.zone == 'محافظة العاصمة' else '' }}>محافظة العاصمة</option>
+                                    <option value="محافظة حولي" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone" {{ 'selected' if shipment.zone == 'محافظة حولي' else '' }}>محافظة حولي</option>
+                                    <option value="محافظة الفروانية" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone" {{ 'selected' if shipment.zone == 'محافظة الفروانية' else '' }}>محافظة الفروانية</option>
+                                    <option value="محافظة الأحمدي" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone" {{ 'selected' if shipment.zone == 'محافظة الأحمدي' else '' }}>محافظة الأحمدي</option>
+                                    <option value="محافظة الجهراء" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone" {{ 'selected' if shipment.zone == 'محافظة الجهراء' else '' }}>محافظة الجهراء</option>
+                                    <option value="محافظة مبارك الكبير" data-price="0" data-direction="sudan_to_kuwait" class="kuwait-zone" {{ 'selected' if shipment.zone == 'محافظة مبارك الكبير' else '' }}>محافظة مبارك الكبير</option>
+                                    <!-- Database zones will be populated by JavaScript -->
+                                    {% for zone in zone_pricings %}
+                                    <option value="{{ zone.zone_name_ar }}" 
+                                            data-price="{{ zone.price_per_kg }}" 
+                                            data-direction="{{ zone.direction }}"
+                                            class="db-zone"
+                                            {{ 'selected' if shipment.zone == zone.zone_name_ar else '' }}>
+                                        {{ zone.zone_name_ar }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="1" id="has_packaging" name="has_packaging" onchange="calculateZoneBasedPrice()" {{ 'checked' if shipment.has_packaging else '' }}>
+                                    <label class="form-check-label" for="has_packaging">
+                                        تغليف
+                                    </label>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="weight" class="form-label">الوزن (كيلوغرام)</label>
-                                    <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
-                                           id="weight" name="weight" value="{{ '%.3f'|format(shipment.weight) if shipment.weight else '' }}" 
-                                           placeholder="0.000" onchange="updatePrice()">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="1" id="has_policy" name="has_policy" onchange="toggleWaybillPrice(); calculateZoneBasedPrice()" {{ 'checked' if shipment.has_policy else '' }}>
+                                    <label class="form-check-label" for="has_policy">
+                                        بوليصة شحن
+                                    </label>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="package_contents" class="form-label">محتويات الطرد</label>
-                                    <input type="text" class="form-control" id="package_contents" name="package_contents" 
-                                           value="{{ shipment.package_contents or '' }}" placeholder="وصف محتويات الطرد">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" value="1" id="has_comment" name="has_comment" onchange="calculateZoneBasedPrice()" {{ 'checked' if shipment.has_comment else '' }}>
+                                    <label class="form-check-label" for="has_comment">
+                                        تعليق
+                                    </label>
+                                </div>
+                                <div class="mt-3" id="waybill_price_field" style="display: {{ 'block' if shipment.has_policy else 'none' }};">
+                                    <label for="waybill_price" class="form-label">سعر البوليصة (د.ك)</label>
+                                    <input type="text" class="form-control" id="waybill_price" name="waybill_price" 
+                                           min="0" placeholder="أدخل سعر البوليصة" onchange="calculateZoneBasedPrice()" 
+                                           value="{{ '%.3f'|format(shipment.waybill_price) if shipment.waybill_price else '' }}">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- الحقول الخاصة بالمستندات (قبل السعر) -->
-                        <div id="document_fields" style="{{ 'display: block;' if shipment.package_type == 'document' else 'display: none;' }}">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="document_type" class="form-label">نوع المستند</label>
-                                    <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
-                                        <option value="">اختر نوع المستند</option>
-                                        {% for doc_type in document_types %}
-                                        <option value="{{ doc_type.name_ar }}" data-price="{{ doc_type.price }}" 
-                                                {{ 'selected' if shipment.document_type == doc_type.name_ar else '' }}>
-                                            {{ doc_type.name_ar }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="action_required" class="form-label">الإجراء المطلوب</label>
-                                    <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
-                                        <option value="">اختر نوع الإجراء</option>
-                                        {% for document_type in document_types %}
-                                        <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}" 
-                                                {{ 'selected' if document_type.name_ar == shipment.package_contents else '' }}>
-                                            {{ document_type.name_ar }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                        <!-- Weight and Package Contents Row (Only for General Shipments) -->
+                        <div class="row" id="weight_contents_row" style="{{ 'display: none;' if shipment.package_type == 'document' else '' }}">
+                            <div class="col-md-4 mb-3 weight-field">
+                                <label for="weight" class="form-label required-field">الوزن (كيلوغرام)</label>
+                                <input type="text" class="form-control" id="weight" name="weight" placeholder="0.0" oninput="calculateZoneBasedPrice()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" value="{{ '%.3f'|format(shipment.weight) if shipment.weight else '' }}">
                             </div>
-                        </div>
-
-                        <!-- الخيارات الإضافية -->
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="has_packaging" name="has_packaging" 
-                                                   value="1" onchange="updatePrice()" {{ 'checked' if shipment.has_packaging else '' }}>
-                                            <label class="form-check-label" for="has_packaging">
-                                                تغليف
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="has_policy" name="has_policy" 
-                                                   value="1" onchange="toggleWaybillPrice(); updatePrice()" {{ 'checked' if shipment.has_policy else '' }}>
-                                            <label class="form-check-label" for="has_policy">
-                                                بوليصة
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="has_comment" name="has_comment" 
-                                                   value="1" onchange="updatePrice()" {{ 'checked' if shipment.has_comment else '' }}>
-                                            <label class="form-check-label" for="has_comment">
-                                                تعليق
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+                            
+                            <div class="col-md-4 mb-3 package-contents-field">
+                                <label for="package_contents" class="form-label">محتويات الطرد</label>
+                                <input type="text" class="form-control" id="package_contents" name="package_contents" placeholder="وصف المحتويات" value="{{ shipment.package_contents or '' }}">
                             </div>
-                        </div>
-
-                        <!-- سعر البوليصة اليدوي -->
-                        <div class="row" id="waybill_price_field" style="{{ 'display: block;' if shipment.has_policy else 'display: none;' }}">
+                            
                             <div class="col-md-4 mb-3">
-                                <label for="waybill_price" class="form-label">سعر البوليصة (د.ك)</label>
-                                <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
-                                       id="waybill_price" name="waybill_price" value="{{ '%.3f'|format(shipment.waybill_price) if shipment.waybill_price else '' }}" 
-                                       placeholder="0.000" onchange="updatePrice()">
+                                <label for="price_per_kg" class="form-label">سعر الكيلو (د.ك)</label>
+                                <input type="text" class="form-control" id="price_per_kg" name="price_per_kg" placeholder="0.000" oninput="calculateZoneBasedPrice()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" value="{{ '%.3f'|format(shipment.price_per_kg) if shipment.price_per_kg else '' }}">
+                                <div class="text-muted mt-1">سيتم استخدام السعر من الإعدادات إذا تُرك فارغاً</div>
                             </div>
                         </div>
 
-                        <!-- الأسعار والدفع -->
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="total_price" class="form-label">السعر الإجمالي (د.ك)</label>
-                                <input type="text" class="form-control" id="total_price" name="total_price" 
-                                       value="{{ '%.2f'|format(shipment.price) if shipment.price else '' }}" placeholder="0.00" readonly>
-                                <input type="hidden" id="cost" name="cost" value="{{ shipment.cost or '0.0' }}">
-                                <input type="hidden" id="profit" name="profit" value="{{ shipment.profit or '0.0' }}">
-                                <!-- Additional hidden fields for checkboxes when unchecked -->
-                                <input type="hidden" name="has_packaging" value="0">
-                                <input type="hidden" name="has_policy" value="0">
-                                <input type="hidden" name="has_comment" value="0">
+                        <!-- Document Type Row (Only for Document Shipments) -->
+                        <div class="row" id="document_type_row" style="{{ 'display: none;' if shipment.package_type != 'document' else '' }}">
+                            <div class="col-md-6 mb-3">
+                                <label for="document_type" class="form-label required-field">نوع المستند</label>
+                                <select class="form-select" id="document_type" name="document_type" onchange="updateDocumentPrice()">
+                                    <option value="">اختر نوع المستند</option>
+                                    {% for doc_type in document_types %}
+                                    <option value="{{ doc_type.name_ar }}" data-price="{{ doc_type.price }}" {{ 'selected' if shipment.document_type == doc_type.name_ar else '' }}>{{ doc_type.name_ar }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="action_required" class="form-label">الإجراء المطلوب</label>
+                                <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
+                                    <option value="">اختر نوع الإجراء</option>
+                                    {% for document_type in document_types %}
+                                    <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}" {{ 'selected' if document_type.name_ar == shipment.package_contents else '' }}>{{ document_type.name_ar }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Row -->
+                        <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="discount" class="form-label">الخصم (د.ك)</label>
-                                <input type="text" class="form-control" id="discount" name="discount" 
-                                       value="{{ '%.2f'|format(shipment.discount) if shipment.discount else '' }}" placeholder="0.00" oninput="applyDiscount()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
-                                <div class="text-muted mt-1">يتم خصمه من السعر الإجمالي</div>
+                                <input type="text" class="form-control" id="discount" name="discount" placeholder="0.00" oninput="applyDiscount()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" value="{{ '%.2f'|format(shipment.discount) if shipment.discount else '' }}">
                             </div>
+                            
                             <div class="col-md-4 mb-3">
-                                <label for="amount_paid" class="form-label">المبلغ المدفوع (د.ك)</label>
-                                <input type="text" pattern="\d+(\.\d{1,3})?" inputmode="decimal" class="form-control" 
-                                       id="amount_paid" name="amount_paid" value="{{ '%.2f'|format(shipment.paid_amount) if shipment.paid_amount else '' }}" 
-                                       placeholder="0.00" onchange="updateRemainingAmount()">
+                                <label for="amount_paid" class="form-label required-field">المبلغ المدفوع (د.ك)</label>
+                                <input type="text" class="form-control" id="amount_paid" name="amount_paid" required placeholder="0.00" oninput="calculateRemaining()" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" value="{{ '%.2f'|format(shipment.paid_amount) if shipment.paid_amount else '' }}">
                             </div>
+                            
                             <div class="col-md-4 mb-3">
                                 <label for="remaining_amount" class="form-label">المبلغ المتبقي (د.ك)</label>
-                                <input type="text" class="form-control" id="remaining_amount" name="remaining_amount" 
-                                       value="{{ '%.2f'|format(shipment.remaining_amount) if shipment.remaining_amount else '' }}" placeholder="0.00" readonly>
+                                <input type="text" class="form-control" id="remaining_amount" name="remaining_amount" readonly placeholder="0.00" value="{{ '%.2f'|format(shipment.remaining_amount) if shipment.remaining_amount else '' }}">
                             </div>
                         </div>
 
-                        <!-- الملاحظات -->
+                        <!-- Total Price Row -->
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="total_price" class="form-label required-field">السعر الإجمالي (د.ك)</label>
+                                <input type="text" class="form-control" id="total_price" name="total_price" required placeholder="0.00" readonly value="{{ '%.2f'|format(shipment.price) if shipment.price else '' }}">
+                                <div id="price_status" class="text-muted mt-1">يتم تحديده تلقائياً حسب النوع والمنطقة والوزن</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
                                 <label for="notes" class="form-label">ملاحظات</label>
-                                <textarea class="form-control" id="notes" name="notes" rows="3" 
-                                          placeholder="ملاحظات إضافية">{{ shipment.notes or '' }}</textarea>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="ملاحظات إضافية">{{ shipment.notes or '' }}</textarea>
                             </div>
                         </div>
 
-                        <!-- تفاصيل السعر -->
-                        <div id="price_breakdown" class="price-breakdown" style="display: none;">
-                            <strong>تفاصيل السعر:</strong>
-                            <div id="price_details"></div>
-                        </div>
-
-                        <!-- تحذير المدفوع أكثر من الإجمالي -->
-                        <div id="payment_warning" class="alert-warning" style="display: none;">
-                            <i class="fas fa-exclamation-triangle"></i> المبلغ المدفوع أكبر من السعر الإجمالي
-                        </div>
+                        <!-- Hidden fields for cost and profit -->
+                        <input type="hidden" id="cost" name="cost" value="{{ shipment.cost or '0.0' }}">
+                        <input type="hidden" id="profit" name="profit" value="{{ shipment.profit or '0.0' }}">
+                        
+                        <!-- Additional hidden fields for checkboxes when unchecked -->
+                        <input type="hidden" name="has_packaging" value="0">
+                        <input type="hidden" name="has_policy" value="0">
+                        <input type="hidden" name="has_comment" value="0">
                     </div>
                 </div>
-
-                <!-- أزرار الحفظ والإلغاء -->
+                
+                <!-- Submit Button -->
                 <div class="form-card">
-                    <div class="form-card-body text-center">
-                        <button type="submit" class="btn btn-primary me-3">
-                            <i class="fas fa-save"></i> حفظ التعديلات
-                        </button>
-                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> إلغاء
-                        </a>
+                    <div class="form-card-body">
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> حفظ التعديلات
+                            </button>
+                            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> إلغاء
+                            </a>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -437,114 +529,416 @@
 
 {% block extra_js %}
 <script>
-// Global variables for pricing
-let packagingPrice = 5.0; // Default packaging price
-let commentPrice = 2.0;   // Default comment price
+    // Initialize shipment type handler on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all form behaviors
+        loadPricePerKg();
+        handleShipmentTypeChange();
+        filterZonesByDirection();
+        
+        // Calculate initial prices
+        setTimeout(() => {
+            const packageType = document.getElementById('package_type').value;
+            if (packageType === 'document') {
+                updateDocumentPrice();
+            } else {
+                calculateZoneBasedPrice();
+            }
+        }, 100);
+    });
 
-// Get global settings on page load
-fetch('/api/global_settings')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            packagingPrice = data.packaging_price || 5.0;
-            commentPrice = data.comment_price || 2.0;
-            // Update price after loading settings
-            setTimeout(updatePrice, 100);
+    // Handle shipment type change to show/hide relevant fields
+    function handleShipmentTypeChange() {
+        const packageType = document.getElementById('package_type').value;
+        const shippingMethodRow = document.getElementById('shipping_method_row');
+        const zonePackagingRow = document.getElementById('zone_packaging_row');
+        const weightContentsRow = document.getElementById('weight_contents_row');
+        const documentTypeRow = document.getElementById('document_type_row');
+        const zoneSelect = document.getElementById('zone');
+        const totalPriceField = document.getElementById('total_price');
+        const priceStatus = document.getElementById('price_status');
+        
+        if (packageType === 'document') {
+            // Hide general shipment fields
+            shippingMethodRow.style.display = 'none';
+            zonePackagingRow.style.display = 'none';
+            weightContentsRow.style.display = 'none';
+            documentTypeRow.style.display = 'block';
+            
+            if (zoneSelect) zoneSelect.required = false;
+            totalPriceField.value = '';
+            priceStatus.textContent = 'يرجى اختيار نوع المستند لتحديد السعر';
+            priceStatus.className = 'text-muted mt-1';
+            calculateRemaining();
+            return;
         }
-    })
-    .catch(error => console.error('Error loading global settings:', error));
-
-function toggleShipmentFields() {
-    const packageType = document.getElementById('package_type').value;
-    const documentFields = document.getElementById('document_fields');
-    const generalFields = document.getElementById('general_fields');
-    const shippingMethodField = document.getElementById('shipping_method_field');
-    
-    if (packageType === 'document') {
-        documentFields.style.display = 'block';
-        generalFields.style.display = 'none';
-        shippingMethodField.style.display = 'none';
-    } else {
-        documentFields.style.display = 'none';
-        generalFields.style.display = 'block';
-        shippingMethodField.style.display = 'block';
-    }
-    
-    updatePrice();
-}
-
-function toggleShippingMethod() {
-    const packageType = document.getElementById('package_type').value;
-    const shippingMethodField = document.getElementById('shipping_method_field');
-    
-    if (packageType === 'general') {
-        shippingMethodField.style.display = 'block';
-    } else {
-        shippingMethodField.style.display = 'none';
-    }
-}
-
-function toggleWaybillPrice() {
-    const hasPolicyCheckbox = document.getElementById('has_policy');
-    const waybillPriceField = document.getElementById('waybill_price_field');
-    
-    if (hasPolicyCheckbox.checked) {
-        waybillPriceField.style.display = 'block';
-    } else {
-        waybillPriceField.style.display = 'none';
-        document.getElementById('waybill_price').value = '';
-    }
-}
-
-function updateDocumentPrice() {
-    const packageType = document.getElementById('package_type').value;
-    
-    // Only process if the shipment type is documents
-    if (packageType !== 'document') {
-        return;
-    }
-    
-    const documentTypeSelect = document.getElementById('document_type');
-    const selectedOption = documentTypeSelect.options[documentTypeSelect.selectedIndex];
-    let basePrice = parseFloat(selectedOption.getAttribute('data-price') || 0);
-    
-    // If no document type selected, try to get current price from form
-    if (basePrice === 0) {
-        const currentPrice = parseFloat(document.getElementById('total_price').value || 0);
-        if (currentPrice > 0) {
-            basePrice = currentPrice;
+        
+        if (packageType && packageType !== '') {
+            // Show general shipment fields
+            shippingMethodRow.style.display = 'block';
+            zonePackagingRow.style.display = 'block';
+            weightContentsRow.style.display = 'block';
+            documentTypeRow.style.display = 'none';
+            
+            if (zoneSelect) zoneSelect.required = true;
+            
+            filterZonesByDirection();
+            
+            // Reset zone selection when direction changes
+            zoneSelect.value = '';
+            totalPriceField.value = '';
+            priceStatus.textContent = 'اختر المنطقة والوزن لحساب السعر الإجمالي';
+            priceStatus.className = 'text-muted mt-1';
+            calculateRemaining();
+        } else {
+            // Hide all specific fields
+            shippingMethodRow.style.display = 'none';
+            zonePackagingRow.style.display = 'none';
+            weightContentsRow.style.display = 'none';
+            documentTypeRow.style.display = 'none';
+            
+            if (zoneSelect) zoneSelect.required = false;
+            totalPriceField.value = '';
+            priceStatus.textContent = 'يتم تحديده تلقائياً حسب النوع والمنطقة والوزن';
+            priceStatus.className = 'text-muted mt-1';
+            calculateRemaining();
         }
     }
     
-    // Get packaging cost from simple checkbox
-    let packagingCost = 0;
-    const packagingCheckbox = document.getElementById('has_packaging');
-    if (packagingCheckbox && packagingCheckbox.checked) {
-        packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
+    // Global variable to store price per kg from settings
+    let globalPricePerKg = 0;
+    
+    // Fetch price per kg from settings when page loads
+    async function loadPricePerKg() {
+        try {
+            const response = await fetch('/api/price_per_kg');
+            const data = await response.json();
+            if (data.success) {
+                globalPricePerKg = data.price_per_kg;
+                console.log('Loaded price per kg:', globalPricePerKg);
+                
+                // Recalculate price if weight is already entered
+                calculateZoneBasedPrice();
+            }
+        } catch (error) {
+            console.error('Error loading price per kg:', error);
+        }
     }
     
-    // Get waybill cost if policy is checked
-    let policyPrice = 0;
-    const hasPolicy = document.getElementById('has_policy').checked;
-    if (hasPolicy) {
-        const waybillPriceInput = document.getElementById('waybill_price');
-        policyPrice = parseFloat(waybillPriceInput.value) || 0;
+    // Refresh price per kg from settings (can be called from external sources)
+    window.refreshPricePerKg = function() {
+        loadPricePerKg();
+    };
+    
+    // Function to filter zones based on selected direction and package type
+    function filterZonesByDirection() {
+        const directionSelect = document.getElementById('direction');
+        const packageTypeSelect = document.getElementById('package_type');
+        const zoneSelect = document.getElementById('zone');
+        
+        if (!directionSelect || !zoneSelect || !packageTypeSelect) return;
+        
+        const direction = directionSelect.value;
+        const packageType = packageTypeSelect.value;
+        
+        // Store current selection
+        const currentZone = zoneSelect.value;
+        
+        // Get all existing options
+        const allOptions = Array.from(zoneSelect.options);
+        
+        // Show/hide options based on conditions
+        allOptions.forEach(option => {
+            if (option.value === '') {
+                // Always show the default option
+                option.style.display = 'block';
+                return;
+            }
+            
+            const optionDirection = option.getAttribute('data-direction');
+            const isSudanZone = option.classList.contains('sudan-zone');
+            const isKuwaitZone = option.classList.contains('kuwait-zone');
+            const isDbZone = option.classList.contains('db-zone');
+            
+            // Show Sudanese zones only for general shipments going Kuwait to Sudan
+            if (isSudanZone) {
+                if (packageType === 'general' && direction === 'kuwait_to_sudan') {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            // Show Kuwaiti zones only for general shipments going Sudan to Kuwait
+            else if (isKuwaitZone) {
+                if (packageType === 'general' && direction === 'sudan_to_kuwait') {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            // Show database zones based on direction
+            else if (isDbZone) {
+                if (direction === '' || optionDirection === direction) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+        });
+        
+        // Reset zone selection if current selection is now hidden
+        const currentOption = zoneSelect.querySelector(`option[value="${currentZone}"]`);
+        if (currentOption && currentOption.style.display === 'none') {
+            zoneSelect.value = '';
+        }
     }
     
-    // Get comment cost
-    let commentPrice = 0;
-    const hasComment = document.getElementById('has_comment').checked;
-    if (hasComment) {
-        commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
+    // Toggle waybill price field
+    function toggleWaybillPrice() {
+        const hasPolicyCheckbox = document.getElementById('has_policy');
+        const waybillPriceField = document.getElementById('waybill_price_field');
+        
+        if (hasPolicyCheckbox.checked) {
+            waybillPriceField.style.display = 'block';
+        } else {
+            waybillPriceField.style.display = 'none';
+            document.getElementById('waybill_price').value = '';
+        }
     }
     
-    // Calculate total price with all costs
-    const totalPrice = basePrice + packagingCost + policyPrice + commentPrice;
+    // Apply discount to the total price
+    function applyDiscount() {
+        const totalPriceField = document.getElementById('total_price');
+        const discountField = document.getElementById('discount');
+        const originalPrice = parseFloat(totalPriceField.getAttribute('data-original-price') || totalPriceField.value || 0);
+        const discount = parseFloat(discountField.value || 0);
+        
+        // Calculate final price after discount
+        const finalPrice = Math.max(0, originalPrice - discount);
+        totalPriceField.value = finalPrice.toFixed(2);
+        
+        // Update remaining amount calculation
+        calculateRemaining();
+        
+        // Show discount info
+        const priceStatus = document.getElementById('price_status');
+        if (discount > 0) {
+            priceStatus.innerHTML = `السعر الأصلي: ${originalPrice.toFixed(2)} د.ك - الخصم: ${discount.toFixed(2)} د.ك = ${finalPrice.toFixed(2)} د.ك`;
+        } else {
+            priceStatus.innerHTML = 'يتم تحديده تلقائياً حسب النوع';
+        }
+    }
+
+    // Calculate price based on settings price per kg + packaging cost (for general shipments only)
+    function calculateZoneBasedPrice() {
+        const packageType = document.getElementById('package_type').value;
+        const weightInput = document.getElementById('weight');
+        const pricePerKgInput = document.getElementById('price_per_kg');
+        const totalPriceField = document.getElementById('total_price');
+        const priceStatus = document.getElementById('price_status');
+        
+        // Skip calculation for document shipments - they use document type pricing
+        if (packageType === 'document') {
+            return;
+        }
+        
+        // Only calculate for general shipments (عامة) when weight is provided
+        if (packageType === '' || !packageType) {
+            totalPriceField.value = '';
+            priceStatus.textContent = 'اختر نوع الشحنة أولاً';
+            priceStatus.className = 'text-muted mt-1';
+            calculateRemaining();
+            return;
+        }
+        
+        const weight = parseFloat(weightInput.value) || 0;
+        
+        if (weight <= 0) {
+            totalPriceField.value = '';
+            priceStatus.textContent = 'أدخل الوزن لحساب السعر الإجمالي';
+            priceStatus.className = 'text-warning mt-1';
+            calculateRemaining();
+            return;
+        }
+        
+        // Use manual price per kg first, then global price, then zone price
+        let pricePerKg = parseFloat(pricePerKgInput.value) || globalPricePerKg;
+        
+        // If no manual or global price, try to get zone price
+        if (pricePerKg <= 0) {
+            const zoneSelect = document.getElementById('zone');
+            if (zoneSelect && zoneSelect.value) {
+                const selectedZoneOption = zoneSelect.options[zoneSelect.selectedIndex];
+                pricePerKg = parseFloat(selectedZoneOption.getAttribute('data-price')) || 0;
+            }
+        }
+        
+        if (pricePerKg <= 0) {
+            totalPriceField.value = '';
+            priceStatus.textContent = 'أدخل سعر الكيلو أو اختر المنطقة أو حدد سعر الكيلو في الإعدادات';
+            priceStatus.className = 'text-warning mt-1';
+            calculateRemaining();
+            return;
+        }
+        
+        // Get packaging cost from simple checkbox
+        let packagingCost = 0;
+        const packagingCheckbox = document.getElementById('has_packaging');
+        if (packagingCheckbox && packagingCheckbox.checked) {
+            packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
+        }
+        
+        // Get additional costs from checkboxes
+        const hasPolicy = document.getElementById('has_policy').checked;
+        const hasComment = document.getElementById('has_comment').checked;
+        
+        // Calculate additional costs
+        let policyPrice = 0;
+        let commentPrice = 0;
+        
+        // Get manual waybill price if policy is checked
+        if (hasPolicy) {
+            const waybillPriceInput = document.getElementById('waybill_price');
+            policyPrice = parseFloat(waybillPriceInput.value) || 0;
+        }
+        if (hasComment) {
+            commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
+        }
+        
+        // Calculate total price: (weight × price per kg) + packaging cost + policy + comment
+        const weightCost = weight * pricePerKg;
+        const totalPrice = weightCost + packagingCost + policyPrice + commentPrice;
+        
+        // Store original price before discount
+        totalPriceField.setAttribute('data-original-price', totalPrice.toFixed(3));
+        totalPriceField.value = totalPrice.toFixed(3);
+        
+        // Apply discount if exists
+        applyDiscount();
+        
+        // Build detailed price breakdown message
+        let priceSource = '(يدوي)';
+        if (!pricePerKgInput.value) {
+            priceSource = globalPricePerKg > 0 ? '(من الإعدادات)' : '(من المنطقة)';
+        }
+        
+        let breakdown = `${weight} كيلو × ${pricePerKg.toFixed(3)} د.ك ${priceSource} = ${weightCost.toFixed(3)} د.ك`;
+        if (packagingCost > 0) {
+            breakdown += ` + ${packagingCost.toFixed(3)} د.ك (تغليف)`;
+        }
+        if (policyPrice > 0) {
+            breakdown += ` + ${policyPrice.toFixed(3)} د.ك (بوليصة)`;
+        }
+        if (commentPrice > 0) {
+            breakdown += ` + ${commentPrice.toFixed(3)} د.ك (تعليق)`;
+        }
+        breakdown += ` = ${totalPrice.toFixed(3)} د.ك`;
+        
+        // Show breakdown only if no discount applied
+        const discountField = document.getElementById('discount');
+        const discount = parseFloat(discountField.value || 0);
+        if (discount === 0) {
+            priceStatus.textContent = breakdown;
+            priceStatus.className = 'text-success mt-1';
+        }
+        
+        calculateProfit();
+    }
     
-    document.getElementById('total_price').value = totalPrice.toFixed(2);
-    updateRemainingAmount();
+    // Calculate profit automatically (Price - Cost)
+    function calculateProfit() {
+        const totalPriceField = document.getElementById('total_price');
+        const costField = document.getElementById('cost');
+        const profitField = document.getElementById('profit');
+        
+        const totalPrice = parseFloat(totalPriceField.value) || 0;
+        const cost = parseFloat(costField.value) || 0;
+        
+        const profit = totalPrice - cost;
+        profitField.value = profit.toFixed(3);
+        
+        // Change profit field color based on value
+        if (profit > 0) {
+            profitField.style.backgroundColor = '#e8f5e8'; // Light green for profit
+        } else if (profit < 0) {
+            profitField.style.backgroundColor = '#ffeaea'; // Light red for loss
+        } else {
+            profitField.style.backgroundColor = '#f8f9fa'; // Neutral for break-even
+        }
+    }
     
-    if (totalPrice > 0) {
+    // Legacy function for backward compatibility - now calls zone-based calculation
+    function calculateWeightBasedPrice() {
+        calculateZoneBasedPrice();
+    }
+    
+    // Update document price (only for document shipments)
+    async function updateDocumentPrice() {
+        const packageType = document.getElementById('package_type').value;
+        const documentTypeSelect = document.getElementById('document_type');
+        const documentType = documentTypeSelect.value;
+        const totalPriceField = document.getElementById('total_price');
+        const priceStatus = document.getElementById('price_status');
+        
+        // Only process if the shipment type is documents
+        if (packageType !== 'document') {
+            return;
+        }
+        
+        if (!documentType || documentType === '') {
+            totalPriceField.value = '';
+            priceStatus.textContent = 'اختر نوع المستند لتحديد السعر';
+            priceStatus.className = 'text-muted mt-1';
+            calculateRemaining();
+            return;
+        }
+        
+        // Get price from data attribute
+        const selectedOption = documentTypeSelect.options[documentTypeSelect.selectedIndex];
+        let basePrice = parseFloat(selectedOption.getAttribute('data-price') || 0);
+        
+        if (basePrice <= 0) {
+            totalPriceField.value = '';
+            priceStatus.textContent = 'لا يوجد سعر محدد لهذا النوع من المستندات';
+            priceStatus.className = 'text-warning mt-1';
+            calculateRemaining();
+            return;
+        }
+        
+        // Get packaging cost from checkbox
+        let packagingCost = 0;
+        const packagingCheckbox = document.getElementById('has_packaging');
+        if (packagingCheckbox && packagingCheckbox.checked) {
+            packagingCost = parseFloat('{{ packaging_price or 0 }}') || 0;
+        }
+        
+        // Get additional costs from checkboxes
+        const hasPolicy = document.getElementById('has_policy').checked;
+        const hasComment = document.getElementById('has_comment').checked;
+        
+        // Calculate additional costs
+        let policyPrice = 0;
+        let commentPrice = 0;
+        
+        // Get manual waybill price if policy is checked
+        if (hasPolicy) {
+            const waybillPriceInput = document.getElementById('waybill_price');
+            policyPrice = parseFloat(waybillPriceInput.value) || 0;
+        }
+        if (hasComment) {
+            commentPrice = parseFloat('{{ comment_price or 0 }}') || 0;
+        }
+        
+        // Calculate total price with all costs
+        const totalPrice = basePrice + packagingCost + policyPrice + commentPrice;
+        
+        // Store original price before discount
+        totalPriceField.setAttribute('data-original-price', totalPrice.toFixed(3));
+        totalPriceField.value = totalPrice.toFixed(3);
+        
+        // Apply discount if exists
+        applyDiscount();
+        
         // Build price breakdown message
         let breakdown = `سعر المستند: ${basePrice.toFixed(3)} د.ك`;
         if (packagingCost > 0) {
@@ -558,205 +952,49 @@ function updateDocumentPrice() {
         }
         breakdown += ` = ${totalPrice.toFixed(3)} د.ك`;
         
-        showPriceBreakdown(breakdown);
-    } else {
-        hidePriceBreakdown();
-    }
-}
-
-function updatePrice() {
-    const packageType = document.getElementById('package_type').value;
-    
-    // Only process for general shipments - documents use updateDocumentPrice()
-    if (packageType === 'document' || packageType === '' || !packageType) {
-        return;
-    }
-    
-    // General shipment pricing calculation (only for non-document shipments)
-    const zoneSelect = document.getElementById('zone');
-    const selectedZone = zoneSelect.options[zoneSelect.selectedIndex];
-    const pricePerKg = parseFloat(selectedZone.getAttribute('data-price') || 0);
-    const weight = parseFloat(document.getElementById('weight').value || 0);
-    
-    let totalPrice = 0;
-    let priceDetails = [];
-    
-    // Only calculate if we have valid zone and weight
-    if (pricePerKg > 0 && weight > 0) {
-        totalPrice = pricePerKg * weight;
-        priceDetails.push(`سعر الشحن: ${pricePerKg.toFixed(3)} × ${weight.toFixed(3)} = ${(pricePerKg * weight).toFixed(3)} د.ك`);
-    } else {
-        // If no zone pricing calculation, preserve existing price
-        const currentPrice = parseFloat(document.getElementById('total_price').value || 0);
-        if (currentPrice > 0) {
-            totalPrice = currentPrice;
+        // Show breakdown only if no discount applied
+        const discountField = document.getElementById('discount');
+        const discount = parseFloat(discountField.value || 0);
+        if (discount === 0) {
+            priceStatus.textContent = breakdown;
+            priceStatus.className = 'text-success mt-1';
         }
+        
+        calculateProfit();
     }
     
-    // Add packaging price
-    const hasPackaging = document.getElementById('has_packaging').checked;
-    if (hasPackaging) {
-        totalPrice += packagingPrice;
-        priceDetails.push(`التغليف: ${packagingPrice.toFixed(3)} د.ك`);
+    // Update procedure price (called when action required is changed)
+    function updateProcedurePrice() {
+        // This function can be extended if needed for additional procedure pricing
+        updateDocumentPrice();
     }
     
-    // Add manual waybill price
-    const hasPolicy = document.getElementById('has_policy').checked;
-    if (hasPolicy) {
-        const waybillPrice = parseFloat(document.getElementById('waybill_price').value || 0);
-        if (waybillPrice > 0) {
-            totalPrice += waybillPrice;
-            priceDetails.push(`البوليصة: ${waybillPrice.toFixed(3)} د.ك`);
-        }
-    }
-    
-    // Add comment price
-    const hasComment = document.getElementById('has_comment').checked;
-    if (hasComment) {
-        totalPrice += commentPrice;
-        priceDetails.push(`التعليق: ${commentPrice.toFixed(3)} د.ك`);
-    }
-    
-    // Only update if we have a valid total price
-    if (totalPrice > 0) {
-        document.getElementById('total_price').value = totalPrice.toFixed(2);
-    }
-    
-    updateRemainingAmount();
-    
-    if (priceDetails.length > 0) {
-        priceDetails.push(`<strong>الإجمالي: ${totalPrice.toFixed(3)} د.ك</strong>`);
-        showPriceBreakdown(priceDetails.join('<br>'));
-    } else {
-        hidePriceBreakdown();
-    }
-}
-
-function updateRemainingAmount() {
-    const totalPrice = parseFloat(document.getElementById('total_price').value || 0);
-    const paidAmount = parseFloat(document.getElementById('amount_paid').value || 0);
-    const remainingAmount = totalPrice - paidAmount;
-    
-    document.getElementById('remaining_amount').value = remainingAmount.toFixed(2);
-    
-    // Show warning if paid amount exceeds total price
-    const warningDiv = document.getElementById('payment_warning');
-    if (paidAmount > totalPrice && totalPrice > 0) {
-        warningDiv.style.display = 'block';
-    } else {
-        warningDiv.style.display = 'none';
-    }
-}
-
-function showPriceBreakdown(details) {
-    const priceBreakdown = document.getElementById('price_breakdown');
-    const priceDetails = document.getElementById('price_details');
-    priceDetails.innerHTML = details;
-    priceBreakdown.style.display = 'block';
-}
-
-function hidePriceBreakdown() {
-    const priceBreakdown = document.getElementById('price_breakdown');
-    priceBreakdown.style.display = 'none';
-}
-
-// Function to filter zones based on selected direction
-function filterZonesByDirection() {
-    const directionSelect = document.getElementById('direction');
-    const zoneSelect = document.getElementById('zone');
-    const direction = directionSelect.value;
-    
-    if (!zoneSelect) return;
-    
-    // Store current selection
-    const currentZone = zoneSelect.value;
-    
-    // Rebuild options based on direction
-    const firstOption = zoneSelect.querySelector('option[value=""]');
-    zoneSelect.innerHTML = '';
-    zoneSelect.appendChild(firstOption);
-    
-    // Get all zones from server data
-    const allZones = {{ zone_pricings | tojson | safe }};
-    
-    allZones.forEach(zone => {
-        if (direction === '' || zone.direction === direction) {
-            const option = document.createElement('option');
-            option.value = zone.zone_name_ar;
-            option.textContent = zone.zone_name_ar;
-            option.setAttribute('data-price', zone.price_per_kg);
-            option.setAttribute('data-direction', zone.direction);
-            // Keep current selection if it matches the filtered zones
-            if (zone.zone_name_ar === currentZone) {
-                option.selected = true;
-            }
-            zoneSelect.appendChild(option);
-        }
-    });
-    
-    // Update price after filtering
-    updatePrice();
-}
-
-// Function to update price based on selected procedure (only for document shipments)
-// Apply discount to the total price
-function applyDiscount() {
-    const totalPriceField = document.getElementById('total_price');
-    const discountField = document.getElementById('discount');
-    const originalPrice = parseFloat(totalPriceField.getAttribute('data-original-price') || totalPriceField.value || 0);
-    const discount = parseFloat(discountField.value || 0);
-    
-    // Calculate final price after discount
-    const finalPrice = Math.max(0, originalPrice - discount);
-    totalPriceField.value = finalPrice.toFixed(2);
-    
-    // Update remaining amount calculation
-    updateRemainingAmount();
-}
-
-function updateProcedurePrice() {
-    const packageType = document.getElementById('package_type').value;
-    const actionSelect = document.getElementById('action_required');
-    const totalPriceField = document.getElementById('total_price');
-    
-    // Only process if the shipment type is documents
-    if (packageType !== 'document') {
-        return;
-    }
-    
-    if (!actionSelect.value) {
-        return;
-    }
-    
-    // Get price from data attribute
-    const selectedOption = actionSelect.options[actionSelect.selectedIndex];
-    const price = selectedOption.getAttribute('data-price');
-    
-    if (price && price !== 'null' && price !== '0') {
-        totalPriceField.value = parseFloat(price).toFixed(3);
-        showPriceBreakdown(`سعر ${selectedOption.text}: ${parseFloat(price).toFixed(3)} د.ك`);
-        updateRemainingAmount();
-    }
-}
-
-// Initialize form on page load
-document.addEventListener('DOMContentLoaded', function() {
-    filterZonesByDirection(); // Initialize zone filtering
-    toggleShipmentFields();
-    toggleWaybillPrice();
-    
-    // Set initial price calculation after a short delay to ensure DOM is ready
-    setTimeout(() => {
-        const packageType = document.getElementById('package_type').value;
-        if (packageType === 'document') {
-            updateDocumentPrice();
+    // Calculate remaining amount
+    function calculateRemaining() {
+        const totalPriceField = document.getElementById('total_price');
+        const amountPaidField = document.getElementById('amount_paid');
+        const remainingAmountField = document.getElementById('remaining_amount');
+        
+        const totalPrice = parseFloat(totalPriceField.value) || 0;
+        const amountPaid = parseFloat(amountPaidField.value) || 0;
+        const remainingAmount = totalPrice - amountPaid;
+        
+        remainingAmountField.value = remainingAmount.toFixed(2);
+        
+        // Change color based on remaining amount
+        if (remainingAmount > 0) {
+            remainingAmountField.style.backgroundColor = '#fff3cd'; // Light yellow for remaining
+        } else if (remainingAmount < 0) {
+            remainingAmountField.style.backgroundColor = '#f8d7da'; // Light red for overpayment
         } else {
-            updatePrice();
+            remainingAmountField.style.backgroundColor = '#d4edda'; // Light green for fully paid
         }
-    }, 200);
+    }
     
-    // Also trigger price update when field values change
-    updateRemainingAmount();
-});
+    // Update zone pricing (placeholder function for compatibility)
+    function updateZonePricing() {
+        // This function can be extended if needed for zone pricing updates
+        filterZonesByDirection();
+    }
 </script>
 {% endblock %}
