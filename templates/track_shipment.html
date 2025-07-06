@@ -964,10 +964,12 @@
         <span class="field-label">التكلفة:</span>
         <span class="field-value">{{ "%.2f"|format(shipment.price) }} د.ك</span>
       </div>
+      {% if shipment.package_type != 'document' %}
       <div>
         <span class="field-label">تاريخ الإنشاء:</span>
         <span class="field-value">{{ shipment.created_at.strftime('%Y-%m-%d') }}</span>
       </div>
+      {% endif %}
       <div>
         <span class="field-label">المحتويات:</span>
         <span class="field-value">{{ shipment.package_contents or 'أغراض شخصية' }}</span>
