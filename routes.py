@@ -448,17 +448,32 @@ def add_shipment():
             price = 0.0
             discount = 0.0
             
-            # Validate required fields (all fields are now optional per requirements)
+            # Validate required fields based on shipment type
             errors = []
             
             # Process weight and price with comprehensive error handling
             if package_type == 'document':
-                # For simplified documents: set default values
-                document_type = 'documents'  # Default document type
+                # For document shipments: validate only specific required fields
+                if not direction:
+                    errors.append('يرجى اختيار اتجاه الشحنة')
+                if not document_type:
+                    errors.append('يرجى اختيار نوع المستند')
+                
+                # Process price and ensure it's valid
+                try:
+                    price = float(price_str) if price_str else 0.0
+                    if price <= 0:
+                        errors.append('يرجى تحديد السعر للعميل')
+                except ValueError:
+                    errors.append('السعر يجب أن يكون رقماً صحيحاً')
+                
+                # Set default values for non-required fields
                 package_contents = 'مستندات عامة'  # Default content description
-                price = 30.0  # Fixed price for all documents (30 KD)
                 weight = 0.0  # Documents don't have weight
-                app.logger.debug(f"Document shipment - using default values: type={document_type}, price={price}")
+                zone = ''  # Not required for documents
+                shipping_method = ''  # Not required for documents
+                
+                app.logger.debug(f"Document shipment - type={document_type}, price={price}")
             else:
                 # For non-documents: process weight and price
                 try:
