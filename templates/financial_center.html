@@ -490,7 +490,7 @@
                                                     <th class="text-center">رقم التتبع</th>
                                                     <th class="text-center">طريق الشحن</th>
                                                     <th class="text-center">الإيراد (د.ك)</th>
-                                                    <th class="text-center">المصروفات (د.ك)</th>
+                                                    <th class="text-center">مصروفات الفئة (د.ك)</th>
                                                     <th class="text-center">صافي الربح (د.ك)</th>
                                                 </tr>
                                             </thead>
@@ -548,7 +548,7 @@
                                                     <th class="text-center">رقم التتبع</th>
                                                     <th class="text-center">نوع المستند</th>
                                                     <th class="text-center">الإيراد (د.ك)</th>
-                                                    <th class="text-center">المصروفات (د.ك)</th>
+                                                    <th class="text-center">مصروفات الفئة (د.ك)</th>
                                                     <th class="text-center">صافي الربح (د.ك)</th>
                                                 </tr>
                                             </thead>
@@ -1590,9 +1590,9 @@ function loadGeneralShipmentsProfitReport(startDate, endDate) {
             
             if (data.shipments && data.shipments.length > 0) {
                 data.shipments.forEach(shipment => {
-                    const revenue = parseFloat(shipment.price || 0);
+                    const revenue = parseFloat(shipment.paid_amount || 0);
                     const expenses = parseFloat(shipment.category_expenses || 0);
-                    const netProfit = revenue - expenses;
+                    const netProfit = parseFloat(shipment.net_profit || 0);
                     
                     totalRevenue += revenue;
                     totalExpenses += expenses;
@@ -1673,9 +1673,9 @@ function loadDocumentShipmentsProfitReport(startDate, endDate) {
             
             if (data.shipments && data.shipments.length > 0) {
                 data.shipments.forEach(shipment => {
-                    const revenue = parseFloat(shipment.price || 0);
+                    const revenue = parseFloat(shipment.paid_amount || 0);
                     const expenses = parseFloat(shipment.category_expenses || 0);
-                    const netProfit = revenue - expenses;
+                    const netProfit = parseFloat(shipment.net_profit || 0);
                     
                     totalRevenue += revenue;
                     totalExpenses += expenses;

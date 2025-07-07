@@ -3862,19 +3862,18 @@ def api_general_shipments_profit_report():
         
         shipments_data = []
         for shipment in shipments:
-            # Calculate category expenses with document type linking for document shipments
-            if shipment.package_type == 'document':
-                category_expenses = shipment.calculate_linked_document_expenses()
-            else:
-                category_expenses = shipment.calculate_category_distributed_expenses()
+            # Calculate category expenses and net profit for reports
+            category_expenses = shipment.calculate_category_expenses_for_report()
+            net_profit = shipment.calculate_net_profit_for_report()
             
             shipments_data.append({
                 'id': shipment.id,
                 'tracking_number': shipment.tracking_number,
                 'shipping_method': shipment.shipping_method or 'غير محدد',
                 'price': float(shipment.price or 0),
+                'paid_amount': float(shipment.paid_amount or 0),
                 'category_expenses': category_expenses,
-                'net_profit': float(shipment.price or 0) - category_expenses,
+                'net_profit': net_profit,
                 'created_at': shipment.created_at.strftime('%Y-%m-%d')
             })
         
@@ -3917,8 +3916,9 @@ def api_document_shipments_profit_report():
         
         shipments_data = []
         for shipment in shipments:
-            # Calculate linked document expenses for document shipments
-            category_expenses = shipment.calculate_linked_document_expenses()
+            # Calculate category expenses and net profit for reports
+            category_expenses = shipment.calculate_category_expenses_for_report()
+            net_profit = shipment.calculate_net_profit_for_report()
             
             # Get document type in Arabic
             document_type = get_document_type_arabic(shipment.document_type) if shipment.document_type else 'مستندات'
@@ -3928,8 +3928,9 @@ def api_document_shipments_profit_report():
                 'tracking_number': shipment.tracking_number,
                 'document_type': document_type,
                 'price': float(shipment.price or 0),
+                'paid_amount': float(shipment.paid_amount or 0),
                 'category_expenses': category_expenses,
-                'net_profit': float(shipment.price or 0) - category_expenses,
+                'net_profit': net_profit,
                 'created_at': shipment.created_at.strftime('%Y-%m-%d')
             })
         

@@ -244,6 +244,44 @@ class Shipment(db.Model):
         self.linked_expenses = self.calculate_total_expenses()
         db.session.commit()
         return self.linked_expenses
+    
+    def calculate_category_expenses_for_report(self):
+        """Calculate category expenses for profit/loss reports based on shipment type"""
+        if self.package_type == 'document':
+            # For document shipments, find matching expenses by category
+            document_type = self.document_type if self.document_type else 'مستندات'
+            
+            # Look for expenses in expenses_documents table that match this document type
+            matching_expenses = ExpenseDocuments.query.filter(
+                ExpenseDocuments.name.like(f'%{document_type}%')
+            ).all()
+            
+            if matching_expenses:
+                # Sum all matching expenses
+                total_matching_expenses = sum(exp.amount for exp in matching_expenses)
+                return float(total_matching_expenses)
+            else:
+                return 0.0
+        else:
+            # For general shipments, get total of all general expenses
+            total_general_expenses = ExpenseGeneral.query.with_entities(
+                db.func.sum(ExpenseGeneral.amount)
+            ).scalar() or 0.0
+            
+            return float(total_general_expenses)
+    
+    def calculate_net_profit_for_report(self):
+        """Calculate net profit for profit/loss reports"""
+        # Revenue is the paid amount
+        revenue = float(self.paid_amount)
+        
+        # Category expenses based on shipment type
+        category_expenses = self.calculate_category_expenses_for_report()
+        
+        # Net profit = Revenue - Category Expenses
+        net_profit = revenue - category_expenses
+        
+        return net_profit
 
     @staticmethod
     def generate_tracking_number():
