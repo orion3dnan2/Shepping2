@@ -3644,8 +3644,12 @@ def api_shipment_reports():
         total_expenses = 0.0
         
         for shipment in shipments:
-            # Calculate distributed category expenses for this shipment
-            category_expenses = shipment.calculate_category_distributed_expenses()
+            # Calculate category expenses with document type linking for document shipments
+            if shipment.package_type == 'document':
+                category_expenses = shipment.calculate_linked_document_expenses()
+            else:
+                category_expenses = shipment.calculate_category_distributed_expenses()
+            
             direct_expenses = shipment.calculate_total_expenses()
             net_profit_with_category = shipment.calculate_net_profit_with_category_expenses()
             
@@ -3745,7 +3749,7 @@ def api_shipment_details(shipment_id):
             'package_type': shipment.package_type,
             'price': float(shipment.price),
             'direct_expenses': shipment.calculate_total_expenses(),
-            'category_expenses': shipment.calculate_category_distributed_expenses(),
+            'category_expenses': shipment.calculate_linked_document_expenses() if shipment.package_type == 'document' else shipment.calculate_category_distributed_expenses(),
             'net_profit': shipment.calculate_net_profit_with_category_expenses(),
             'created_at': shipment.created_at.strftime('%Y-%m-%d %H:%M'),
             'expenses': expenses
@@ -3858,8 +3862,11 @@ def api_general_shipments_profit_report():
         
         shipments_data = []
         for shipment in shipments:
-            # Calculate category expenses for this shipment
-            category_expenses = shipment.calculate_category_distributed_expenses()
+            # Calculate category expenses with document type linking for document shipments
+            if shipment.package_type == 'document':
+                category_expenses = shipment.calculate_linked_document_expenses()
+            else:
+                category_expenses = shipment.calculate_category_distributed_expenses()
             
             shipments_data.append({
                 'id': shipment.id,
@@ -3910,8 +3917,8 @@ def api_document_shipments_profit_report():
         
         shipments_data = []
         for shipment in shipments:
-            # Calculate category expenses for this shipment
-            category_expenses = shipment.calculate_category_distributed_expenses()
+            # Calculate linked document expenses for document shipments
+            category_expenses = shipment.calculate_linked_document_expenses()
             
             # Get document type in Arabic
             document_type = get_document_type_arabic(shipment.document_type) if shipment.document_type else 'مستندات'

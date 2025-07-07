@@ -167,6 +167,41 @@ class Shipment(db.Model):
             logging.error(f'Error calculating total document category expenses: {str(e)}')
             return 0.0
 
+    def calculate_linked_document_expenses(self):
+        """Calculate document expenses linked to specific document type for 'إرسال' expenses"""
+        try:
+            if self.package_type != 'document' or not self.document_type:
+                return 0.0
+            
+            # Get document type price from DocumentType model
+            from models import DocumentType
+            doc_type = DocumentType.query.filter_by(name_ar=self.document_type).first()
+            if not doc_type:
+                return 0.0
+            
+            # Find "إرسال" expenses in document expenses
+            sending_expenses = ExpenseDocuments.query.filter(
+                ExpenseDocuments.name.like('%إرسال%')
+            ).all()
+            
+            total_sending_expenses = sum(float(exp.amount) for exp in sending_expenses if exp.amount)
+            total_document_shipments = Shipment.query.filter_by(package_type='document').count()
+            
+            if total_document_shipments == 0:
+                return 0.0
+            
+            # Calculate distributed sending expense for this shipment
+            distributed_expense = total_sending_expenses / total_document_shipments
+            
+            # Link with document type - deduct document type price from expense
+            linked_expense = max(0, distributed_expense - float(doc_type.price))
+            
+            return linked_expense
+            
+        except Exception as e:
+            logging.error(f'Error calculating linked document expenses for shipment {self.id}: {str(e)}')
+            return 0.0
+
     @staticmethod
     def get_total_general_category_expenses():
         """Get total expenses for all general shipments category"""
@@ -192,9 +227,16 @@ class Shipment(db.Model):
             return 0.0
 
     def calculate_net_profit_with_category_expenses(self):
-        """Calculate net profit using distributed category expenses"""
+        """Calculate net profit using distributed category expenses with document type linking"""
         revenue = float(self.price) if self.price else 0.0
-        category_expenses = self.calculate_category_distributed_expenses()
+        
+        if self.package_type == 'document':
+            # Use linked document expenses for document shipments
+            category_expenses = self.calculate_linked_document_expenses()
+        else:
+            # Use regular category expenses for general shipments
+            category_expenses = self.calculate_category_distributed_expenses()
+            
         return revenue - category_expenses
     
     def update_linked_expenses(self):
