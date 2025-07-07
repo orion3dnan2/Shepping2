@@ -1080,18 +1080,11 @@ function loadDocumentExpenses() {
                                     <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
                                     <h5 class="text-primary mb-0">${expense.amount.toFixed(3)} د.ك</h5>
                                 </div>
-                                <div class="btn-group-vertical btn-group-sm">
-                                    <button class="btn btn-sm btn-outline-primary mb-1" 
-                                            onclick="editDocumentExpense(${expense.id})"
-                                            title="تعديل المصروف">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" 
-                                            onclick="deleteDocumentExpense(${expense.id})"
-                                            title="حذف المصروف">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
+                                <button class="btn btn-sm btn-outline-primary ms-2" 
+                                        onclick="editDocumentExpense(${expense.id})"
+                                        title="تعديل المصروف">
+                                    <i class="fas fa-edit"></i>
+                                </button>
                             </div>
                         </div>
                     </div>

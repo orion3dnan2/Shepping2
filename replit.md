@@ -245,6 +245,7 @@ The system is specifically configured for cPanel hosting with:
    • Integrated edit functionality with existing expense management system
    • All edit operations include proper error handling and success notifications
    • Real-time updates to expense displays after successful edits
+   • Removed delete button from document expenses per user request (edit-only for document expenses)
 
 ## User Preferences
 
