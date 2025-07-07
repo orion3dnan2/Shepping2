@@ -194,6 +194,61 @@ class Shipment(db.Model):
             logging.error(f'Error calculating linked document expenses for shipment {self.id}: {str(e)}')
             return 0.0
 
+    def get_category_expenses(self):
+        """Get category-specific expenses for this shipment based on type"""
+        try:
+            if self.package_type == 'document':
+                # For document shipments: get expense amount for specific document type
+                if self.document_type:
+                    expense_record = ExpenseDocuments.get_expense_for_document_type(self.document_type)
+                    if expense_record and expense_record.is_active:
+                        return float(expense_record.amount) if expense_record.amount else 0.0
+                return 0.0
+            else:
+                # For general shipments: get total general shipments expenses
+                total_general_expenses = 0.0
+                
+                # Get from FinancialTransaction table (general shipments expenses)
+                general_financial_expenses = FinancialTransaction.query.filter_by(
+                    transaction_type='expense',
+                    shipping_type='شحنات عامة'
+                ).all()
+                
+                for expense in general_financial_expenses:
+                    total_general_expenses += float(expense.amount) if expense.amount else 0.0
+                
+                return total_general_expenses
+                
+        except Exception as e:
+            logging.error(f'Error calculating category expenses for shipment {self.id}: {str(e)}')
+            return 0.0
+
+    def calculate_net_profit_with_category_expenses(self):
+        """Calculate net profit: Revenue (paid_amount) - Category Expenses"""
+        try:
+            # Use paid_amount as revenue (what customer actually paid)
+            revenue = float(self.paid_amount) if self.paid_amount else 0.0
+            
+            # Get category-specific expenses
+            category_expenses = self.get_category_expenses()
+            
+            # Calculate net profit
+            net_profit = revenue - category_expenses
+            
+            return {
+                'revenue': revenue,
+                'category_expenses': category_expenses,
+                'net_profit': net_profit
+            }
+            
+        except Exception as e:
+            logging.error(f'Error calculating net profit with category expenses for shipment {self.id}: {str(e)}')
+            return {
+                'revenue': 0.0,
+                'category_expenses': 0.0,
+                'net_profit': 0.0
+            }
+
     @staticmethod
     def get_total_general_category_expenses():
         """Get total expenses for all general shipments category"""

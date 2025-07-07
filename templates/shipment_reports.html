@@ -251,10 +251,11 @@ function updateShipmentsTable(shipments) {
             </td>
             <td>
                 <span class="badge bg-info">${shipment.package_type_ar || shipment.package_type}</span>
+                ${shipment.document_type ? `<br><small class="text-muted">${shipment.document_type}</small>` : ''}
             </td>
             <td class="fw-bold">${shipment.sender_name}</td>
             <td class="fw-bold">${shipment.receiver_name}</td>
-            <td class="text-primary fw-bold">${shipment.price.toFixed(3)} د.ك</td>
+            <td class="text-primary fw-bold">${shipment.revenue.toFixed(3)} د.ك</td>
             <td class="text-warning fw-bold">${shipment.category_expenses.toFixed(3)} د.ك</td>
             <td class="${profitClass} fw-bold">${shipment.net_profit.toFixed(3)} د.ك</td>
             <td>${statusBadge}</td>

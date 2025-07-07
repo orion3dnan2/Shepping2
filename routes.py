@@ -4084,37 +4084,35 @@ def api_shipment_reports():
         total_expenses = 0.0
         
         for shipment in shipments:
-            # Calculate category expenses with document type linking for document shipments
-            if shipment.package_type == 'document':
-                category_expenses = shipment.calculate_linked_document_expenses()
-            else:
-                category_expenses = shipment.calculate_category_distributed_expenses()
-            
-            direct_expenses = shipment.calculate_total_expenses()
-            net_profit_with_category = shipment.calculate_net_profit_with_category_expenses()
+            # Calculate profit and expenses using the new methods
+            profit_data = shipment.calculate_net_profit_with_category_expenses()
+            category_expenses = shipment.get_category_expenses()
             
             # Update shipment's linked_expenses field with category expenses
             shipment.linked_expenses = category_expenses
             
             shipment_type_ar = 'مستندات' if shipment.package_type == 'document' else 'شحنات عامة'
             
+            # Determine document type display for document shipments
+            document_type_display = shipment.document_type if shipment.package_type == 'document' else ''
+            
             shipments_data.append({
                 'id': shipment.id,
                 'tracking_number': shipment.tracking_number,
                 'package_type': shipment.package_type,
                 'package_type_ar': shipment_type_ar,
+                'document_type': document_type_display,
                 'sender_name': shipment.sender_name,
                 'receiver_name': shipment.receiver_name,
-                'price': float(shipment.price),
-                'direct_expenses': direct_expenses,
-                'category_expenses': category_expenses,
-                'net_profit': net_profit_with_category,
+                'revenue': profit_data['revenue'],  # Use paid_amount as revenue
+                'category_expenses': profit_data['category_expenses'],
+                'net_profit': profit_data['net_profit'],
                 'status': shipment.status,
                 'created_at': shipment.created_at.strftime('%Y-%m-%d')
             })
             
-            total_revenue += float(shipment.price)
-            total_expenses += category_expenses
+            total_revenue += profit_data['revenue']
+            total_expenses += profit_data['category_expenses']
         
         # Commit the linked_expenses updates
         db.session.commit()
