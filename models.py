@@ -168,35 +168,27 @@ class Shipment(db.Model):
             return 0.0
 
     def calculate_linked_document_expenses(self):
-        """Calculate document expenses linked to specific document type for 'إرسال' expenses"""
+        """Calculate document expenses linked to specific document type"""
         try:
             if self.package_type != 'document' or not self.document_type:
                 return 0.0
             
-            # Get document type price from DocumentType model
-            from models import DocumentType
-            doc_type = DocumentType.query.filter_by(name_ar=self.document_type).first()
-            if not doc_type:
-                return 0.0
+            # Get expense record for this document type
+            expense_record = ExpenseDocuments.get_expense_for_document_type(self.document_type)
+            if expense_record:
+                return float(expense_record.amount)
             
-            # Find "إرسال" expenses in document expenses
-            sending_expenses = ExpenseDocuments.query.filter(
-                ExpenseDocuments.name.like('%إرسال%')
-            ).all()
+            # Fallback: if no specific expense record, use distributed expenses
+            total_doc_expenses = sum(float(exp.amount) for exp in ExpenseDocuments.query.filter_by(
+                expense_type='مستندات', is_active=True
+            ).all() if exp.amount)
             
-            total_sending_expenses = sum(float(exp.amount) for exp in sending_expenses if exp.amount)
             total_document_shipments = Shipment.query.filter_by(package_type='document').count()
             
             if total_document_shipments == 0:
                 return 0.0
             
-            # Calculate distributed sending expense for this shipment
-            distributed_expense = total_sending_expenses / total_document_shipments
-            
-            # Link with document type - deduct document type price from expense
-            linked_expense = max(0, distributed_expense - float(doc_type.price))
-            
-            return linked_expense
+            return total_doc_expenses / total_document_shipments
             
         except Exception as e:
             logging.error(f'Error calculating linked document expenses for shipment {self.id}: {str(e)}')
@@ -730,11 +722,41 @@ class ExpenseDocuments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     amount = db.Column(db.Numeric(10, 3), nullable=False)
+    expense_type = db.Column(db.String(50), nullable=False, default='مستندات')  # Type of expense
+    document_type_name = db.Column(db.String(255), nullable=True)  # Link to specific document type
     notes = db.Column(db.Text)
     expense_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
     # Link to specific shipment for P&L analysis
     shipment_id = db.Column(db.Integer, db.ForeignKey('shipment.id'), nullable=True)
     
     def __repr__(self):
         return f'<ExpenseDocuments {self.name}: {self.amount}>'
+    
+    @staticmethod
+    def get_expense_for_document_type(document_type_name):
+        """Get expense record for a specific document type"""
+        return ExpenseDocuments.query.filter_by(
+            expense_type='مستندات',
+            document_type_name=document_type_name,
+            is_active=True
+        ).first()
+    
+    @staticmethod
+    def create_or_update_document_expense(document_type_name, amount=0.0):
+        """Create or update expense record for a document type"""
+        existing = ExpenseDocuments.get_expense_for_document_type(document_type_name)
+        if existing:
+            return existing
+        
+        new_expense = ExpenseDocuments(
+            name=document_type_name,
+            amount=amount,
+            expense_type='مستندات',
+            document_type_name=document_type_name,
+            expense_date=datetime.utcnow().date()
+        )
+        db.session.add(new_expense)
+        db.session.commit()
+        return new_expense

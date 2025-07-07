@@ -225,6 +225,17 @@ The system is specifically configured for cPanel hosting with:
    • Added test data: general expenses (500 KD), document expenses (100 KD + 4 KD entries)
    • System now calculates net profit as: Revenue (paid_amount) - Category Expenses
 
+✅ July 07, 2025: Complete Document Type Expense Management System
+   • Enhanced ExpenseDocuments model with expense_type, document_type_name, and is_active fields
+   • Automatic expense record creation when adding new document types in settings
+   • Document type name changes automatically update corresponding expense records
+   • Document type deletion automatically deactivates corresponding expense records
+   • New API endpoints: /api/document_type_expenses and /update_document_type_expense
+   • Separated client pricing (what customer pays) from real costs (used for profit calculation)
+   • Document shipment profit calculations now use specific document type expense amounts
+   • Enhanced expense management with clear separation between document types and general expenses
+   • Migration completed successfully from Replit Agent to standard Replit environment
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

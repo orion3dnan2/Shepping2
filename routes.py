@@ -1605,7 +1605,14 @@ def add_document_type():
         db.session.add(new_type)
         db.session.commit()
         
-        flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح', 'success')
+        # Automatically create expense record for this document type
+        try:
+            from models import ExpenseDocuments
+            ExpenseDocuments.create_or_update_document_expense(name_ar, 0.0)
+            flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح وتم إنشاء سجل المصروف تلقائياً', 'success')
+        except Exception as e:
+            app.logger.error(f'Error creating expense record for document type: {str(e)}')
+            flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح', 'success')
         
     except Exception as e:
         db.session.rollback()
@@ -2171,12 +2178,30 @@ def edit_document_type(type_id):
             flash('نوع الوثيقة موجود بالفعل', 'error')
             return redirect(url_for('settings') + '#types')
         
+        # Store old name for expense record update
+        old_name = document_type.name_ar
+        
         # Update document type
         document_type.name_ar = name_ar
         document_type.name_en = name_en
         document_type.price = price
         document_type.is_active = is_active
         db.session.commit()
+        
+        # Update expense record if name changed
+        if old_name != name_ar:
+            try:
+                from models import ExpenseDocuments
+                expense_record = ExpenseDocuments.get_expense_for_document_type(old_name)
+                if expense_record:
+                    expense_record.name = name_ar
+                    expense_record.document_type_name = name_ar
+                    db.session.commit()
+                else:
+                    # Create new expense record if it doesn't exist
+                    ExpenseDocuments.create_or_update_document_expense(name_ar, 0.0)
+            except Exception as e:
+                app.logger.error(f'Error updating expense record for document type: {str(e)}')
         
         flash(f'تم تحديث نوع الوثيقة "{name_ar}" بنجاح', 'success')
         
@@ -2646,6 +2671,16 @@ def delete_document_type(type_id):
         # Soft delete by setting is_active to False
         document_type.is_active = False
         db.session.commit()
+        
+        # Also deactivate the corresponding expense record
+        try:
+            from models import ExpenseDocuments
+            expense_record = ExpenseDocuments.get_expense_for_document_type(document_type.name_ar)
+            if expense_record:
+                expense_record.is_active = False
+                db.session.commit()
+        except Exception as e:
+            app.logger.error(f'Error deactivating expense record for document type: {str(e)}')
         
         flash(f'تم حذف نوع الوثيقة "{document_type.name_ar}" بنجاح', 'success')
         
@@ -3354,10 +3389,22 @@ def add_expense_documents():
         # Use current date automatically
         expense_date = datetime.now().date()
         
+        # Check if this is a document type expense
+        document_type_name = None
+        expense_type = 'مستندات'
+        
+        # Check if there's a document type with this name
+        from models import DocumentType
+        doc_type = DocumentType.query.filter_by(name_ar=name).first()
+        if doc_type:
+            document_type_name = name
+        
         # Create new expense
         expense = ExpenseDocuments(
             name=name,
             amount=amount,
+            expense_type=expense_type,
+            document_type_name=document_type_name,
             notes=notes if notes else None,
             expense_date=expense_date,
             shipment_id=int(shipment_id) if shipment_id else None
@@ -3508,7 +3555,7 @@ def get_expenses_general():
 def get_expenses_documents():
     """Get all document expenses"""
     try:
-        expenses = ExpenseDocuments.query.order_by(ExpenseDocuments.expense_date.desc()).all()
+        expenses = ExpenseDocuments.query.filter_by(is_active=True).order_by(ExpenseDocuments.expense_date.desc()).all()
         expenses_data = []
         
         for expense in expenses:
@@ -3516,9 +3563,12 @@ def get_expenses_documents():
                 'id': expense.id,
                 'name': expense.name,
                 'amount': float(expense.amount),
+                'expense_type': getattr(expense, 'expense_type', 'مستندات'),
+                'document_type_name': getattr(expense, 'document_type_name', None),
                 'notes': expense.notes,
                 'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
-                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else ''
+                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else '',
+                'is_document_type_expense': getattr(expense, 'document_type_name', None) is not None
             })
         
         return jsonify({'success': True, 'expenses': expenses_data})
@@ -3526,6 +3576,77 @@ def get_expenses_documents():
     except Exception as e:
         logging.error(f'Error fetching document expenses: {str(e)}')
         return jsonify({'success': False, 'message': 'خطأ في تحميل المصروفات'})
+
+
+@app.route('/api/document_type_expenses')
+@login_required
+@permission_required('expenses')
+def get_document_type_expenses():
+    """Get all document type specific expenses"""
+    try:
+        from models import DocumentType
+        document_types = DocumentType.query.filter_by(is_active=True).all()
+        
+        expense_list = []
+        for doc_type in document_types:
+            expense_record = ExpenseDocuments.get_expense_for_document_type(doc_type.name_ar)
+            expense_list.append({
+                'document_type_id': doc_type.id,
+                'document_type_name': doc_type.name_ar,
+                'client_price': float(doc_type.price),
+                'expense_amount': float(expense_record.amount) if expense_record else 0.0,
+                'expense_id': expense_record.id if expense_record else None,
+                'has_expense_record': expense_record is not None
+            })
+        
+        return jsonify({'success': True, 'document_type_expenses': expense_list})
+        
+    except Exception as e:
+        logging.error(f'Error getting document type expenses: {str(e)}')
+        return jsonify({'success': False, 'message': 'خطأ في تحميل مصروفات أنواع المستندات'})
+
+
+@app.route('/update_document_type_expense', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def update_document_type_expense():
+    """Update expense amount for a document type"""
+    try:
+        document_type_name = request.form.get('document_type_name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        
+        if not document_type_name:
+            return jsonify({'success': False, 'message': 'نوع المستند مطلوب'})
+        
+        if not amount_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+        
+        try:
+            amount = float(amount_str)
+            if amount < 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من أو يساوي صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+        
+        # Get or create expense record
+        expense_record = ExpenseDocuments.get_expense_for_document_type(document_type_name)
+        if expense_record:
+            expense_record.amount = amount
+        else:
+            expense_record = ExpenseDocuments.create_or_update_document_expense(document_type_name, amount)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'تم تحديث مصروف "{document_type_name}" بنجاح',
+            'new_amount': amount
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error updating document type expense: {str(e)}')
+        return jsonify({'success': False, 'message': f'حدث خطأ في تحديث المصروف: {str(e)}'})
 
 
 @app.route('/delete_expense_general/<int:expense_id>', methods=['POST'])
