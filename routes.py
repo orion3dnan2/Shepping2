@@ -3491,8 +3491,8 @@ def get_expenses_general():
                 'name': expense.name,
                 'amount': float(expense.amount),
                 'notes': expense.notes,
-                'expense_date': expense.expense_date.strftime('%Y-%m-%d'),
-                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M')
+                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
+                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else ''
             })
         
         return jsonify({'success': True, 'expenses': expenses_data})
@@ -3517,8 +3517,8 @@ def get_expenses_documents():
                 'name': expense.name,
                 'amount': float(expense.amount),
                 'notes': expense.notes,
-                'expense_date': expense.expense_date.strftime('%Y-%m-%d'),
-                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M')
+                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
+                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else ''
             })
         
         return jsonify({'success': True, 'expenses': expenses_data})

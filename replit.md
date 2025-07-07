@@ -215,6 +215,16 @@ The system is specifically configured for cPanel hosting with:
    • Default admin account created and ready for use (admin/admin123)
    • All database tables initialized and working with PostgreSQL
 
+✅ July 07, 2025: Enhanced Profit/Loss Reporting with Category Expenses
+   • Added new methods for calculating category-specific expenses in Shipment model
+   • Document shipments now link to matching expense categories by document type
+   • General shipments use total general expenses distributed across all shipments
+   • Updated profit/loss reports to show "مصروفات الفئة" and "صافي الربح" columns
+   • Revenue calculation now uses paid_amount instead of price for accuracy
+   • Fixed expense API routes to handle null created_at values properly
+   • Added test data: general expenses (500 KD), document expenses (100 KD + 4 KD entries)
+   • System now calculates net profit as: Revenue (paid_amount) - Category Expenses
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
