@@ -26,7 +26,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # Configure the database
 database_url = os.environ.get("DATABASE_URL")
 if not database_url:
-    raise RuntimeError("DATABASE_URL environment variable must be set")
+    # For development, use SQLite as fallback
+    database_url = "sqlite:///shipping_system.db"
+    print("Warning: DATABASE_URL not set, using SQLite for development")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
