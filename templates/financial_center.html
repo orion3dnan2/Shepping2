@@ -964,11 +964,18 @@ function loadGeneralExpenses() {
                                     <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
                                     <h5 class="text-success mb-0">${expense.amount.toFixed(3)} د.ك</h5>
                                 </div>
-                                <button class="btn btn-sm btn-outline-danger ms-2" 
-                                        onclick="deleteGeneralExpense(${expense.id})"
-                                        title="حذف المصروف">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <button class="btn btn-sm btn-outline-primary mb-1" 
+                                            onclick="editGeneralExpense(${expense.id})"
+                                            title="تعديل المصروف">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteGeneralExpense(${expense.id})"
+                                            title="حذف المصروف">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1073,11 +1080,18 @@ function loadDocumentExpenses() {
                                     <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
                                     <h5 class="text-primary mb-0">${expense.amount.toFixed(3)} د.ك</h5>
                                 </div>
-                                <button class="btn btn-sm btn-outline-danger ms-2" 
-                                        onclick="deleteDocumentExpense(${expense.id})"
-                                        title="حذف المصروف">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <button class="btn btn-sm btn-outline-primary mb-1" 
+                                            onclick="editDocumentExpense(${expense.id})"
+                                            title="تعديل المصروف">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteDocumentExpense(${expense.id})"
+                                            title="حذف المصروف">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1116,6 +1130,64 @@ function deleteDocumentExpense(expenseId) {
             showNotification('حدث خطأ في حذف المصروف', 'error');
         });
     }
+}
+
+// Edit General Expense
+function editGeneralExpense(expenseId) {
+    // Get expense data from server
+    fetch(`/get_expense_general/${expenseId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const expense = data.expense;
+            
+            // Show edit modal
+            const modal = new bootstrap.Modal(document.getElementById('editGeneralExpenseModal'));
+            
+            // Populate modal fields
+            document.getElementById('editGeneralExpenseId').value = expense.id;
+            document.getElementById('editGeneralExpenseName').value = expense.name;
+            document.getElementById('editGeneralExpenseAmount').value = expense.amount;
+            document.getElementById('editGeneralExpenseNotes').value = expense.notes;
+            
+            modal.show();
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في تحميل بيانات المصروف', 'error');
+    });
+}
+
+// Edit Document Expense
+function editDocumentExpense(expenseId) {
+    // Get expense data from server
+    fetch(`/get_expense_documents/${expenseId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const expense = data.expense;
+            
+            // Show edit modal
+            const modal = new bootstrap.Modal(document.getElementById('editDocumentExpenseModal'));
+            
+            // Populate modal fields
+            document.getElementById('editDocumentExpenseId').value = expense.id;
+            document.getElementById('editDocumentExpenseName').value = expense.name;
+            document.getElementById('editDocumentExpenseAmount').value = expense.amount;
+            document.getElementById('editDocumentExpenseNotes').value = expense.notes;
+            
+            modal.show();
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في تحميل بيانات المصروف', 'error');
+    });
 }
 
 // Reports Functions
@@ -1951,5 +2023,157 @@ function printDocumentExpenses() {
     printWindow.document.close();
     printWindow.print();
 }
+</script>
+
+<!-- Edit General Expense Modal -->
+<div class="modal fade" id="editGeneralExpenseModal" tabindex="-1" aria-labelledby="editGeneralExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGeneralExpenseModalLabel">تعديل مصروف عام</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editGeneralExpenseForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editGeneralExpenseId" name="expense_id">
+                    
+                    <div class="mb-3">
+                        <label for="editGeneralExpenseName" class="form-label">اسم المصروف</label>
+                        <input type="text" class="form-control" id="editGeneralExpenseName" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editGeneralExpenseAmount" class="form-label">المبلغ (د.ك)</label>
+                        <input type="number" class="form-control" id="editGeneralExpenseAmount" name="amount" step="0.001" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editGeneralExpenseNotes" class="form-label">الملاحظات</label>
+                        <textarea class="form-control" id="editGeneralExpenseNotes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ التغييرات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Document Expense Modal -->
+<div class="modal fade" id="editDocumentExpenseModal" tabindex="-1" aria-labelledby="editDocumentExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDocumentExpenseModalLabel">تعديل مصروف مستندات</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editDocumentExpenseForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editDocumentExpenseId" name="expense_id">
+                    
+                    <div class="mb-3">
+                        <label for="editDocumentExpenseName" class="form-label">اسم المصروف</label>
+                        <input type="text" class="form-control" id="editDocumentExpenseName" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editDocumentExpenseAmount" class="form-label">المبلغ (د.ك)</label>
+                        <input type="number" class="form-control" id="editDocumentExpenseAmount" name="amount" step="0.001" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editDocumentExpenseNotes" class="form-label">الملاحظات</label>
+                        <textarea class="form-control" id="editDocumentExpenseNotes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ التغييرات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Edit General Expense Form Handler
+document.getElementById('editGeneralExpenseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const expenseId = document.getElementById('editGeneralExpenseId').value;
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+    submitButton.disabled = true;
+    
+    fetch(`/edit_expense_general/${expenseId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editGeneralExpenseModal')).hide();
+            loadGeneralExpenses();
+            loadTotalExpenses();
+            refreshFinancialReports();
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في تحديث المصروف', 'error');
+    })
+    .finally(() => {
+        submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ التغييرات';
+        submitButton.disabled = false;
+    });
+});
+
+// Edit Document Expense Form Handler
+document.getElementById('editDocumentExpenseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const expenseId = document.getElementById('editDocumentExpenseId').value;
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+    submitButton.disabled = true;
+    
+    fetch(`/edit_expense_documents/${expenseId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editDocumentExpenseModal')).hide();
+            loadDocumentExpenses();
+            loadTotalExpenses();
+            refreshFinancialReports();
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في تحديث المصروف', 'error');
+    })
+    .finally(() => {
+        submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ التغييرات';
+        submitButton.disabled = false;
+    });
+});
 </script>
 {% endblock %}

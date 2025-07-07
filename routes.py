@@ -3685,6 +3685,144 @@ def delete_expense_documents(expense_id):
         return jsonify({'success': False, 'message': 'حدث خطأ في حذف المصروف'})
 
 
+@app.route('/edit_expense_general/<int:expense_id>', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def edit_expense_general(expense_id):
+    """Edit a general expense"""
+    try:
+        expense = ExpenseGeneral.query.get_or_404(expense_id)
+        
+        name = request.form.get('name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        notes = request.form.get('notes', '').strip()
+        
+        # Validate inputs
+        if not name:
+            return jsonify({'success': False, 'message': 'يرجى إدخال اسم المصروف'})
+        
+        if not amount_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+        
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+        
+        # Update expense
+        expense.name = name
+        expense.amount = amount
+        expense.notes = notes if notes else None
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم تحديث المصروف بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error editing general expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحديث المصروف'})
+
+
+@app.route('/edit_expense_documents/<int:expense_id>', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def edit_expense_documents(expense_id):
+    """Edit a document expense"""
+    try:
+        expense = ExpenseDocuments.query.get_or_404(expense_id)
+        
+        name = request.form.get('name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        notes = request.form.get('notes', '').strip()
+        
+        # Validate inputs
+        if not name:
+            return jsonify({'success': False, 'message': 'يرجى إدخال اسم المصروف'})
+        
+        if not amount_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+        
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+        
+        # Update expense
+        expense.name = name
+        expense.amount = amount
+        expense.notes = notes if notes else None
+        
+        # Check if this is a document type expense and update accordingly
+        from models import DocumentType
+        doc_type = DocumentType.query.filter_by(name_ar=name).first()
+        if doc_type:
+            expense.document_type_name = name
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم تحديث المصروف بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error editing document expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحديث المصروف'})
+
+
+@app.route('/get_expense_general/<int:expense_id>')
+@login_required
+@permission_required('expenses')
+def get_expense_general(expense_id):
+    """Get general expense details for editing"""
+    try:
+        expense = ExpenseGeneral.query.get_or_404(expense_id)
+        
+        return jsonify({
+            'success': True,
+            'expense': {
+                'id': expense.id,
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'notes': expense.notes or '',
+                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else ''
+            }
+        })
+        
+    except Exception as e:
+        logging.error(f'Error getting general expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل بيانات المصروف'})
+
+
+@app.route('/get_expense_documents/<int:expense_id>')
+@login_required
+@permission_required('expenses')
+def get_expense_documents(expense_id):
+    """Get document expense details for editing"""
+    try:
+        expense = ExpenseDocuments.query.get_or_404(expense_id)
+        
+        return jsonify({
+            'success': True,
+            'expense': {
+                'id': expense.id,
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'notes': expense.notes or '',
+                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
+                'expense_type': getattr(expense, 'expense_type', 'مستندات'),
+                'document_type_name': getattr(expense, 'document_type_name', None)
+            }
+        })
+        
+    except Exception as e:
+        logging.error(f'Error getting document expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل بيانات المصروف'})
+
+
 @app.route('/api/total_expenses')
 @login_required
 @permission_required('expenses')
