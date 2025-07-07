@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session, j
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from app import app, db
-from models import Admin, Shipment, ShipmentType, DocumentType, Notification, ZonePricing, PackagingType, GlobalSettings, FinancialTransaction, OperationalCost, ExpenseGeneral, ExpenseDocuments
+from models import Admin, Shipment, ShipmentType, DocumentType, Notification, ZonePricing, PackagingType, GlobalSettings, FinancialTransaction, OperationalCost, ExpenseGeneral, ExpenseDocuments, ExpenseOffice
 import logging
 from datetime import datetime, timedelta
 from sqlalchemy import func, extract
@@ -3823,6 +3823,183 @@ def get_expense_documents(expense_id):
         return jsonify({'success': False, 'message': 'حدث خطأ في تحميل بيانات المصروف'})
 
 
+# Office Expense Functions
+@app.route('/add_expense_office', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def add_expense_office():
+    """Add a new office expense"""
+    try:
+        name = request.form.get('name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        notes = request.form.get('notes', '').strip()
+        
+        # Validate inputs
+        if not name:
+            return jsonify({'success': False, 'message': 'يرجى إدخال اسم المصروف'})
+        
+        if not amount_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+        
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+        
+        # Create new office expense
+        new_expense = ExpenseOffice(
+            name=name,
+            amount=amount,
+            notes=notes if notes else None,
+            expense_date=datetime.now().date()
+        )
+        
+        db.session.add(new_expense)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم إضافة مصروف المكتب بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error adding office expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في إضافة المصروف'})
+
+
+@app.route('/api/expenses_office')
+@login_required
+@permission_required('expenses')
+def get_expenses_office():
+    """Get all office expenses"""
+    try:
+        expenses = ExpenseOffice.query.order_by(ExpenseOffice.created_at.desc()).all()
+        expenses_data = []
+        for expense in expenses:
+            expenses_data.append({
+                'id': expense.id,
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'notes': expense.notes,
+                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
+                'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else ''
+            })
+        
+        return jsonify({'success': True, 'expenses': expenses_data})
+        
+    except Exception as e:
+        logging.error(f'Error fetching office expenses: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل مصروفات المكتب'})
+
+
+@app.route('/delete_expense_office/<int:expense_id>', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def delete_expense_office(expense_id):
+    """Delete an office expense"""
+    try:
+        expense = ExpenseOffice.query.get_or_404(expense_id)
+        db.session.delete(expense)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم حذف مصروف المكتب بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error deleting office expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في حذف المصروف'})
+
+
+@app.route('/edit_expense_office/<int:expense_id>', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def edit_expense_office(expense_id):
+    """Edit an office expense"""
+    try:
+        expense = ExpenseOffice.query.get_or_404(expense_id)
+        
+        name = request.form.get('name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        notes = request.form.get('notes', '').strip()
+        
+        # Validate inputs
+        if not name:
+            return jsonify({'success': False, 'message': 'يرجى إدخال اسم المصروف'})
+        
+        if not amount_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+        
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+        
+        # Update expense
+        expense.name = name
+        expense.amount = amount
+        expense.notes = notes if notes else None
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم تحديث مصروف المكتب بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error editing office expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحديث المصروف'})
+
+
+@app.route('/get_expense_office/<int:expense_id>')
+@login_required
+@permission_required('expenses')
+def get_expense_office(expense_id):
+    """Get office expense details for editing"""
+    try:
+        expense = ExpenseOffice.query.get_or_404(expense_id)
+        
+        return jsonify({
+            'success': True,
+            'expense': {
+                'id': expense.id,
+                'name': expense.name,
+                'amount': float(expense.amount),
+                'notes': expense.notes or '',
+                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else ''
+            }
+        })
+        
+    except Exception as e:
+        logging.error(f'Error getting office expense: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل بيانات المصروف'})
+
+
+@app.route('/api/total_office_expenses')
+@login_required
+@permission_required('expenses')
+def api_total_office_expenses():
+    """Calculate total office expenses"""
+    try:
+        # Get total from ExpenseOffice table
+        total_office = ExpenseOffice.query.with_entities(
+            db.func.sum(ExpenseOffice.amount)
+        ).scalar() or 0.0
+        
+        return jsonify({
+            'success': True,
+            'total': float(total_office)
+        })
+        
+    except Exception as e:
+        logging.error(f'Error calculating total office expenses: {str(e)}')
+        return jsonify({
+            'success': False,
+            'total': 0.0,
+            'message': 'حدث خطأ في حساب إجمالي مصروفات المكتب'
+        })
+
+
 @app.route('/api/total_expenses')
 @login_required
 @permission_required('expenses')
@@ -3831,8 +4008,11 @@ def api_total_expenses():
     try:
         from sqlalchemy import func
         
-        # Calculate total office expenses (ExpenseGeneral)
-        office_total = db.session.query(func.sum(ExpenseGeneral.amount)).scalar() or 0
+        # Calculate total office expenses (ExpenseOffice)
+        office_total = db.session.query(func.sum(ExpenseOffice.amount)).scalar() or 0
+        
+        # Calculate total general expenses (ExpenseGeneral)  
+        general_total = db.session.query(func.sum(ExpenseGeneral.amount)).scalar() or 0
         
         # Calculate total general shipments expenses (FinancialTransaction with shipping_type = 'شحنات عامة')
         general_shipments_total = db.session.query(func.sum(FinancialTransaction.amount)).filter_by(
@@ -3844,11 +4024,12 @@ def api_total_expenses():
         document_total = db.session.query(func.sum(ExpenseDocuments.amount)).scalar() or 0
         
         # Calculate grand total
-        grand_total = float(office_total) + float(general_shipments_total) + float(document_total)
+        grand_total = float(office_total) + float(general_total) + float(general_shipments_total) + float(document_total)
         
         return jsonify({
             'success': True,
             'office_total': float(office_total),
+            'general_total': float(general_total),
             'general_shipments_total': float(general_shipments_total),
             'document_total': float(document_total),
             'grand_total': grand_total

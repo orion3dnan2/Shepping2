@@ -247,6 +247,16 @@ The system is specifically configured for cPanel hosting with:
    • Real-time updates to expense displays after successful edits
    • Removed delete button from document expenses per user request (edit-only for document expenses)
 
+✅ July 07, 2025: Office Expenses Separation and Management System
+   • Created new ExpenseOffice model separate from general shipment expenses
+   • Added third expense section "مصروفات المكتب" (Office Expenses) in Financial Center
+   • Implemented complete CRUD operations for office expenses with API routes
+   • Added office expense form, display cards, and edit/delete functionality
+   • Created office expense edit modal with validation and error handling
+   • Integrated office expenses into reports and total calculations
+   • Added print functionality for office expenses with custom styling
+   • Successfully separated office expenses from general shipment expenses per user requirements
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

@@ -760,3 +760,18 @@ class ExpenseDocuments(db.Model):
         db.session.add(new_expense)
         db.session.commit()
         return new_expense
+
+
+class ExpenseOffice(db.Model):
+    """Model for office expenses"""
+    __tablename__ = 'expenses_office'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    amount = db.Column(db.Numeric(10, 3), nullable=False)
+    notes = db.Column(db.Text)
+    expense_date = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<ExpenseOffice {self.name}: {self.amount}>'
