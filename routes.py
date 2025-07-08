@@ -1639,8 +1639,17 @@ def add_document_type():
         # Automatically create expense record for this document type
         try:
             from models import ExpenseDocuments
-            ExpenseDocuments.create_or_update_document_expense(name_ar, 5.0)  # Default amount
-            flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح وتم إنشاء سجل المصروف تلقائياً (5.000 د.ك)', 'success')
+            # Check if expense record already exists
+            existing_expense = ExpenseDocuments.query.filter_by(
+                document_type_name=name_ar,
+                is_active=True
+            ).first()
+            
+            if not existing_expense:
+                ExpenseDocuments.create_or_update_document_expense(name_ar, 5.0)  # Default amount
+                flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح وتم إنشاء سجل المصروف تلقائياً (5.000 د.ك)', 'success')
+            else:
+                flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح (المصروف موجود بالفعل)', 'success')
         except Exception as e:
             app.logger.error(f'Error creating expense record for document type: {str(e)}')
             flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح', 'success')
@@ -3584,8 +3593,36 @@ def get_expenses_general():
 @login_required
 @permission_required('expenses')
 def get_expenses_documents():
-    """Get all document expenses"""
+    """Get all document expenses - sync with document types first"""
     try:
+        from datetime import datetime
+        # First, ensure all document types have expense records
+        from models import DocumentType
+        document_types = DocumentType.query.filter_by(is_active=True).all()
+        
+        for doc_type in document_types:
+            # Check if expense record exists
+            existing_expense = ExpenseDocuments.query.filter_by(
+                document_type_name=doc_type.name_ar,
+                is_active=True
+            ).first()
+            
+            if not existing_expense:
+                # Create expense record with default amount
+                new_expense = ExpenseDocuments(
+                    name=doc_type.name_ar,
+                    amount=5.0,
+                    expense_type='مستندات',
+                    document_type_name=doc_type.name_ar,
+                    expense_date=datetime.now().date(),
+                    created_at=datetime.now(),
+                    is_active=True
+                )
+                db.session.add(new_expense)
+        
+        db.session.commit()
+        
+        # Now get all expenses
         expenses = ExpenseDocuments.query.filter_by(is_active=True).order_by(ExpenseDocuments.expense_date.desc()).all()
         expenses_data = []
         
