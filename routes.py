@@ -4084,35 +4084,49 @@ def api_shipment_reports():
         total_expenses = 0.0
         
         for shipment in shipments:
-            # Calculate profit and expenses using the new methods
-            profit_data = shipment.calculate_net_profit_with_category_expenses()
-            category_expenses = shipment.get_category_expenses()
-            
-            # Update shipment's linked_expenses field with category expenses
-            shipment.linked_expenses = category_expenses
-            
-            shipment_type_ar = 'مستندات' if shipment.package_type == 'document' else 'شحنات عامة'
-            
-            # Determine document type display for document shipments
-            document_type_display = shipment.document_type if shipment.package_type == 'document' else ''
-            
-            shipments_data.append({
-                'id': shipment.id,
-                'tracking_number': shipment.tracking_number,
-                'package_type': shipment.package_type,
-                'package_type_ar': shipment_type_ar,
-                'document_type': document_type_display,
-                'sender_name': shipment.sender_name,
-                'receiver_name': shipment.receiver_name,
-                'revenue': profit_data['revenue'],  # Use paid_amount as revenue
-                'category_expenses': profit_data['category_expenses'],
-                'net_profit': profit_data['net_profit'],
-                'status': shipment.status,
-                'created_at': shipment.created_at.strftime('%Y-%m-%d')
-            })
-            
-            total_revenue += profit_data['revenue']
-            total_expenses += profit_data['category_expenses']
+            try:
+                # Calculate profit and expenses using the new methods
+                profit_data = shipment.calculate_net_profit_with_category_expenses()
+                
+                # Ensure profit_data is a dictionary
+                if not isinstance(profit_data, dict):
+                    logging.error(f'profit_data is not a dictionary for shipment {shipment.id}: {type(profit_data)}')
+                    profit_data = {
+                        'revenue': float(shipment.paid_amount) if shipment.paid_amount else 0.0,
+                        'category_expenses': 0.0,
+                        'net_profit': float(shipment.paid_amount) if shipment.paid_amount else 0.0
+                    }
+                
+                category_expenses = shipment.get_category_expenses()
+                
+                # Update shipment's linked_expenses field with category expenses
+                shipment.linked_expenses = category_expenses
+                
+                shipment_type_ar = 'مستندات' if shipment.package_type == 'document' else 'شحنات عامة'
+                
+                # Determine document type display for document shipments
+                document_type_display = shipment.document_type if shipment.package_type == 'document' else ''
+                
+                shipments_data.append({
+                    'id': shipment.id,
+                    'tracking_number': shipment.tracking_number,
+                    'package_type': shipment.package_type,
+                    'package_type_ar': shipment_type_ar,
+                    'document_type': document_type_display,
+                    'sender_name': shipment.sender_name,
+                    'receiver_name': shipment.receiver_name,
+                    'revenue': profit_data['revenue'],  # Use paid_amount as revenue
+                    'category_expenses': profit_data['category_expenses'],
+                    'net_profit': profit_data['net_profit'],
+                    'status': shipment.status,
+                    'created_at': shipment.created_at.strftime('%Y-%m-%d')
+                })
+                
+                total_revenue += profit_data['revenue']
+                total_expenses += profit_data['category_expenses']
+            except Exception as e:
+                logging.error(f'Error processing shipment {shipment.id} for reports: {str(e)}')
+                continue
         
         # Commit the linked_expenses updates
         db.session.commit()

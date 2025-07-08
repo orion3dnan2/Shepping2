@@ -273,18 +273,7 @@ class Shipment(db.Model):
             logging.error(f'Error calculating total general category expenses: {str(e)}')
             return 0.0
 
-    def calculate_net_profit_with_category_expenses(self):
-        """Calculate net profit using distributed category expenses with document type linking"""
-        revenue = float(self.price) if self.price else 0.0
-        
-        if self.package_type == 'document':
-            # Use linked document expenses for document shipments
-            category_expenses = self.calculate_linked_document_expenses()
-        else:
-            # Use regular category expenses for general shipments
-            category_expenses = self.calculate_category_distributed_expenses()
-            
-        return revenue - category_expenses
+
     
     def update_linked_expenses(self):
         """Update the linked_expenses field with calculated total"""
