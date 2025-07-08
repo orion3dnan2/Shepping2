@@ -1089,11 +1089,18 @@ function loadDocumentExpenses() {
                                     <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
                                     <h5 class="text-primary mb-0">${expense.amount.toFixed(3)} د.ك</h5>
                                 </div>
-                                <button class="btn btn-sm btn-outline-primary ms-2" 
-                                        onclick="editDocumentExpense(${expense.id})"
-                                        title="تعديل المصروف">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                <div class="btn-group-vertical">
+                                    <button class="btn btn-sm btn-outline-primary mb-1" 
+                                            onclick="editDocumentExpense(${expense.id})"
+                                            title="تعديل المصروف">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteDocumentExpense(${expense.id}, '${expense.name}')"
+                                            title="حذف المصروف">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1307,6 +1314,51 @@ function editDocumentExpense(expenseId) {
     .catch(error => {
         console.error('Error:', error);
         showNotification('حدث خطأ في تحميل بيانات المصروف', 'error');
+    });
+}
+
+// Delete Document Expense
+function deleteDocumentExpense(expenseId, expenseName) {
+    // Confirmation dialog
+    if (!confirm(`هل أنت متأكد من حذف المصروف "${expenseName}"؟\n\nهذا الإجراء لا يمكن التراجع عنه.`)) {
+        return;
+    }
+    
+    // Show loading state
+    const deleteButtons = document.querySelectorAll(`button[onclick*="deleteDocumentExpense(${expenseId}"]`);
+    deleteButtons.forEach(btn => {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+    });
+    
+    // Send delete request
+    fetch(`/delete_expense_documents/${expenseId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            loadDocumentExpenses();
+            loadTotalExpenses();
+            refreshFinancialReports();
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في حذف المصروف', 'error');
+    })
+    .finally(() => {
+        // Restore button states
+        deleteButtons.forEach(btn => {
+            btn.innerHTML = '<i class="fas fa-trash"></i>';
+            btn.disabled = false;
+        });
     });
 }
 
