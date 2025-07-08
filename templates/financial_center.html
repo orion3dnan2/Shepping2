@@ -1086,12 +1086,24 @@ document.getElementById('documentExpenseForm').addEventListener('submit', functi
 });
 
 function loadDocumentExpenses() {
-    fetch('/api/expenses_documents')
-    .then(response => response.json())
+    fetch('/api/expenses_documents', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         const tableBody = document.getElementById('documentExpensesTableBody');
         
-        if (data.success && data.expenses.length > 0) {
+        if (data.success && data.expenses && data.expenses.length > 0) {
             tableBody.innerHTML = '';
             data.expenses.forEach(expense => {
                 const row = document.createElement('tr');
@@ -1116,6 +1128,7 @@ function loadDocumentExpenses() {
                 `;
                 tableBody.appendChild(row);
             });
+            console.log('Document expenses loaded successfully:', data.expenses.length);
         } else {
             tableBody.innerHTML = `
                 <tr>
@@ -1125,9 +1138,21 @@ function loadDocumentExpenses() {
                     </td>
                 </tr>
             `;
+            console.log('No document expenses found');
         }
     })
-    .catch(error => console.error('Error loading document expenses:', error));
+    .catch(error => {
+        console.error('Error loading document expenses:', error);
+        const tableBody = document.getElementById('documentExpensesTableBody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <br><small>خطأ في تحميل المصروفات</small>
+                </td>
+            </tr>
+        `;
+    });
 }
 
 function deleteDocumentExpense(expenseId) {
