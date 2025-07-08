@@ -82,10 +82,17 @@
                         <div class="types-container">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h4 class="section-title">نوع المستند</h4>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentTypeModal">
-                                    <i class="fas fa-plus me-2"></i>
-                                    إضافة نوع وثيقة
-                                </button>
+                                <div>
+                                    <form method="post" action="{{ url_for('sync_document_expenses') }}" style="display: inline;" class="me-2">
+                                        <button type="submit" class="btn btn-sm" style="background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; border: none;" title="مزامنة أنواع الوثائق مع جدول المصروفات">
+                                            <i class="fas fa-sync-alt me-1"></i>مزامنة مع المصروفات
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentTypeModal">
+                                        <i class="fas fa-plus me-2"></i>
+                                        إضافة نوع وثيقة
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="table-responsive">

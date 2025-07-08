@@ -1483,6 +1483,37 @@ def edit_user(user_id):
 
 
 # Settings Page Route
+@app.route('/sync_document_expenses', methods=['POST'])
+@login_required
+@permission_required('settings')
+def sync_document_expenses():
+    """Sync all document types with their expense records"""
+    try:
+        from models import DocumentType, ExpenseDocuments
+        
+        # Get all active document types
+        document_types = DocumentType.query.filter_by(is_active=True).all()
+        synced_count = 0
+        
+        for doc_type in document_types:
+            # Check if expense record exists
+            existing_expense = ExpenseDocuments.get_expense_for_document_type(doc_type.name_ar)
+            if not existing_expense:
+                # Create expense record with default amount
+                ExpenseDocuments.create_or_update_document_expense(doc_type.name_ar, 5.0)
+                synced_count += 1
+        
+        if synced_count > 0:
+            flash(f'تم مزامنة {synced_count} نوع مستند مع جدول المصروفات', 'success')
+        else:
+            flash('جميع أنواع المستندات لها مصروفات موجودة', 'info')
+            
+    except Exception as e:
+        app.logger.error(f'Error syncing document expenses: {str(e)}')
+        flash('حدث خطأ في مزامنة مصروفات المستندات', 'error')
+    
+    return redirect(url_for('settings') + '#types')
+
 @app.route('/settings')
 @login_required
 @permission_required('settings')
@@ -1608,8 +1639,8 @@ def add_document_type():
         # Automatically create expense record for this document type
         try:
             from models import ExpenseDocuments
-            ExpenseDocuments.create_or_update_document_expense(name_ar, 0.0)
-            flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح وتم إنشاء سجل المصروف تلقائياً', 'success')
+            ExpenseDocuments.create_or_update_document_expense(name_ar, 5.0)  # Default amount
+            flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح وتم إنشاء سجل المصروف تلقائياً (5.000 د.ك)', 'success')
         except Exception as e:
             app.logger.error(f'Error creating expense record for document type: {str(e)}')
             flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح', 'success')

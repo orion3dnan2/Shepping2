@@ -163,6 +163,15 @@ The system is specifically configured for cPanel hosting with:
    • When no expenses exist, shows "لا توجد مصروفات مستندات" message
    • Table is always visible and does not collapse or hide
 
+✅ July 08, 2025: Automatic Document Type to Expense Synchronization
+   • Added automatic expense record creation when adding new document types in settings
+   • Created sync_document_expenses route for manual synchronization
+   • Added "مزامنة مع المصروفات" button in settings page (purple gradient style)
+   • New document types automatically get 5.000 KD default expense amount
+   • Added 7 common document types with corresponding expense records
+   • System now maintains 1:1 relationship between document types and their expenses
+   • Document expenses table permanently shows all document type expenses from settings
+
 ✅ Database recreated with proper initialization
 ✅ Complete system documentation in README.md covering:
    • All 16 database tables with sample data
