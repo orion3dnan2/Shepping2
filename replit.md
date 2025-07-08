@@ -204,6 +204,15 @@ The system is specifically configured for cPanel hosting with:
    • When document types are added/removed in Settings, expenses are automatically created/deleted
    • Clean slate ensures no orphaned or duplicate expense records
 
+✅ July 08, 2025: Complete Database Cleanup - Document Types and Expenses
+   • Removed all hardcoded document expenses from HTML template
+   • Cleared all document types from database (document_type table)
+   • Cleared all document expenses from database (expenses_documents table)
+   • System now starts with completely clean slate
+   • Settings page shows no document types (as requested by user)
+   • Financial center document expenses table shows "لا توجد مصروفات مستندات" message
+   • Full synchronization ready: when document types are added in Settings, expenses will be created automatically
+
 ✅ Database recreated with proper initialization
 ✅ Complete system documentation in README.md covering:
    • All 16 database tables with sample data
