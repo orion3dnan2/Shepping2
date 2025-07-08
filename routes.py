@@ -2712,15 +2712,21 @@ def delete_document_type(type_id):
         document_type.is_active = False
         db.session.commit()
         
-        # Also deactivate the corresponding expense record
+        # Also delete the corresponding expense record
         try:
             from models import ExpenseDocuments
-            expense_record = ExpenseDocuments.get_expense_for_document_type(document_type.name_ar)
-            if expense_record:
-                expense_record.is_active = False
-                db.session.commit()
+            expense_records = ExpenseDocuments.query.filter_by(
+                document_type_name=document_type.name_ar,
+                is_active=True
+            ).all()
+            
+            for expense_record in expense_records:
+                db.session.delete(expense_record)
+                
+            db.session.commit()
+            app.logger.info(f'Deleted {len(expense_records)} expense records for document type: {document_type.name_ar}')
         except Exception as e:
-            app.logger.error(f'Error deactivating expense record for document type: {str(e)}')
+            app.logger.error(f'Error deleting expense records: {str(e)}')
         
         flash(f'تم حذف نوع الوثيقة "{document_type.name_ar}" بنجاح', 'success')
         
