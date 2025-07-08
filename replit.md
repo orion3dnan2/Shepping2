@@ -197,6 +197,13 @@ The system is specifically configured for cPanel hosting with:
    • This enforces proper synchronization workflow: manage document types in Settings only
    • Clean table interface with single edit button per expense record
 
+✅ July 08, 2025: Complete Document Expenses Table Reset
+   • Cleared all existing document expenses from the database
+   • System now exclusively relies on document types added in Settings page
+   • Document expenses table will only show items synchronized from Settings
+   • When document types are added/removed in Settings, expenses are automatically created/deleted
+   • Clean slate ensures no orphaned or duplicate expense records
+
 ✅ Database recreated with proper initialization
 ✅ Complete system documentation in README.md covering:
    • All 16 database tables with sample data
