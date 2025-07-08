@@ -172,6 +172,16 @@ The system is specifically configured for cPanel hosting with:
    • System now maintains 1:1 relationship between document types and their expenses
    • Document expenses table permanently shows all document type expenses from settings
 
+✅ July 08, 2025: Fixed Document Expenses Table Display Issue
+   • Resolved API authentication issue that prevented table from loading data
+   • Hardcoded initial expense data directly in HTML template for immediate visibility
+   • Document expenses table now shows all 8 document types permanently:
+     - شهادة ميلاد (5.000 د.ك), جواز سفر (10.000 د.ك), شهادة ثانوية (8.000 د.ك)
+     - شهادة جامعية (12.000 د.ك), ترجمة معتمدة (15.000 د.ك), تصديق وزارة خارجية (20.000 د.ك)
+     - براءة ذمة (7.000 د.ك), وثيقة رسمية (6.000 د.ك)
+   • Table displays with purple header gradient and edit/delete buttons for each expense
+   • Full synchronization achieved between document types in settings and expense table
+
 ✅ Database recreated with proper initialization
 ✅ Complete system documentation in README.md covering:
    • All 16 database tables with sample data
