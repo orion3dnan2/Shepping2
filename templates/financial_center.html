@@ -302,11 +302,26 @@
                                                 <i class="fas fa-print me-1"></i>طباعة
                                             </button>
                                         </div>
-                                        <div class="row" id="documentExpensesCards">
-                                            <div class="col-12 text-center text-muted py-4">
-                                                <i class="fas fa-inbox me-2 fa-lg"></i>
-                                                <br><small>لا توجد مصروفات مستندات</small>
-                                            </div>
+                                        <!-- Document Expenses Table -->
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="documentExpensesTable">
+                                                <thead style="background: linear-gradient(135deg, #8e44ad, #9b59b6);" class="text-white">
+                                                    <tr>
+                                                        <th style="width: 40%">اسم المصروف</th>
+                                                        <th style="width: 20%">المبلغ (د.ك)</th>
+                                                        <th style="width: 25%">الملاحظات</th>
+                                                        <th style="width: 15%">الإجراءات</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="documentExpensesTableBody">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted py-4">
+                                                            <i class="fas fa-inbox me-2 fa-lg"></i>
+                                                            <br><small>لا توجد مصروفات مستندات</small>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -1074,45 +1089,41 @@ function loadDocumentExpenses() {
     fetch('/api/expenses_documents')
     .then(response => response.json())
     .then(data => {
-        const cardsContainer = document.getElementById('documentExpensesCards');
+        const tableBody = document.getElementById('documentExpensesTableBody');
         
         if (data.success && data.expenses.length > 0) {
-            cardsContainer.innerHTML = '';
+            tableBody.innerHTML = '';
             data.expenses.forEach(expense => {
-                const cardCol = document.createElement('div');
-                cardCol.className = 'col-md-6 col-lg-4 mb-3';
-                cardCol.innerHTML = `
-                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f8f4ff, #f0e6ff);">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="flex-grow-1">
-                                    <h6 class="card-title mb-2 text-dark">${expense.name}</h6>
-                                    <h5 class="text-primary mb-0">${expense.amount.toFixed(3)} د.ك</h5>
-                                </div>
-                                <div class="btn-group-vertical">
-                                    <button class="btn btn-sm btn-outline-primary mb-1" 
-                                            onclick="editDocumentExpense(${expense.id})"
-                                            title="تعديل المصروف">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" 
-                                            onclick="deleteDocumentExpense(${expense.id}, '${expense.name}')"
-                                            title="حذف المصروف">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="fw-bold">${expense.name}</td>
+                    <td class="text-primary fw-bold">${expense.amount.toFixed(3)}</td>
+                    <td class="text-muted">${expense.notes || '-'}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="editDocumentExpense(${expense.id})"
+                                    title="تعديل المصروف">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="deleteDocumentExpense(${expense.id}, '${expense.name}')"
+                                    title="حذف المصروف">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
-                    </div>
+                    </td>
                 `;
-                cardsContainer.appendChild(cardCol);
+                tableBody.appendChild(row);
             });
         } else {
-            cardsContainer.innerHTML = `
-                <div class="col-12 text-center text-muted py-4">
-                    <i class="fas fa-inbox me-2 fa-lg"></i>
-                    <br><small>لا توجد مصروفات مستندات</small>
-                </div>
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        <i class="fas fa-inbox me-2 fa-lg"></i>
+                        <br><small>لا توجد مصروفات مستندات</small>
+                    </td>
+                </tr>
             `;
         }
     })
@@ -1359,6 +1370,66 @@ function deleteDocumentExpense(expenseId, expenseName) {
             btn.innerHTML = '<i class="fas fa-trash"></i>';
             btn.disabled = false;
         });
+    });
+}
+
+// Print Document Expenses
+function printDocumentExpenses() {
+    fetch('/api/expenses_documents')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.expenses.length > 0) {
+            const table = document.getElementById('documentExpensesTable').cloneNode(true);
+            
+            // Remove action buttons from print version
+            const actionHeaders = table.querySelectorAll('th:last-child');
+            const actionCells = table.querySelectorAll('td:last-child');
+            actionHeaders.forEach(header => header.remove());
+            actionCells.forEach(cell => cell.remove());
+            
+            // Create print content
+            const printContent = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #8e44ad; margin: 0;">مصروفات شحن المستندات</h2>
+                    <p style="color: #666; margin: 5px 0;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')}</p>
+                </div>
+                ${table.outerHTML}
+                <div style="margin-top: 30px; text-align: center; color: #666; font-size: 14px;">
+                    <p>نظام إدارة الشحن - مرسال</p>
+                </div>
+            `;
+            
+            // Open print window
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl">
+                <head>
+                    <title>مصروفات شحن المستندات</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; direction: rtl; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+                        th { background-color: #8e44ad; color: white; font-weight: bold; }
+                        .text-primary { color: #8e44ad !important; }
+                        .fw-bold { font-weight: bold; }
+                        @media print { body { margin: 0; } }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        } else {
+            showNotification('لا توجد مصروفات مستندات للطباعة', 'warning');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('حدث خطأ في تحميل البيانات للطباعة', 'error');
     });
 }
 
