@@ -758,6 +758,14 @@ document.addEventListener('DOMContentLoaded', function() {
         loadOfficeExpenses();
         loadTotalExpenses(); // Load total expenses when expenses tab is activated
     });
+    
+    // Load document expenses immediately when page loads
+    loadDocumentExpenses();
+    
+    // Also load when expenses tab is initially shown
+    setTimeout(() => {
+        loadDocumentExpenses();
+    }, 1000);
     document.getElementById('reports-tab').addEventListener('shown.bs.tab', loadFinancialReports);
     document.getElementById('profit-loss-tab').addEventListener('shown.bs.tab', function() {
         // Set default dates if not already set
