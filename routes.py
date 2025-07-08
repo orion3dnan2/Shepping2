@@ -1584,24 +1584,32 @@ def add_shipment_type():
             flash('يرجى إدخال الاسم بالعربية', 'error')
             return redirect(url_for('settings') + '#types')
         
-        # Check if type already exists
+        # Check if type already exists (case-insensitive search)
         existing_type = ShipmentType.query.filter(
-            (ShipmentType.name_ar == name_ar) | (ShipmentType.name_en == name_en)
+            db.func.lower(ShipmentType.name_ar) == db.func.lower(name_ar)
         ).first()
         
         if existing_type:
-            flash('نوع الشحنة موجود بالفعل', 'error')
-            return redirect(url_for('settings') + '#types')
-        
-        # Create new shipment type
-        new_type = ShipmentType(name_ar=name_ar, name_en=name_en)
-        db.session.add(new_type)
-        db.session.commit()
-        
-        flash(f'تم إضافة نوع الشحنة "{name_ar}" بنجاح', 'success')
+            if not existing_type.is_active:
+                # Reactivate the existing type
+                existing_type.is_active = True
+                existing_type.name_en = name_en  # Update English name if provided
+                db.session.commit()
+                flash(f'تم إعادة تفعيل النوع المحذوف سابقاً "{name_ar}"', 'success')
+            else:
+                # Type is already active
+                flash('نوع الشحنة موجود بالفعل', 'error')
+                return redirect(url_for('settings') + '#types')
+        else:
+            # Create new shipment type
+            new_type = ShipmentType(name_ar=name_ar, name_en=name_en, is_active=True)
+            db.session.add(new_type)
+            db.session.commit()
+            flash(f'تم إضافة نوع الشحنة "{name_ar}" بنجاح', 'success')
         
     except Exception as e:
         db.session.rollback()
+        app.logger.error(f'Error in add_shipment_type: {str(e)}')
         flash('حدث خطأ أثناء إضافة نوع الشحنة', 'error')
     
     return redirect(url_for('settings') + '#types')
@@ -1622,40 +1630,60 @@ def add_document_type():
             flash('يرجى إدخال الاسم بالعربية', 'error')
             return redirect(url_for('settings') + '#types')
         
-        # Check if type already exists
+        # Check if type already exists (case-insensitive search)
         existing_type = DocumentType.query.filter(
-            (DocumentType.name_ar == name_ar) | (DocumentType.name_en == name_en)
+            db.func.lower(DocumentType.name_ar) == db.func.lower(name_ar)
         ).first()
         
         if existing_type:
-            flash('نوع الوثيقة موجود بالفعل', 'error')
-            return redirect(url_for('settings') + '#types')
-        
-        # Create new document type
-        new_type = DocumentType(name_ar=name_ar, name_en=name_en)
-        db.session.add(new_type)
-        db.session.commit()
-        
-        # Automatically create expense record for this document type
-        try:
-            from models import ExpenseDocuments
-            # Check if expense record already exists
-            existing_expense = ExpenseDocuments.query.filter_by(
-                document_type_name=name_ar,
-                is_active=True
-            ).first()
+            if not existing_type.is_active:
+                # Reactivate the existing type
+                existing_type.is_active = True
+                existing_type.name_en = name_en  # Update English name if provided
+                db.session.commit()
+                
+                # Automatically create/reactivate expense record
+                try:
+                    from models import ExpenseDocuments
+                    # Check if expense record exists (active or inactive)
+                    existing_expense = ExpenseDocuments.query.filter_by(
+                        document_type_name=existing_type.name_ar
+                    ).first()
+                    
+                    if existing_expense:
+                        # Reactivate existing expense
+                        existing_expense.is_active = True
+                        db.session.commit()
+                    else:
+                        # Create new expense record
+                        ExpenseDocuments.create_or_update_document_expense(existing_type.name_ar, 5.0)
+                    
+                    flash(f'تم إعادة تفعيل النوع المحذوف سابقاً "{name_ar}" وتم إنشاء سجل المصروف تلقائياً (5.000 د.ك)', 'success')
+                except Exception as e:
+                    app.logger.error(f'Error creating expense record for reactivated document type: {str(e)}')
+                    flash(f'تم إعادة تفعيل النوع المحذوف سابقاً "{name_ar}"', 'success')
+            else:
+                # Type is already active
+                flash('نوع الوثيقة موجود بالفعل', 'error')
+                return redirect(url_for('settings') + '#types')
+        else:
+            # Create new document type
+            new_type = DocumentType(name_ar=name_ar, name_en=name_en, is_active=True)
+            db.session.add(new_type)
+            db.session.commit()
             
-            if not existing_expense:
+            # Automatically create expense record for this document type
+            try:
+                from models import ExpenseDocuments
                 ExpenseDocuments.create_or_update_document_expense(name_ar, 5.0)  # Default amount
                 flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح وتم إنشاء سجل المصروف تلقائياً (5.000 د.ك)', 'success')
-            else:
-                flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح (المصروف موجود بالفعل)', 'success')
-        except Exception as e:
-            app.logger.error(f'Error creating expense record for document type: {str(e)}')
-            flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح', 'success')
+            except Exception as e:
+                app.logger.error(f'Error creating expense record for document type: {str(e)}')
+                flash(f'تم إضافة نوع الوثيقة "{name_ar}" بنجاح', 'success')
         
     except Exception as e:
         db.session.rollback()
+        app.logger.error(f'Error in add_document_type: {str(e)}')
         flash('حدث خطأ أثناء إضافة نوع الوثيقة', 'error')
     
     return redirect(url_for('settings') + '#types')
