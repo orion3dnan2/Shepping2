@@ -154,6 +154,15 @@ The system is specifically configured for cPanel hosting with:
    • Application now runs cleanly on port 5000 with gunicorn server
    • Default admin account available (admin/admin123) for immediate use
 
+✅ July 08, 2025: Document Expenses Table Enhanced with Permanent Display
+   • Confirmed document expenses table is displayed permanently in Financial Center
+   • Table shows purple header with gradient colors (#8e44ad, #9b59b6) as requested
+   • Added sample document expense data for better visibility
+   • Table includes columns: expense name, amount (د.ك), notes, and action buttons (edit/delete)
+   • JavaScript function loadDocumentExpenses() properly populates table from API
+   • When no expenses exist, shows "لا توجد مصروفات مستندات" message
+   • Table is always visible and does not collapse or hide
+
 ✅ Database recreated with proper initialization
 ✅ Complete system documentation in README.md covering:
    • All 16 database tables with sample data
