@@ -190,6 +190,13 @@ The system is specifically configured for cPanel hosting with:
    • Document type deletions now remove expense records completely from database
    • Complete bidirectional synchronization: Settings ↔ Financial Center works automatically
 
+✅ July 08, 2025: Removed Delete Buttons from Document Expenses Table
+   • Removed all delete buttons from document expenses table in Financial Center
+   • Only edit buttons remain for document expense records
+   • Document expenses can only be deleted by deleting the corresponding document type in Settings
+   • This enforces proper synchronization workflow: manage document types in Settings only
+   • Clean table interface with single edit button per expense record
+
 ✅ Database recreated with proper initialization
 ✅ Complete system documentation in README.md covering:
    • All 16 database tables with sample data
