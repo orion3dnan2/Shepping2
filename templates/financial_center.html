@@ -1846,53 +1846,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // General Shipments Expense Functions
-    document.getElementById('generalShipmentsExpenseForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const submitButton = this.querySelector('button[type="submit"]');
-        
-        // Convert amount to proper number format
-        const amountInput = this.querySelector('input[name="amount"]');
-        const amountValue = parseFloat(amountInput.value);
-        if (isNaN(amountValue) || amountValue <= 0) {
-            showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
-            return;
-        }
-        formData.set('amount', amountValue.toString());
-        
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
-        submitButton.disabled = true;
-        
-        // Set default price_per_kg to 0 since field is not in the form
-        formData.set('price_per_kg', '0');
-        // Set empty tracking_number since field is not in the form
-        formData.set('tracking_number', '');
-
-        fetch('/add_expense_general', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message, 'success');
-                this.reset();
-                loadGeneralShipmentsExpenses();
-                loadTotalExpenses(); // Update total expenses
-            } else {
-                showNotification(data.message, 'error');
+    const generalForm = document.getElementById('generalShipmentsExpenseForm');
+    if (generalForm) {
+        generalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted'); // Debug log
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            // Convert amount to proper number format
+            const amountInput = this.querySelector('input[name="amount"]');
+            const amountValue = parseFloat(amountInput.value);
+            if (isNaN(amountValue) || amountValue <= 0) {
+                showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('حدث خطأ في الاتصال بالخادم', 'error');
-        })
-        .finally(() => {
-            submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ المصروف';
-            submitButton.disabled = false;
+            formData.set('amount', amountValue.toString());
+            
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+            submitButton.disabled = true;
+            
+            // Set default price_per_kg to 0 since field is not in the form
+            formData.set('price_per_kg', '0');
+            // Set empty tracking_number since field is not in the form
+            formData.set('tracking_number', '');
+
+            fetch('/add_expense_general', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    this.reset();
+                    loadGeneralShipmentsExpenses();
+                    loadTotalExpenses(); // Update total expenses
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+            })
+            .finally(() => {
+                submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ مصروف عام';
+                submitButton.disabled = false;
+            });
         });
-    });
+    } else {
+        console.error('General shipments expense form not found');
+    }
     
 
     
