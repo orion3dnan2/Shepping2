@@ -204,6 +204,14 @@ The system is specifically configured for cPanel hosting with:
    • When document types are added/removed in Settings, expenses are automatically created/deleted
    • Clean slate ensures no orphaned or duplicate expense records
 
+✅ July 09, 2025: Simplified General Expense Form Interface
+   • Removed price per kg field from general expense forms (both add and edit)
+   • Removed tracking number field from general expense forms
+   • Simplified expense entry to only include: name, amount, and notes
+   • Updated backend routes to use default values (price_per_kg = 0, tracking_number = empty)
+   • Enhanced user experience with cleaner, more focused expense management
+   • Maintained cost_per_kg setting in global settings for profit calculations
+
 ✅ July 08, 2025: Complete Database Cleanup - Document Types and Expenses
    • Removed all hardcoded document expenses from HTML template
    • Cleared all document types from database (document_type table)

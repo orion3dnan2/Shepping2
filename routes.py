@@ -3430,8 +3430,8 @@ def add_expense_general():
     try:
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
-        price_per_kg_str = request.form.get('price_per_kg', '').strip()
-        tracking_number = request.form.get('tracking_number', '').strip()
+        price_per_kg_str = '0'  # Default value
+        tracking_number = ''  # Default empty
         notes = request.form.get('notes', '').strip()
         shipment_id = request.form.get('shipment_id') or None
         
@@ -3707,8 +3707,8 @@ def edit_expense_general(expense_id):
         # Get form data
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
-        price_per_kg_str = request.form.get('price_per_kg', '0').strip()
-        tracking_number = request.form.get('tracking_number', '').strip()
+        price_per_kg_str = '0'  # Default value
+        tracking_number = ''  # Default empty
         notes = request.form.get('notes', '').strip()
         
         # Validate inputs
