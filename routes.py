@@ -3391,10 +3391,12 @@ def clear_all_expenses():
 @login_required
 @permission_required('expenses')
 def add_expense_general():
-    """Add a new general expense"""
+    """Add a new general expense with tracking number and price per kg"""
     try:
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
+        price_per_kg_str = request.form.get('price_per_kg', '').strip()
+        tracking_number = request.form.get('tracking_number', '').strip()
         notes = request.form.get('notes', '').strip()
         shipment_id = request.form.get('shipment_id') or None
         
@@ -3404,6 +3406,9 @@ def add_expense_general():
         
         if not amount_str:
             return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+            
+        if not price_per_kg_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال سعر الكيلو الواحد للمصروف'})
         
         try:
             amount = float(amount_str)
@@ -3411,6 +3416,13 @@ def add_expense_general():
                 return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
         except ValueError:
             return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+            
+        try:
+            price_per_kg = float(price_per_kg_str)
+            if price_per_kg <= 0:
+                return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون رقماً صحيحاً'})
         
         # Use current date automatically
         expense_date = datetime.now().date()
@@ -3419,6 +3431,8 @@ def add_expense_general():
         expense = ExpenseGeneral(
             name=name,
             amount=amount,
+            price_per_kg=price_per_kg,
+            tracking_number=tracking_number if tracking_number else None,
             notes=notes if notes else None,
             expense_date=expense_date,
             shipment_id=int(shipment_id) if shipment_id else None
@@ -3611,6 +3625,8 @@ def get_expenses_general():
                 'id': expense.id,
                 'name': expense.name,
                 'amount': float(expense.amount),
+                'price_per_kg': float(expense.price_per_kg) if hasattr(expense, 'price_per_kg') and expense.price_per_kg else 0.0,
+                'tracking_number': expense.tracking_number if hasattr(expense, 'tracking_number') else None,
                 'notes': expense.notes,
                 'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
                 'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else ''
@@ -3797,6 +3813,8 @@ def edit_expense_general(expense_id):
         
         name = request.form.get('name', '').strip()
         amount_str = request.form.get('amount', '').strip()
+        price_per_kg_str = request.form.get('price_per_kg', '').strip()
+        tracking_number = request.form.get('tracking_number', '').strip()
         notes = request.form.get('notes', '').strip()
         
         # Validate inputs
@@ -3812,11 +3830,25 @@ def edit_expense_general(expense_id):
                 return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
         except ValueError:
             return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+            
+        # Validate price_per_kg if provided
+        price_per_kg = 0.0
+        if price_per_kg_str:
+            try:
+                price_per_kg = float(price_per_kg_str)
+                if price_per_kg < 0:
+                    return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون أكبر من أو يساوي صفر'})
+            except ValueError:
+                return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون رقماً صحيحاً'})
         
         # Update expense
         expense.name = name
         expense.amount = amount
         expense.notes = notes if notes else None
+        if hasattr(expense, 'price_per_kg'):
+            expense.price_per_kg = price_per_kg
+        if hasattr(expense, 'tracking_number'):
+            expense.tracking_number = tracking_number if tracking_number else None
         
         db.session.commit()
         
@@ -3889,6 +3921,8 @@ def get_expense_general(expense_id):
                 'id': expense.id,
                 'name': expense.name,
                 'amount': float(expense.amount),
+                'price_per_kg': float(expense.price_per_kg) if hasattr(expense, 'price_per_kg') and expense.price_per_kg else 0.0,
+                'tracking_number': expense.tracking_number if hasattr(expense, 'tracking_number') else '',
                 'notes': expense.notes or '',
                 'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else ''
             }

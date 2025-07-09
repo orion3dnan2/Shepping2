@@ -282,7 +282,7 @@ class Shipment(db.Model):
         return self.linked_expenses
     
     def calculate_category_expenses_for_report(self):
-        """Calculate category expenses for profit/loss reports based on shipment type"""
+        """Calculate category expenses for profit/loss reports based on shipment type and weight"""
         if self.package_type == 'document':
             # For document shipments, find matching expenses by category
             document_type = self.document_type if self.document_type else 'مستندات'
@@ -299,25 +299,40 @@ class Shipment(db.Model):
             else:
                 return 0.0
         else:
-            # For general shipments, get total of all general expenses
-            total_general_expenses = ExpenseGeneral.query.with_entities(
-                db.func.sum(ExpenseGeneral.amount)
-            ).scalar() or 0.0
+            # For general shipments: Calculate expense cost = سعر الكيلو الواحد للمصروف × وزن الشحنة
+            # Get expenses linked to this tracking number
+            linked_expenses = ExpenseGeneral.query.filter_by(tracking_number=self.tracking_number).all()
             
-            return float(total_general_expenses)
+            total_expense_cost = 0.0
+            for expense in linked_expenses:
+                # Calculate: expense cost = price_per_kg × weight
+                expense_cost = float(expense.price_per_kg) * float(self.weight)
+                total_expense_cost += expense_cost
+            
+            return total_expense_cost
     
     def calculate_net_profit_for_report(self):
-        """Calculate net profit for profit/loss reports"""
-        # Revenue is the paid amount
-        revenue = float(self.paid_amount)
-        
-        # Category expenses based on shipment type
-        category_expenses = self.calculate_category_expenses_for_report()
-        
-        # Net profit = Revenue - Category Expenses
-        net_profit = revenue - category_expenses
-        
-        return net_profit
+        """Calculate net profit for profit/loss reports with new calculation method"""
+        if self.package_type == 'document':
+            # For document shipments, use existing logic
+            revenue = float(self.paid_amount)
+            category_expenses = self.calculate_category_expenses_for_report()
+            net_profit = revenue - category_expenses
+            return net_profit
+        else:
+            # For general shipments: الربح = (الوزن × سعر البيع للكيلو من العميل) - (الوزن × سعر الكيلو للمصروف لكل نوع مصروف)
+            
+            # Calculate customer revenue per kg
+            customer_price_per_kg = float(self.paid_amount) / float(self.weight) if self.weight > 0 else 0.0
+            customer_revenue = float(self.weight) * customer_price_per_kg
+            
+            # Calculate total expense costs (already multiplied by weight in calculate_category_expenses_for_report)
+            total_expense_costs = self.calculate_category_expenses_for_report()
+            
+            # Net profit = Customer Revenue - Total Expense Costs
+            net_profit = customer_revenue - total_expense_costs
+            
+            return net_profit
 
     @staticmethod
     def generate_tracking_number():
@@ -749,6 +764,8 @@ class ExpenseGeneral(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     amount = db.Column(db.Numeric(10, 3), nullable=False)
+    price_per_kg = db.Column(db.Numeric(10, 3), nullable=False, default=0.0)  # سعر الكيلو الواحد للمصروف
+    tracking_number = db.Column(db.String(20), nullable=True)  # رقم التتبع المرتبط بالمصروف
     notes = db.Column(db.Text)
     expense_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
