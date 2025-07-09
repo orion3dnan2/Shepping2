@@ -247,11 +247,9 @@
                                             <table class="table table-hover" id="generalShipmentsExpensesTable">
                                                 <thead class="table-primary">
                                                     <tr>
-                                                        <th style="width: 30%">اسم المصروف</th>
-                                                        <th style="width: 20%">المبلغ</th>
-                                                        <th style="width: 20%">سعر الكيلو</th>
-                                                        <th style="width: 15%">رقم التتبع</th>
-                                                        <th style="width: 15%">الإجراءات</th>
+                                                        <th style="width: 40%">اسم المصروف</th>
+                                                        <th style="width: 25%">المبلغ</th>
+                                                        <th style="width: 35%">الإجراءات</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
@@ -1845,60 +1843,78 @@ document.addEventListener('DOMContentLoaded', function() {
         startRevenueAutoUpdate();
     }
     
-    // General Shipments Expense Functions
-    const generalForm = document.getElementById('generalShipmentsExpenseForm');
-    if (generalForm) {
-        generalForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Form submitted'); // Debug log
+    // Initialize General Shipments Expense Functions  
+    function initializeGeneralShipmentsForm() {
+        const generalForm = document.getElementById('generalShipmentsExpenseForm');
+        if (generalForm) {
+            console.log('General shipments form found and initialized');
             
-            const formData = new FormData(this);
-            const submitButton = this.querySelector('button[type="submit"]');
-            
-            // Convert amount to proper number format
-            const amountInput = this.querySelector('input[name="amount"]');
-            const amountValue = parseFloat(amountInput.value);
-            if (isNaN(amountValue) || amountValue <= 0) {
-                showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
-                return;
-            }
-            formData.set('amount', amountValue.toString());
-            
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
-            submitButton.disabled = true;
-            
-            // Set default price_per_kg to 0 since field is not in the form
-            formData.set('price_per_kg', '0');
-            // Set empty tracking_number since field is not in the form
-            formData.set('tracking_number', '');
-
-            fetch('/add_expense_general', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    this.reset();
-                    loadGeneralShipmentsExpenses();
-                    loadTotalExpenses(); // Update total expenses
-                } else {
-                    showNotification(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('حدث خطأ في الاتصال بالخادم', 'error');
-            })
-            .finally(() => {
-                submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ مصروف عام';
-                submitButton.disabled = false;
-            });
-        });
-    } else {
-        console.error('General shipments expense form not found');
+            // Remove existing event listeners to prevent duplicates
+            generalForm.removeEventListener('submit', handleGeneralFormSubmit);
+            generalForm.addEventListener('submit', handleGeneralFormSubmit);
+        } else {
+            console.log('General shipments form not found yet');
+        }
     }
+    
+    function handleGeneralFormSubmit(e) {
+        e.preventDefault();
+        console.log('Form submitted'); // Debug log
+        
+        const formData = new FormData(this);
+        const submitButton = this.querySelector('button[type="submit"]');
+        
+        // Convert amount to proper number format
+        const amountInput = this.querySelector('input[name="amount"]');
+        const amountValue = parseFloat(amountInput.value);
+        if (isNaN(amountValue) || amountValue <= 0) {
+            showNotification('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+            return;
+        }
+        formData.set('amount', amountValue.toString());
+        
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
+        submitButton.disabled = true;
+        
+        // Set default price_per_kg to 0 since field is not in the form
+        formData.set('price_per_kg', '0');
+        // Set empty tracking_number since field is not in the form
+        formData.set('tracking_number', '');
+
+        fetch('/add_expense_general', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                this.reset();
+                loadGeneralShipmentsExpenses();
+                loadTotalExpenses(); // Update total expenses
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+        })
+        .finally(() => {
+            submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ مصروف عام';
+            submitButton.disabled = false;
+        });
+    }
+    
+    // Initialize form when page loads
+    initializeGeneralShipmentsForm();
+    
+    // Re-initialize when expenses tab is shown
+    document.addEventListener('shown.bs.tab', function (e) {
+        if (e.target.getAttribute('data-bs-target') === '#expenses') {
+            setTimeout(initializeGeneralShipmentsForm, 100);
+        }
+    });
     
 
     
@@ -1926,8 +1942,6 @@ function loadGeneralShipmentsExpenses() {
                 row.innerHTML = `
                     <td class="fw-bold">${expense.name}</td>
                     <td class="text-success fw-bold">${expense.amount.toFixed(3)} د.ك</td>
-                    <td class="text-info fw-bold">${(expense.price_per_kg || 0).toFixed(3)} د.ك/كغ</td>
-                    <td class="text-secondary">${expense.tracking_number || 'غير محدد'}</td>
                     <td>
                         <div class="btn-group-vertical btn-group-sm">
                             <button class="btn btn-sm btn-outline-primary mb-1" 
