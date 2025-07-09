@@ -462,16 +462,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="action_required" class="form-label">الإجراء المطلوب</label>
-                                <select class="form-select" id="action_required" name="action_required" onchange="updateProcedurePrice()">
-                                    <option value="">اختر نوع الإجراء</option>
-                                    {% for document_type in document_types %}
-                                    <option value="{{ document_type.name_ar }}" data-price="{{ document_type.price }}" {{ 'selected' if document_type.name_ar == shipment.package_contents else '' }}>{{ document_type.name_ar }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
                         </div>
 
                         <!-- Pricing Row -->
@@ -1012,11 +1002,7 @@
         calculateProfit();
     }
     
-    // Update procedure price (called when action required is changed)
-    function updateProcedurePrice() {
-        // This function can be extended if needed for additional procedure pricing
-        updateDocumentPrice();
-    }
+
     
     // Calculate remaining amount
     function calculateRemaining() {

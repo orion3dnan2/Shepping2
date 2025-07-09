@@ -144,6 +144,16 @@ The system is specifically configured for cPanel hosting with:
 
 ## Recent Changes
 
+✅ July 09, 2025: Document Shipment Edit Form Improvements and Migration Completion
+   • Removed "الإجراء المطلوب" (action required) field from document shipment edit form
+   • Cleaned up all references to action_required in both edit_shipment.html and add_shipment.html templates
+   • Fixed backend update_shipment route to preserve user's document type selection instead of overriding
+   • Removed hardcoded document type override logic that was changing user selections
+   • Updated JavaScript to remove updateProcedurePrice function and all action_required references
+   • Enhanced form validation to focus only on essential document shipment fields
+   • Completed migration from Replit Agent to Replit environment successfully
+   • All core functionality verified: login, dashboard, shipment creation, document tracking, financial reports
+
 ✅ July 08, 2025: Complete Migration from Replit Agent to Replit Environment
    • Successfully migrated shipping management system from Replit Agent to standard Replit environment
    • Created PostgreSQL database with proper environment variables (DATABASE_URL, PGPORT, PGUSER, etc.)

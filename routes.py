@@ -416,7 +416,6 @@ def add_shipment():
             package_type = request.form.get('package_type', 'general').strip()
             shipping_method = request.form.get('shipping_method', '').strip()
             package_contents = request.form.get('package_contents', '').strip()
-            action_required = request.form.get('action_required', '').strip()
             document_type = request.form.get('document_type', '').strip()
             zone = request.form.get('zone', '').strip()
             
@@ -3048,7 +3047,6 @@ def update_shipment(shipment_id):
         direction = request.form.get('direction', '').strip() or 'kuwait_to_sudan'
         package_type = request.form.get('package_type', '').strip() or 'general'
         package_contents = request.form.get('package_contents', '').strip()
-        action_required = request.form.get('action_required', '').strip()
         document_type = request.form.get('document_type', '').strip()
         zone = request.form.get('zone', '').strip()
         shipping_method = request.form.get('shipping_method', '').strip()
@@ -3110,18 +3108,15 @@ def update_shipment(shipment_id):
         except ValueError:
             profit = 0.0
         
-        # Handle simplified document shipments
+        # Handle document shipments - preserve user selections
         if package_type == 'document':
-            # Set default values for simplified document workflow
-            document_type = 'documents'  # Default document type
-            package_contents = 'مستندات عامة'  # Default content description
-            price = 30.0  # Fixed price for all documents (30 KD)
+            # Set defaults only for unused fields in document workflow
             weight = 0.0  # Documents don't have weight
-            zone = ''  # No zone for documents
-            has_packaging = False  # No packaging for documents
-            has_policy = False  # No policy for documents
-            has_comment = False  # No comment for documents
-            waybill_price = 0.0  # No waybill price for documents
+            if not zone:  # Only set empty if not provided
+                zone = ''
+            # Preserve user's document_type selection
+            # Preserve user's price selection
+            # Preserve user's other selections
         
         # Calculate remaining amount
         remaining_amount = price - paid_amount
