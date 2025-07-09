@@ -311,22 +311,26 @@ class Shipment(db.Model):
             else:
                 return 0.0
         else:
-            # For general shipments: Distribute total general expenses across all general shipments
+            # For general shipments: Use total general expenses for each shipment
+            # This means each general shipment is charged the full amount of general expenses
+            # Plus cost per kg calculation
             
             # Get total general expenses from both ExpenseGeneral and FinancialTransaction
             total_general_expenses = self.get_total_general_category_expenses()
             
-            # Get count of all general shipments (non-document)
-            total_general_shipments = Shipment.query.filter(
-                Shipment.package_type != 'document'
-            ).count()
+            # Get cost per kg setting from global settings
+            try:
+                cost_per_kg = float(GlobalSettings.get_setting('cost_per_kg', 0.0))
+            except:
+                cost_per_kg = 0.0
             
-            if total_general_shipments > 0:
-                # Distribute expenses equally among all general shipments
-                expense_per_shipment = total_general_expenses / total_general_shipments
-                return float(expense_per_shipment)
-            else:
-                return 0.0
+            # Calculate cost based on weight
+            weight_cost = cost_per_kg * float(self.weight) if self.weight else 0.0
+            
+            # Total category expenses = General expenses + Weight cost
+            total_category_expenses = total_general_expenses + weight_cost
+            
+            return float(total_category_expenses)
     
     def calculate_net_profit_for_report(self):
         """Calculate net profit for profit/loss reports with new calculation method"""
@@ -337,15 +341,15 @@ class Shipment(db.Model):
             net_profit = revenue - category_expenses
             return net_profit
         else:
-            # For general shipments: الربح = المبلغ المدفوع - الحصة من إجمالي المصروفات العامة
+            # For general shipments: الربح = إيراد الشحنة - (مجموع المصروفات العامة + تكلفة الكيلو)
             
-            # Revenue = Amount paid by customer
+            # Revenue = Amount paid by customer for this shipment
             revenue = float(self.paid_amount)
             
-            # Expenses = Share of total general expenses distributed across all general shipments
+            # Total expenses = Total general expenses + cost per kg × weight
             category_expenses = self.calculate_category_expenses_for_report()
             
-            # Net profit = Revenue - Category Expenses
+            # Net profit = Revenue - Total Expenses
             net_profit = revenue - category_expenses
             
             return net_profit

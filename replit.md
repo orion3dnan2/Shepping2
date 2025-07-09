@@ -227,6 +227,14 @@ The system is specifically configured for cPanel hosting with:
    • Combined totals now show in main profit/loss summary cards with proper color coding
    • Profit/loss reports now fully integrated between general shipments and document shipments
 
+✅ July 09, 2025: Updated General Shipments Profit Calculation Method
+   • Changed calculation method: each general shipment now uses full amount of general expenses
+   • Formula: Profit = Shipment Revenue - (Total General Expenses + Cost per KG × Weight)
+   • Example: Revenue 50 KD - Total Expenses 30 KD = Profit 20 KD
+   • Cost per KG setting from global settings is included in calculation
+   • Each general shipment is now charged the complete general expenses amount
+   • This ensures accurate individual shipment profitability analysis
+
 ✅ July 08, 2025: Complete Database Cleanup - Document Types and Expenses
    • Removed all hardcoded document expenses from HTML template
    • Cleared all document types from database (document_type table)
