@@ -1864,16 +1864,10 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الحفظ...';
         submitButton.disabled = true;
         
-        // Validate price_per_kg
-        const pricePerKgInput = this.querySelector('input[name="price_per_kg"]');
-        const pricePerKgValue = parseFloat(pricePerKgInput.value);
-        if (isNaN(pricePerKgValue) || pricePerKgValue <= 0) {
-            showNotification('يرجى إدخال سعر الكيلو صحيح أكبر من صفر', 'error');
-            submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ مصروف عام';
-            submitButton.disabled = false;
-            return;
-        }
-        formData.set('price_per_kg', pricePerKgValue.toString());
+        // Set default price_per_kg to 0 since field is not in the form
+        formData.set('price_per_kg', '0');
+        // Set empty tracking_number since field is not in the form
+        formData.set('tracking_number', '');
 
         fetch('/add_expense_general', {
             method: 'POST',
