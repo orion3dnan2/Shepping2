@@ -2158,6 +2158,11 @@ function loadProfitLossReport() {
     // Load both general and document reports
     loadGeneralShipmentsProfitReport(startDate, endDate);
     loadDocumentShipmentsProfitReport(startDate, endDate);
+    
+    // Update combined totals after both reports are loaded
+    setTimeout(() => {
+        updateCombinedProfitLossTotals();
+    }, 1000);
 }
 
 // Load General Shipments Profit/Loss Report
@@ -2228,6 +2233,9 @@ function loadGeneralShipmentsProfitReport(startDate, endDate) {
             
             // Show summary
             document.getElementById('generalSummary').style.display = 'block';
+            
+            // Update combined totals
+            updateCombinedProfitLossTotals();
         }
     })
     .catch(error => {
@@ -2311,6 +2319,9 @@ function loadDocumentShipmentsProfitReport(startDate, endDate) {
             
             // Show summary
             document.getElementById('documentSummary').style.display = 'block';
+            
+            // Update combined totals
+            updateCombinedProfitLossTotals();
         }
     })
     .catch(error => {
@@ -2337,6 +2348,67 @@ function getShippingMethodIcon(method) {
     if (method === 'جوي') return '<i class="fas fa-plane me-1"></i>';
     if (method === 'بري') return '<i class="fas fa-truck me-1"></i>';
     return '<i class="fas fa-box me-1"></i>';
+}
+
+// Update combined profit/loss totals from both reports
+function updateCombinedProfitLossTotals() {
+    try {
+        // Get totals from general shipments report
+        const generalRevenueText = document.getElementById('generalTotalRevenue').textContent;
+        const generalExpensesText = document.getElementById('generalTotalExpenses').textContent;
+        const generalNetProfitText = document.getElementById('generalNetProfit').textContent;
+        
+        // Get totals from document shipments report
+        const documentRevenueText = document.getElementById('documentTotalRevenue').textContent;
+        const documentExpensesText = document.getElementById('documentTotalExpenses').textContent;
+        const documentNetProfitText = document.getElementById('documentNetProfit').textContent;
+        
+        // Parse numeric values (removing "د.ك" suffix)
+        const generalRevenue = parseFloat(generalRevenueText.replace(' د.ك', '')) || 0;
+        const generalExpenses = parseFloat(generalExpensesText.replace(' د.ك', '')) || 0;
+        const generalNetProfit = parseFloat(generalNetProfitText.replace(' د.ك', '')) || 0;
+        
+        const documentRevenue = parseFloat(documentRevenueText.replace(' د.ك', '')) || 0;
+        const documentExpenses = parseFloat(documentExpensesText.replace(' د.ك', '')) || 0;
+        const documentNetProfit = parseFloat(documentNetProfitText.replace(' د.ك', '')) || 0;
+        
+        // Calculate combined totals
+        const combinedRevenue = generalRevenue + documentRevenue;
+        const combinedExpenses = generalExpenses + documentExpenses;
+        const combinedNetProfit = generalNetProfit + documentNetProfit;
+        const profitMargin = combinedRevenue > 0 ? ((combinedNetProfit / combinedRevenue) * 100) : 0;
+        
+        // Update the combined summary cards
+        document.getElementById('totalRevenueProfit').textContent = combinedRevenue.toFixed(3) + ' د.ك';
+        document.getElementById('totalExpensesProfit').textContent = combinedExpenses.toFixed(3) + ' د.ك';
+        document.getElementById('netProfitProfit').textContent = combinedNetProfit.toFixed(3) + ' د.ك';
+        document.getElementById('profitMarginProfit').textContent = profitMargin.toFixed(1) + '%';
+        
+        // Update colors based on profit/loss
+        const netProfitElement = document.getElementById('netProfitProfit');
+        const profitMarginElement = document.getElementById('profitMarginProfit');
+        
+        if (combinedNetProfit >= 0) {
+            netProfitElement.className = 'text-success';
+            profitMarginElement.className = 'text-success';
+        } else {
+            netProfitElement.className = 'text-danger';
+            profitMarginElement.className = 'text-danger';
+        }
+        
+        // Show the summary section
+        document.getElementById('profitLossSummary').style.display = 'block';
+        
+        console.log('Combined totals updated:', {
+            revenue: combinedRevenue,
+            expenses: combinedExpenses,
+            netProfit: combinedNetProfit,
+            profitMargin: profitMargin
+        });
+        
+    } catch (error) {
+        console.error('Error updating combined profit/loss totals:', error);
+    }
 }
 
 // Print functions

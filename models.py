@@ -311,17 +311,22 @@ class Shipment(db.Model):
             else:
                 return 0.0
         else:
-            # For general shipments: Calculate expense cost = سعر الكيلو الواحد للمصروف × وزن الشحنة
-            # Get expenses linked to this tracking number
-            linked_expenses = ExpenseGeneral.query.filter_by(tracking_number=self.tracking_number).all()
+            # For general shipments: Distribute total general expenses across all general shipments
             
-            total_expense_cost = 0.0
-            for expense in linked_expenses:
-                # Calculate: expense cost = price_per_kg × weight
-                expense_cost = float(expense.price_per_kg) * float(self.weight)
-                total_expense_cost += expense_cost
+            # Get total general expenses from both ExpenseGeneral and FinancialTransaction
+            total_general_expenses = self.get_total_general_category_expenses()
             
-            return total_expense_cost
+            # Get count of all general shipments (non-document)
+            total_general_shipments = Shipment.query.filter(
+                Shipment.package_type != 'document'
+            ).count()
+            
+            if total_general_shipments > 0:
+                # Distribute expenses equally among all general shipments
+                expense_per_shipment = total_general_expenses / total_general_shipments
+                return float(expense_per_shipment)
+            else:
+                return 0.0
     
     def calculate_net_profit_for_report(self):
         """Calculate net profit for profit/loss reports with new calculation method"""
@@ -332,17 +337,16 @@ class Shipment(db.Model):
             net_profit = revenue - category_expenses
             return net_profit
         else:
-            # For general shipments: الربح = (الوزن × سعر البيع للكيلو من العميل) - (الوزن × سعر الكيلو للمصروف لكل نوع مصروف)
+            # For general shipments: الربح = المبلغ المدفوع - الحصة من إجمالي المصروفات العامة
             
-            # Calculate customer revenue per kg
-            customer_price_per_kg = float(self.paid_amount) / float(self.weight) if self.weight > 0 else 0.0
-            customer_revenue = float(self.weight) * customer_price_per_kg
+            # Revenue = Amount paid by customer
+            revenue = float(self.paid_amount)
             
-            # Calculate total expense costs (already multiplied by weight in calculate_category_expenses_for_report)
-            total_expense_costs = self.calculate_category_expenses_for_report()
+            # Expenses = Share of total general expenses distributed across all general shipments
+            category_expenses = self.calculate_category_expenses_for_report()
             
-            # Net profit = Customer Revenue - Total Expense Costs
-            net_profit = customer_revenue - total_expense_costs
+            # Net profit = Revenue - Category Expenses
+            net_profit = revenue - category_expenses
             
             return net_profit
 

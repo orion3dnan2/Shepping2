@@ -219,6 +219,14 @@ The system is specifically configured for cPanel hosting with:
    • Added proper form initialization and event handling to prevent null reference errors
    • Improved error handling and debugging for form submission process
 
+✅ July 09, 2025: Connected General Shipments Profit/Loss Report with Main Reports
+   • Updated calculate_category_expenses_for_report() method to distribute total general expenses across all general shipments
+   • Modified calculate_net_profit_for_report() method to use paid amount minus distributed expenses
+   • General shipments expenses now properly linked to profit/loss calculations
+   • Added updateCombinedProfitLossTotals() function to combine general and document reports
+   • Combined totals now show in main profit/loss summary cards with proper color coding
+   • Profit/loss reports now fully integrated between general shipments and document shipments
+
 ✅ July 08, 2025: Complete Database Cleanup - Document Types and Expenses
    • Removed all hardcoded document expenses from HTML template
    • Cleared all document types from database (document_type table)
