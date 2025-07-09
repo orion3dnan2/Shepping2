@@ -226,6 +226,15 @@ The system is specifically configured for cPanel hosting with:
    • Simplified user interface shows only essential fields: name and amount
    • Streamlined expense editing process reduces user cognitive load
 
+✅ July 09, 2025: Fixed Profit/Loss Report Calculation Error
+   • Fixed critical error in financial center profit/loss calculations
+   • Updated JavaScript to properly sum individual shipment net profits instead of subtracting total expenses
+   • Corrected both general shipments and document shipments profit calculation logic
+   • Added totalNetProfit tracking to ensure accurate combined totals
+   • Fixed calculation method: Total Net Profit = Sum of (Revenue - Category Expenses) for each shipment
+   • Resolved issue where combined totals were incorrectly calculated as simple subtraction
+   • Verified correct calculations: Revenue 15.0 د.ك - Expenses 12.5 د.ك = Net Profit 2.5 د.ك
+
 ✅ July 09, 2025: Connected General Shipments Profit/Loss Report with Main Reports
    • Updated calculate_category_expenses_for_report() method to distribute total general expenses across all general shipments
    • Modified calculate_net_profit_for_report() method to use paid amount minus distributed expenses

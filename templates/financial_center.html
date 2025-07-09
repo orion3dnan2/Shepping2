@@ -2164,6 +2164,7 @@ function loadGeneralShipmentsProfitReport(startDate, endDate) {
             let tableHTML = '';
             let totalRevenue = 0;
             let totalExpenses = 0;
+            let totalNetProfit = 0;
             
             if (data.shipments && data.shipments.length > 0) {
                 data.shipments.forEach(shipment => {
@@ -2173,6 +2174,7 @@ function loadGeneralShipmentsProfitReport(startDate, endDate) {
                     
                     totalRevenue += revenue;
                     totalExpenses += expenses;
+                    totalNetProfit += netProfit;
                     
                     tableHTML += `
                         <tr>
@@ -2203,12 +2205,11 @@ function loadGeneralShipmentsProfitReport(startDate, endDate) {
             
             tableBody.innerHTML = tableHTML;
             
-            // Update summary
-            const netProfit = totalRevenue - totalExpenses;
+            // Update summary - use calculated net profit instead of simple subtraction
             document.getElementById('generalTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
             document.getElementById('generalTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
-            document.getElementById('generalNetProfit').textContent = netProfit.toFixed(3) + ' د.ك';
-            document.getElementById('generalNetProfit').className = `h6 ${netProfit >= 0 ? 'text-success' : 'text-danger'}`;
+            document.getElementById('generalNetProfit').textContent = totalNetProfit.toFixed(3) + ' د.ك';
+            document.getElementById('generalNetProfit').className = `h6 ${totalNetProfit >= 0 ? 'text-success' : 'text-danger'}`;
             
             // Show summary
             document.getElementById('generalSummary').style.display = 'block';
@@ -2250,6 +2251,7 @@ function loadDocumentShipmentsProfitReport(startDate, endDate) {
             let tableHTML = '';
             let totalRevenue = 0;
             let totalExpenses = 0;
+            let totalNetProfit = 0;
             
             if (data.shipments && data.shipments.length > 0) {
                 data.shipments.forEach(shipment => {
@@ -2259,6 +2261,7 @@ function loadDocumentShipmentsProfitReport(startDate, endDate) {
                     
                     totalRevenue += revenue;
                     totalExpenses += expenses;
+                    totalNetProfit += netProfit;
                     
                     tableHTML += `
                         <tr>
@@ -2289,12 +2292,11 @@ function loadDocumentShipmentsProfitReport(startDate, endDate) {
             
             tableBody.innerHTML = tableHTML;
             
-            // Update summary
-            const netProfit = totalRevenue - totalExpenses;
+            // Update summary - use calculated net profit instead of simple subtraction
             document.getElementById('documentTotalRevenue').textContent = totalRevenue.toFixed(3) + ' د.ك';
             document.getElementById('documentTotalExpenses').textContent = totalExpenses.toFixed(3) + ' د.ك';
-            document.getElementById('documentNetProfit').textContent = netProfit.toFixed(3) + ' د.ك';
-            document.getElementById('documentNetProfit').className = `h6 ${netProfit >= 0 ? 'text-success' : 'text-danger'}`;
+            document.getElementById('documentNetProfit').textContent = totalNetProfit.toFixed(3) + ' د.ك';
+            document.getElementById('documentNetProfit').className = `h6 ${totalNetProfit >= 0 ? 'text-success' : 'text-danger'}`;
             
             // Show summary
             document.getElementById('documentSummary').style.display = 'block';
