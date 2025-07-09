@@ -667,6 +667,57 @@
             </div>
         </div>
     </div>
+<!-- Edit General Expense Modal -->
+<div class="modal fade" id="editGeneralExpenseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تعديل المصروف العام</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editGeneralExpenseForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editGeneralExpenseId" name="id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">اسم المصروف</label>
+                        <input type="text" class="form-control" id="editGeneralExpenseName" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">المبلغ (د.ك)</label>
+                        <input type="text" class="form-control" id="editGeneralExpenseAmount" name="amount" 
+                               pattern="[0-9]+(\.[0-9]{1,3})?" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">سعر الكيلو الواحد (د.ك)</label>
+                        <input type="text" class="form-control" id="editGeneralExpensePricePerKg" name="price_per_kg" 
+                               pattern="[0-9]+(\.[0-9]{1,3})?" placeholder="0.000">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">رقم التتبع (اختياري)</label>
+                        <input type="text" class="form-control" id="editGeneralExpenseTrackingNumber" name="tracking_number" 
+                               placeholder="MS123456789">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">الملاحظات</label>
+                        <textarea class="form-control" id="editGeneralExpenseNotes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ التغييرات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 </div>
 {% endblock %}
 
@@ -1869,7 +1920,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Global function for loading general shipments expenses
 function loadGeneralShipmentsExpenses() {
-    fetch('/api/expenses_general_shipments')
+    fetch('/api/expenses_general')
     .then(response => response.json())
     .then(data => {
         const tableBody = document.querySelector('#generalShipmentsExpensesTable tbody');
@@ -1915,11 +1966,38 @@ function loadGeneralShipmentsExpenses() {
     });
 }
 
-// Global function for deleting general shipments expenses
-function deleteGeneralShipmentsExpense(expenseId) {
+// Global function for editing general expenses
+function editGeneralExpense(expenseId) {
+    fetch(`/get_expense_general/${expenseId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Populate modal with expense data
+            document.getElementById('editGeneralExpenseId').value = data.expense.id;
+            document.getElementById('editGeneralExpenseName').value = data.expense.name;
+            document.getElementById('editGeneralExpenseAmount').value = data.expense.amount;
+            document.getElementById('editGeneralExpensePricePerKg').value = data.expense.price_per_kg || 0;
+            document.getElementById('editGeneralExpenseTrackingNumber').value = data.expense.tracking_number || '';
+            document.getElementById('editGeneralExpenseNotes').value = data.expense.notes || '';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('editGeneralExpenseModal'));
+            modal.show();
+        } else {
+            showNotification('خطأ في تحميل بيانات المصروف', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('خطأ في الاتصال بالخادم', 'error');
+    });
+}
+
+// Global function for deleting general expenses
+function deleteGeneralExpense(expenseId) {
     if (confirm('هل أنت متأكد من حذف هذا المصروف؟')) {
-        fetch(`/delete_expense_general_shipments/${expenseId}`, {
-            method: 'DELETE'
+        fetch(`/delete_expense_general/${expenseId}`, {
+            method: 'POST'
         })
         .then(response => response.json())
         .then(data => {
@@ -1937,6 +2015,49 @@ function deleteGeneralShipmentsExpense(expenseId) {
         });
     }
 }
+
+// Edit expense form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const editForm = document.getElementById('editGeneralExpenseForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const expenseId = document.getElementById('editGeneralExpenseId').value;
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري التحديث...';
+            submitButton.disabled = true;
+            
+            fetch(`/edit_expense_general/${expenseId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editGeneralExpenseModal'));
+                    modal.hide();
+                    // Reload expenses
+                    loadGeneralShipmentsExpenses();
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('خطأ في الاتصال بالخادم', 'error');
+            })
+            .finally(() => {
+                submitButton.innerHTML = '<i class="fas fa-save me-2"></i>حفظ التغييرات';
+                submitButton.disabled = false;
+            });
+        });
+    }
+});
 
 // Load shipments for expense linking
 function loadShipmentsForLinking() {

@@ -195,7 +195,7 @@ class Shipment(db.Model):
             return 0.0
 
     def get_category_expenses(self):
-        """Get category-specific expenses for this shipment based on type"""
+        """Get category-specific expenses for this shipment based on new calculation method"""
         try:
             if self.package_type == 'document':
                 # For document shipments: get expense amount for specific document type
@@ -205,19 +205,31 @@ class Shipment(db.Model):
                         return float(expense_record.amount) if expense_record.amount else 0.0
                 return 0.0
             else:
-                # For general shipments: get total general shipments expenses
-                total_general_expenses = 0.0
+                # For general shipments: new calculation method
+                # الربح = (السعر الإجمالي للعميل) - ((تكلفة سعر الكيلو من الإعدادات × وزن الشحنة) + مجموع المصروفات المرتبطة بنفس رقم التتبع)
                 
-                # Get from FinancialTransaction table (general shipments expenses)
-                general_financial_expenses = FinancialTransaction.query.filter_by(
-                    transaction_type='expense',
-                    shipping_type='شحنات عامة'
-                ).all()
+                total_expenses = 0.0
                 
-                for expense in general_financial_expenses:
-                    total_general_expenses += float(expense.amount) if expense.amount else 0.0
+                # 1. Get cost per kg from settings
+                cost_per_kg = GlobalSettings.get_setting('cost_per_kg', 0.0)
                 
-                return total_general_expenses
+                # 2. Calculate weight-based cost
+                weight = float(self.weight) if self.weight else 0.0
+                weight_based_cost = cost_per_kg * weight
+                total_expenses += weight_based_cost
+                
+                # 3. Get expenses linked to this tracking number
+                tracking_expenses = ExpenseGeneral.query.filter_by(tracking_number=self.tracking_number).all()
+                for expense in tracking_expenses:
+                    if expense.price_per_kg and expense.price_per_kg > 0:
+                        # Use price_per_kg * weight for this expense
+                        expense_cost = float(expense.price_per_kg) * weight
+                    else:
+                        # Use fixed amount if no price_per_kg is set
+                        expense_cost = float(expense.amount) if expense.amount else 0.0
+                    total_expenses += expense_cost
+                
+                return total_expenses
                 
         except Exception as e:
             logging.error(f'Error calculating category expenses for shipment {self.id}: {str(e)}')

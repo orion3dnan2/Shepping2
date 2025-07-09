@@ -1532,6 +1532,7 @@ def settings():
     # Get additional pricing from GlobalSettings
     packaging_price = GlobalSettings.get_setting('packaging_price', 0.000)
     waybill_price = GlobalSettings.get_setting('waybill_price', 0.000)
+    cost_per_kg = GlobalSettings.get_setting('cost_per_kg', 0.000)
     
     return render_template('settings.html', 
                          shipment_types=shipment_types,
@@ -1539,6 +1540,7 @@ def settings():
                          price_per_kg=price_per_kg,
                          packaging_price=packaging_price,
                          waybill_price=waybill_price,
+                         cost_per_kg=cost_per_kg,
                          users=users,
                          total_pricing=total_pricing)
 
@@ -2318,6 +2320,39 @@ def update_air_shipping_costs():
     except Exception as e:
         logging.error(f'Error updating air shipping costs: {str(e)}')
         return jsonify({'success': False, 'message': 'حدث خطأ أثناء حفظ التكاليف'})
+
+
+@app.route('/update_cost_per_kg', methods=['POST'])
+@login_required
+@permission_required('settings')
+def update_cost_per_kg():
+    """Update cost per kg setting for profit calculation"""
+    try:
+        cost_per_kg_str = request.form.get('cost_per_kg', '').strip()
+        
+        if not cost_per_kg_str:
+            flash('يرجى إدخال تكلفة الكيلو', 'error')
+            return redirect(url_for('settings') + '#pricing')
+        
+        try:
+            cost_per_kg = float(cost_per_kg_str)
+            if cost_per_kg < 0:
+                flash('تكلفة الكيلو يجب أن تكون أكبر من أو تساوي صفر', 'error')
+                return redirect(url_for('settings') + '#pricing')
+        except ValueError:
+            flash('يرجى إدخال رقم صحيح لتكلفة الكيلو', 'error')
+            return redirect(url_for('settings') + '#pricing')
+        
+        # Update the setting
+        GlobalSettings.set_setting('cost_per_kg', cost_per_kg)
+        
+        flash(f'تم تحديث تكلفة الكيلو إلى {cost_per_kg:.3f} د.ك بنجاح', 'success')
+        return redirect(url_for('settings') + '#pricing')
+        
+    except Exception as e:
+        logging.error(f'Error updating cost per kg: {str(e)}')
+        flash('حدث خطأ أثناء تحديث تكلفة الكيلو', 'error')
+        return redirect(url_for('settings') + '#pricing')
 
 
 @app.route('/api/price_per_kg')
@@ -3407,9 +3442,6 @@ def add_expense_general():
         if not amount_str:
             return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
             
-        if not price_per_kg_str:
-            return jsonify({'success': False, 'message': 'يرجى إدخال سعر الكيلو الواحد للمصروف'})
-        
         try:
             amount = float(amount_str)
             if amount <= 0:
@@ -3418,9 +3450,9 @@ def add_expense_general():
             return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
             
         try:
-            price_per_kg = float(price_per_kg_str)
-            if price_per_kg <= 0:
-                return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون أكبر من صفر'})
+            price_per_kg = float(price_per_kg_str) if price_per_kg_str else 0.0
+            if price_per_kg < 0:
+                return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون أكبر من أو يساوي صفر'})
         except ValueError:
             return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون رقماً صحيحاً'})
         
@@ -3625,8 +3657,8 @@ def get_expenses_general():
                 'id': expense.id,
                 'name': expense.name,
                 'amount': float(expense.amount),
-                'price_per_kg': float(expense.price_per_kg) if hasattr(expense, 'price_per_kg') and expense.price_per_kg else 0.0,
-                'tracking_number': expense.tracking_number if hasattr(expense, 'tracking_number') else None,
+                'price_per_kg': float(expense.price_per_kg) if expense.price_per_kg else 0.0,
+                'tracking_number': expense.tracking_number if expense.tracking_number else None,
                 'notes': expense.notes,
                 'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else '',
                 'created_at': expense.created_at.strftime('%Y-%m-%d %H:%M') if expense.created_at else ''
@@ -3637,6 +3669,103 @@ def get_expenses_general():
     except Exception as e:
         logging.error(f'Error fetching general expenses: {str(e)}')
         return jsonify({'success': False, 'message': 'خطأ في تحميل المصروفات'})
+
+
+@app.route('/get_expense_general/<int:expense_id>')
+@login_required
+@permission_required('expenses')
+def get_expense_general(expense_id):
+    """Get a specific general expense for editing"""
+    try:
+        expense = ExpenseGeneral.query.get_or_404(expense_id)
+        
+        expense_data = {
+            'id': expense.id,
+            'name': expense.name,
+            'amount': float(expense.amount),
+            'price_per_kg': float(expense.price_per_kg) if expense.price_per_kg else 0.0,
+            'tracking_number': expense.tracking_number if expense.tracking_number else '',
+            'notes': expense.notes if expense.notes else '',
+            'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else ''
+        }
+        
+        return jsonify({'success': True, 'expense': expense_data})
+        
+    except Exception as e:
+        logging.error(f'Error fetching expense {expense_id}: {str(e)}')
+        return jsonify({'success': False, 'message': 'خطأ في تحميل بيانات المصروف'})
+
+
+@app.route('/edit_expense_general/<int:expense_id>', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def edit_expense_general(expense_id):
+    """Edit a general expense"""
+    try:
+        expense = ExpenseGeneral.query.get_or_404(expense_id)
+        
+        # Get form data
+        name = request.form.get('name', '').strip()
+        amount_str = request.form.get('amount', '').strip()
+        price_per_kg_str = request.form.get('price_per_kg', '0').strip()
+        tracking_number = request.form.get('tracking_number', '').strip()
+        notes = request.form.get('notes', '').strip()
+        
+        # Validate inputs
+        if not name:
+            return jsonify({'success': False, 'message': 'يرجى إدخال اسم المصروف'})
+        
+        if not amount_str:
+            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
+        
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
+        
+        try:
+            price_per_kg = float(price_per_kg_str) if price_per_kg_str else 0.0
+            if price_per_kg < 0:
+                return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون أكبر من أو يساوي صفر'})
+        except ValueError:
+            return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون رقماً صحيحاً'})
+        
+        # Update expense
+        expense.name = name
+        expense.amount = amount
+        expense.price_per_kg = price_per_kg
+        expense.tracking_number = tracking_number if tracking_number else None
+        expense.notes = notes if notes else None
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم تحديث المصروف بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error editing expense {expense_id}: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في تحديث المصروف'})
+
+
+@app.route('/delete_expense_general/<int:expense_id>', methods=['POST'])
+@login_required
+@permission_required('expenses')
+def delete_expense_general(expense_id):
+    """Delete a general expense"""
+    try:
+        expense = ExpenseGeneral.query.get_or_404(expense_id)
+        
+        db.session.delete(expense)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'تم حذف المصروف بنجاح'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error deleting expense {expense_id}: {str(e)}')
+        return jsonify({'success': False, 'message': 'حدث خطأ في حذف المصروف'})
 
 
 @app.route('/api/expenses_documents')
@@ -3767,22 +3896,7 @@ def update_document_type_expense():
         return jsonify({'success': False, 'message': f'حدث خطأ في تحديث المصروف: {str(e)}'})
 
 
-@app.route('/delete_expense_general/<int:expense_id>', methods=['POST'])
-@login_required
-@permission_required('expenses')
-def delete_expense_general(expense_id):
-    """Delete a general expense"""
-    try:
-        expense = ExpenseGeneral.query.get_or_404(expense_id)
-        db.session.delete(expense)
-        db.session.commit()
-        
-        return jsonify({'success': True, 'message': 'تم حذف المصروف بنجاح'})
-        
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f'Error deleting general expense: {str(e)}')
-        return jsonify({'success': False, 'message': 'حدث خطأ في حذف المصروف'})
+
 
 
 @app.route('/delete_expense_documents/<int:expense_id>', methods=['POST'])
@@ -3803,61 +3917,7 @@ def delete_expense_documents(expense_id):
         return jsonify({'success': False, 'message': 'حدث خطأ في حذف المصروف'})
 
 
-@app.route('/edit_expense_general/<int:expense_id>', methods=['POST'])
-@login_required
-@permission_required('expenses')
-def edit_expense_general(expense_id):
-    """Edit a general expense"""
-    try:
-        expense = ExpenseGeneral.query.get_or_404(expense_id)
-        
-        name = request.form.get('name', '').strip()
-        amount_str = request.form.get('amount', '').strip()
-        price_per_kg_str = request.form.get('price_per_kg', '').strip()
-        tracking_number = request.form.get('tracking_number', '').strip()
-        notes = request.form.get('notes', '').strip()
-        
-        # Validate inputs
-        if not name:
-            return jsonify({'success': False, 'message': 'يرجى إدخال اسم المصروف'})
-        
-        if not amount_str:
-            return jsonify({'success': False, 'message': 'يرجى إدخال المبلغ'})
-        
-        try:
-            amount = float(amount_str)
-            if amount <= 0:
-                return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون أكبر من صفر'})
-        except ValueError:
-            return jsonify({'success': False, 'message': 'المبلغ يجب أن يكون رقماً صحيحاً'})
-            
-        # Validate price_per_kg if provided
-        price_per_kg = 0.0
-        if price_per_kg_str:
-            try:
-                price_per_kg = float(price_per_kg_str)
-                if price_per_kg < 0:
-                    return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون أكبر من أو يساوي صفر'})
-            except ValueError:
-                return jsonify({'success': False, 'message': 'سعر الكيلو يجب أن يكون رقماً صحيحاً'})
-        
-        # Update expense
-        expense.name = name
-        expense.amount = amount
-        expense.notes = notes if notes else None
-        if hasattr(expense, 'price_per_kg'):
-            expense.price_per_kg = price_per_kg
-        if hasattr(expense, 'tracking_number'):
-            expense.tracking_number = tracking_number if tracking_number else None
-        
-        db.session.commit()
-        
-        return jsonify({'success': True, 'message': 'تم تحديث المصروف بنجاح'})
-        
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f'Error editing general expense: {str(e)}')
-        return jsonify({'success': False, 'message': 'حدث خطأ في تحديث المصروف'})
+
 
 
 @app.route('/edit_expense_documents/<int:expense_id>', methods=['POST'])
@@ -3907,30 +3967,7 @@ def edit_expense_documents(expense_id):
         return jsonify({'success': False, 'message': 'حدث خطأ في تحديث المصروف'})
 
 
-@app.route('/get_expense_general/<int:expense_id>')
-@login_required
-@permission_required('expenses')
-def get_expense_general(expense_id):
-    """Get general expense details for editing"""
-    try:
-        expense = ExpenseGeneral.query.get_or_404(expense_id)
-        
-        return jsonify({
-            'success': True,
-            'expense': {
-                'id': expense.id,
-                'name': expense.name,
-                'amount': float(expense.amount),
-                'price_per_kg': float(expense.price_per_kg) if hasattr(expense, 'price_per_kg') and expense.price_per_kg else 0.0,
-                'tracking_number': expense.tracking_number if hasattr(expense, 'tracking_number') else '',
-                'notes': expense.notes or '',
-                'expense_date': expense.expense_date.strftime('%Y-%m-%d') if expense.expense_date else ''
-            }
-        })
-        
-    except Exception as e:
-        logging.error(f'Error getting general expense: {str(e)}')
-        return jsonify({'success': False, 'message': 'حدث خطأ في تحميل بيانات المصروف'})
+
 
 
 @app.route('/get_expense_documents/<int:expense_id>')
