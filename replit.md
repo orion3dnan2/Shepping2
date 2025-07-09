@@ -235,6 +235,14 @@ The system is specifically configured for cPanel hosting with:
    • Each general shipment is now charged the complete general expenses amount
    • This ensures accurate individual shipment profitability analysis
 
+✅ July 09, 2025: Updated Main Profit/Loss Reports Page with New Calculation Method
+   • Updated templates/shipment_reports.html to display new calculation method
+   • Added informational alert explaining calculation formulas for both shipment types
+   • Updated API routes to use new calculation methods (calculate_category_expenses_for_report, calculate_net_profit_for_report)
+   • Enhanced shipment details modal to show new calculation breakdown
+   • Reports now clearly show: Revenue (paid amount) - Category Expenses = Net Profit
+   • Added explanatory text for both general shipments and documents calculation methods
+
 ✅ July 08, 2025: Complete Database Cleanup - Document Types and Expenses
    • Removed all hardcoded document expenses from HTML template
    • Cleared all document types from database (document_type table)

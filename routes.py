@@ -4259,18 +4259,15 @@ def api_shipment_reports():
         for shipment in shipments:
             try:
                 # Calculate profit and expenses using the new methods
-                profit_data = shipment.calculate_net_profit_with_category_expenses()
+                revenue = float(shipment.paid_amount) if shipment.paid_amount else 0.0
+                category_expenses = shipment.calculate_category_expenses_for_report()
+                net_profit = shipment.calculate_net_profit_for_report()
                 
-                # Ensure profit_data is a dictionary
-                if not isinstance(profit_data, dict):
-                    logging.error(f'profit_data is not a dictionary for shipment {shipment.id}: {type(profit_data)}')
-                    profit_data = {
-                        'revenue': float(shipment.paid_amount) if shipment.paid_amount else 0.0,
-                        'category_expenses': 0.0,
-                        'net_profit': float(shipment.paid_amount) if shipment.paid_amount else 0.0
-                    }
-                
-                category_expenses = shipment.get_category_expenses()
+                profit_data = {
+                    'revenue': revenue,
+                    'category_expenses': category_expenses,
+                    'net_profit': net_profit
+                }
                 
                 # Update shipment's linked_expenses field with category expenses
                 shipment.linked_expenses = category_expenses
@@ -4373,9 +4370,10 @@ def api_shipment_details(shipment_id):
             'receiver_name': shipment.receiver_name,
             'package_type': shipment.package_type,
             'price': float(shipment.price),
+            'paid_amount': float(shipment.paid_amount) if shipment.paid_amount else 0.0,
             'direct_expenses': shipment.calculate_total_expenses(),
-            'category_expenses': shipment.calculate_linked_document_expenses() if shipment.package_type == 'document' else shipment.calculate_category_distributed_expenses(),
-            'net_profit': shipment.calculate_net_profit_with_category_expenses(),
+            'category_expenses': shipment.calculate_category_expenses_for_report(),
+            'net_profit': shipment.calculate_net_profit_for_report(),
             'created_at': shipment.created_at.strftime('%Y-%m-%d %H:%M'),
             'expenses': expenses
         }

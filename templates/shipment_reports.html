@@ -36,6 +36,36 @@
                         </div>
                     </div>
 
+                    <!-- Calculation Method Info -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info border-0 shadow-sm">
+                                <div class="row align-items-center">
+                                    <div class="col-md-1 text-center">
+                                        <i class="fas fa-calculator fa-2x text-primary"></i>
+                                    </div>
+                                    <div class="col-md-11">
+                                        <h6 class="mb-2 fw-bold">طريقة حساب الربح والخسارة:</h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong>للشحنات العامة:</strong>
+                                                <br>الربح = الإيراد - (مجموع المصروفات العامة + تكلفة الكيلو × الوزن)
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>للمستندات:</strong>
+                                                <br>الربح = الإيراد - مصروف نوع المستند
+                                            </div>
+                                        </div>
+                                        <small class="text-muted mt-1">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            كل شحنة عامة تُحمل بمجموع المصروفات العامة الكاملة لضمان دقة تحليل الربحية
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Summary Cards -->
                     <div class="row mb-4" id="summaryCards">
                         <div class="col-md-3 mb-3">
@@ -328,11 +358,18 @@ function generateShipmentDetailsHTML(shipment) {
             <div class="col-md-6">
                 <h6 class="fw-bold mb-3">الحساب المالي</h6>
                 <table class="table table-borderless table-sm">
-                    <tr><td class="fw-bold">سعر الشحنة:</td><td class="text-primary">${shipment.price.toFixed(3)} د.ك</td></tr>
-                    <tr><td class="fw-bold">مصروفات الفئة (موزعة):</td><td class="text-warning">${shipment.category_expenses ? shipment.category_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
-                    <tr><td class="fw-bold">مصروفات مباشرة:</td><td class="text-danger">${shipment.direct_expenses ? shipment.direct_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
+                    <tr><td class="fw-bold">الإيراد (المبلغ المدفوع):</td><td class="text-primary">${shipment.paid_amount.toFixed(3)} د.ك</td></tr>
+                    <tr><td class="fw-bold">مصروفات الفئة:</td><td class="text-warning">${shipment.category_expenses ? shipment.category_expenses.toFixed(3) : '0.000'} د.ك</td></tr>
                     <tr><td class="fw-bold">صافي الربح:</td><td class="fw-bold ${shipment.net_profit > 0 ? 'text-success' : shipment.net_profit < 0 ? 'text-danger' : 'text-warning'}">${shipment.net_profit.toFixed(3)} د.ك</td></tr>
                 </table>
+                <div class="alert alert-light border-0 mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        ${shipment.package_type === 'document' ? 
+                            'للمستندات: الربح = الإيراد - مصروف نوع المستند' : 
+                            'للشحنات العامة: الربح = الإيراد - (مجموع المصروفات العامة + تكلفة الكيلو × الوزن)'}
+                    </small>
+                </div>
             </div>
         </div>
         
