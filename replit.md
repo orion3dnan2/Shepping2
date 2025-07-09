@@ -219,6 +219,13 @@ The system is specifically configured for cPanel hosting with:
    • Added proper form initialization and event handling to prevent null reference errors
    • Improved error handling and debugging for form submission process
 
+✅ July 09, 2025: Complete General Expenses Edit Form Simplification
+   • Removed price per kg, tracking number, and notes fields from general expense edit modal
+   • Updated JavaScript to only populate name and amount fields when editing
+   • Modified backend edit route to use default values for removed fields
+   • Simplified user interface shows only essential fields: name and amount
+   • Streamlined expense editing process reduces user cognitive load
+
 ✅ July 09, 2025: Connected General Shipments Profit/Loss Report with Main Reports
    • Updated calculate_category_expenses_for_report() method to distribute total general expenses across all general shipments
    • Modified calculate_net_profit_for_report() method to use paid amount minus distributed expenses

@@ -3709,7 +3709,7 @@ def edit_expense_general(expense_id):
         amount_str = request.form.get('amount', '').strip()
         price_per_kg_str = '0'  # Default value
         tracking_number = ''  # Default empty
-        notes = request.form.get('notes', '').strip()
+        notes = ''  # Default empty
         
         # Validate inputs
         if not name:
